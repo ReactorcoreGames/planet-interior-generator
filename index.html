@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Celestial Cutaway — Interior Cross-Section Generator</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header id="app-header">
+    <h1>Celestial Cutaway</h1>
+    <p class="tagline">stylized interior cross-sections of worlds &amp; stars</p>
+  </header>
+
+  <main id="app-main">
+    <section id="preview-pane">
+      <canvas id="preview-canvas" width="1280" height="720"></canvas>
+      <div id="preview-caption">live preview — 16:9 composition (illustration + lore panel)</div>
+    </section>
+
+    <aside id="settings-panel">
+      <h2>Settings</h2>
+
+      <div class="control-row">
+        <label for="body-type">Body type</label>
+        <div class="control-input">
+          <select id="body-type">
+            <option value="rocky">Rocky / Terrestrial</option>
+            <option value="gas">Gas Giant</option>
+            <option value="youngstar">Young Star</option>
+            <option value="oldstar">Old Star (Red Giant)</option>
+          </select>
+          <label class="lock"><input type="checkbox" id="lock-body-type" title="Lock body type against Randomize">🔒</label>
+        </div>
+      </div>
+
+      <div class="control-row">
+        <label for="seed">Seed</label>
+        <div class="control-input">
+          <input type="text" id="seed" value="ember-1" spellcheck="false">
+          <label class="lock"><input type="checkbox" id="lock-seed" title="Lock seed against Randomize">🔒</label>
+        </div>
+      </div>
+
+      <div class="control-row">
+        <label for="palette">Palette</label>
+        <div class="control-input">
+          <select id="palette"></select>
+          <label class="lock"><input type="checkbox" id="lock-palette" title="Lock palette against Randomize">🔒</label>
+        </div>
+      </div>
+
+      <div class="control-row">
+        <label for="wobble">Boundary wobble <span class="val" id="wobble-val"></span></label>
+        <div class="control-input">
+          <input type="range" id="wobble" min="0" max="100" value="50">
+          <label class="lock"><input type="checkbox" id="lock-wobble" title="Lock wobble against Randomize">🔒</label>
+        </div>
+      </div>
+
+      <div class="control-row">
+        <label for="detail">Layer richness <span class="val" id="detail-val"></span></label>
+        <div class="control-input">
+          <input type="range" id="detail" min="0" max="100" value="50">
+          <label class="lock"><input type="checkbox" id="lock-detail" title="Lock layer richness against Randomize">🔒</label>
+        </div>
+      </div>
+
+      <div class="control-row">
+        <label for="body-name">Name</label>
+        <div class="control-input">
+          <input type="text" id="body-name" value="" spellcheck="false" placeholder="(auto from seed)">
+          <label class="lock"><input type="checkbox" id="lock-name" title="Lock name against Randomize">🔒</label>
+        </div>
+      </div>
+
+      <div class="control-row">
+        <label for="resolution">Resolution (vertical px)</label>
+        <div class="control-input">
+          <input type="number" id="resolution" min="240" max="2160" step="10" value="720">
+        </div>
+      </div>
+
+      <button id="randomize-btn" class="big-btn">🎲 Randomize (unlocked only)</button>
+
+      <h2>Export</h2>
+      <button id="export-169-btn" class="big-btn">Export 16:9 — cutaway + lore panel (PNG)</button>
+      <button id="export-11-btn" class="big-btn">Export 1:1 — body only, transparent (PNG)</button>
+    </aside>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

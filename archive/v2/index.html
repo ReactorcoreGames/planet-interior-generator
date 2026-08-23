@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Celestial Cutaway — Interior Cross-Section Generator</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header id="app-header">
+    <h1>Celestial Cutaway</h1>
+    <p class="tagline">stylized interior cross-sections of worlds &amp; stars</p>
+  </header>
+
+  <main id="app-main">
+    <section id="preview-pane">
+      <canvas id="preview-canvas" width="1280" height="720"></canvas>
+      <div id="preview-caption">live preview</div>
+    </section>
+
+    <aside id="settings-panel">
+
+      <h2>World</h2>
+
+      <div class="control-row" title="What kind of object to generate. Each type has its own interior structure, palette set, and feature pool.">
+        <label for="body-type">Body type <span class="help" title="Rocky worlds have metal cores and solid crusts. Gas giants are banded and coreless at the surface. Young stars burn steadily; old stars are bloated with a tiny dense core.">?</span></label>
+        <div class="control-input">
+          <select id="body-type"></select>
+          <label class="lock" title="Keep this setting when you press Randomize"><input type="checkbox" id="lock-body-type">🔒</label>
+        </div>
+      </div>
+
+      <div class="control-row" title="Any text works. The same seed always produces the same world, so you can save a seed and come back to it.">
+        <label for="seed">Seed <span class="help" title="The seed drives everything structural: layer sizes, features, name, and stats. Type anything — a word, a date, a phrase.">?</span></label>
+        <div class="control-input">
+          <input type="text" id="seed" value="ember-1" spellcheck="false">
+          <label class="lock" title="Keep this seed when you press Randomize"><input type="checkbox" id="lock-seed">🔒</label>
+        </div>
+      </div>
+
+      <div class="control-row" title="The color scheme for this body type.">
+        <label for="palette">Palette <span class="help" title="Each body type has its own hand-tuned palettes. Use the Hue shift slider below to push any palette somewhere new.">?</span></label>
+        <div class="control-input">
+          <select id="palette"></select>
+          <label class="lock" title="Keep this palette when you press Randomize"><input type="checkbox" id="lock-palette">🔒</label>
+        </div>
+      </div>
+
+      <div class="control-row" title="How many distinct interior layers the body has.">
+        <label for="detail">Layer richness <span class="val" id="detail-val"></span> <span class="help" title="Low values give a simple 3–4 layer cutaway. High values add transition zones and more internal texture. Also slightly increases the body's computed size.">?</span></label>
+        <div class="control-input">
+          <input type="range" id="detail" min="0" max="100" value="50">
+          <label class="lock" title="Keep this value when you press Randomize"><input type="checkbox" id="lock-detail">🔒</label>
+        </div>
+      </div>
+
+      <div class="control-row" title="Auto-generated from the seed unless you type something here.">
+        <label for="body-name">Name <span class="help" title="Leave blank to use the generated name shown as placeholder text. Generated names sometimes include a Greek letter or a catalog designation.">?</span></label>
+        <div class="control-input">
+          <input type="text" id="body-name" value="" spellcheck="false" placeholder="(auto from seed)">
+          <label class="lock" title="Keep this name when you press Randomize"><input type="checkbox" id="lock-name">🔒</label>
+        </div>
+      </div>
+
+      <h2>Look</h2>
+
+      <div class="control-row" title="Switches the whole rendering approach without changing the world itself.">
+        <label for="art-style">Art style <span class="help" title="Artistic is the original illustrated look. Semi-technical tames the boundaries and thins the texture. Vector draws perfect circles with flat gradients — the easiest to recolor or filter afterward.">?</span></label>
+        <div class="control-input">
+          <select id="art-style"></select>
+          <label class="lock" title="Keep this style when you press Randomize"><input type="checkbox" id="lock-style">🔒</label>
+        </div>
+        <p class="hint" id="style-hint"></p>
+      </div>
+
+      <div class="control-row" title="How irregular the boundaries between layers are.">
+        <label for="wobble">Boundary wobble <span class="val" id="wobble-val"></span> <span class="help" title="0 gives near-circular boundaries; high values give organic, hand-drawn irregularity. Has no effect in Vector style, which always draws true circles.">?</span></label>
+        <div class="control-input">
+          <input type="range" id="wobble" min="0" max="100" value="50">
+          <label class="lock" title="Keep this value when you press Randomize"><input type="checkbox" id="lock-wobble">🔒</label>
+        </div>
+      </div>
+
+      <div class="control-row" title="Rotates every color in the palette around the color wheel.">
+        <label for="hue-shift">Hue shift <span class="val" id="hue-val"></span> <span class="help" title="Rotates all palette hues by this many degrees. Near-greyscale colors are left alone so the background and highlights stay neutral. A quick way to get a unique look from a familiar palette.">?</span></label>
+        <div class="control-input">
+          <input type="range" id="hue-shift" min="-180" max="180" value="0">
+          <label class="lock" title="Keep this hue shift when you press Randomize"><input type="checkbox" id="lock-hue">🔒</label>
+        </div>
+      </div>
+
+      <div class="control-row" title="Scales color intensity across the palette.">
+        <label for="saturation">Saturation <span class="val" id="sat-val"></span> <span class="help" title="Below 100% desaturates toward grey — useful for a muted technical drawing. Above 100% pushes colors toward vivid.">?</span></label>
+        <div class="control-input">
+          <input type="range" id="saturation" min="0" max="200" value="100">
+        </div>
+      </div>
+
+      <h2>Schematic overlay</h2>
+
+      <div class="control-row" title="Adds leader lines, labels, and data callouts over the illustration.">
+        <label class="inline-check" title="When on, the survey panel is replaced by callouts arranged around a centered, full-bleed body.">
+          <input type="checkbox" id="overlay-toggle">
+          <span>Hologram overlay <span class="help" title="Turns the image into a technical schematic: labelled leader lines to each layer and feature, stat nuggets under each label, a legend, and a scale bar. Replaces the side panel.">?</span></span>
+        </label>
+      </div>
+
+      <div id="overlay-suboptions">
+        <div class="control-row" title="Which things get a callout line.">
+          <label class="inline-check" title="Label each interior layer with its name and description."><input type="checkbox" id="overlay-layers" checked><span>Label layers</span></label>
+          <label class="inline-check" title="Label notable features — storms, rifts, anomalies."><input type="checkbox" id="overlay-features" checked><span>Label features</span></label>
+          <label class="inline-check" title="Distribute mass, gravity, diameter, temperature and pressure under the layer labels instead of listing them separately."><input type="checkbox" id="overlay-stats" checked><span>Show stat nuggets</span></label>
+        </div>
+
+        <div class="control-row" title="The color of the overlay lines and text.">
+          <label for="ink-color">Overlay ink <span class="help" title="Auto picks a bright contrasting tone from the body's own palette so the image reads as one designed piece. The named colors give you a classic fixed HUD look instead.">?</span></label>
+          <div class="control-input">
+            <select id="ink-color"></select>
+          </div>
+        </div>
+      </div>
+
+      <h2>Background</h2>
+
+      <div class="control-row" title="Background for the 16:9 export and the preview.">
+        <label for="bg-mode">16:9 background <span class="help" title="Starfield uses the palette's own space color with scattered stars. Solid uses the color picker below. Transparent leaves the background empty — note that glow effects are drawn more conservatively over transparency so they don't turn into flat discs.">?</span></label>
+        <div class="control-input">
+          <select id="bg-mode">
+            <option value="starfield">Starfield (from palette)</option>
+            <option value="solid">Solid color</option>
+            <option value="transparent">Transparent</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="control-row" title="Background for the square body-only export.">
+        <label for="bg-mode-11">1:1 background <span class="help" title="The square export is meant for compositing elsewhere, so it defaults to transparent.">?</span></label>
+        <div class="control-input">
+          <select id="bg-mode-11">
+            <option value="transparent">Transparent</option>
+            <option value="solid">Solid color</option>
+            <option value="starfield">Starfield (from palette)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="control-row" title="Used by both exports when their background mode is set to Solid color.">
+        <label for="bg-color">Solid color <span class="help" title="Only active while one of the background modes above is set to Solid color.">?</span></label>
+        <div class="control-input">
+          <input type="color" id="bg-color" value="#0a0c14">
+        </div>
+      </div>
+
+      <h2>Output</h2>
+
+      <div class="control-row" title="Vertical pixel height of the exported image. The 16:9 export is this tall and 16/9 as wide.">
+        <label for="resolution">Resolution (vertical px) <span class="help" title="720 is a good working size. 2160 gives a 3840×2160 16:9 export — slower to render but print-usable.">?</span></label>
+        <div class="control-input">
+          <input type="number" id="resolution" min="240" max="2160" step="10" value="720">
+        </div>
+      </div>
+
+      <button id="randomize-btn" class="big-btn" title="Re-roll every setting that isn't locked with a 🔒">🎲 Randomize (unlocked only)</button>
+
+      <button id="export-169-btn" class="big-btn" title="Save the 16:9 image exactly as previewed above">Export 16:9 (PNG)</button>
+      <button id="export-11-btn" class="big-btn" title="Save just the body as a square PNG, using the 1:1 background setting">Export 1:1 — body only (PNG)</button>
+
+      <p class="branding">Made by Reactorcore — <a href="https://linktr.ee/reactorcore">linktr.ee/reactorcore</a></p>
+    </aside>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

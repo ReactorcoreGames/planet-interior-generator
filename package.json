@@ -1,0 +1,23 @@
+{
+  "name": "celestial-cutaway",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Offline generator for stylized interior cross-sections of celestial bodies.",
+  "type": "module",
+  "scripts": {
+    "test": "node test/doccheck.mjs && node test/domtest.mjs",
+    "test:docs": "node test/doccheck.mjs",
+    "test:dom": "node test/domtest.mjs",
+    "test:lib": "node test/libcheck.mjs",
+    "shots": "node test/shots.mjs",
+    "sheet": "node test/sheet.mjs",
+    "film": "node test/film.mjs",
+    "zones": "node test/zones.mjs",
+    "climate": "node test/climate.mjs",
+    "framing": "node test/framing.mjs"
+  },
+  "devDependencies": {
+    "@napi-rs/canvas": "^0.1.60",
+    "jsdom": "^26.0.0"
+  }
+}

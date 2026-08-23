@@ -1,94 +1,553 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Celestial Cutaway — Interior Cross-Section Generator</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Celestial Cutaway</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header id="app-header">
-    <h1>Celestial Cutaway</h1>
-    <p class="tagline">stylized interior cross-sections of worlds &amp; stars</p>
-  </header>
 
-  <main id="app-main">
-    <section id="preview-pane">
-      <canvas id="preview-canvas" width="1280" height="720"></canvas>
-      <div id="preview-caption">live preview — 16:9 composition (illustration + lore panel)</div>
-    </section>
+<div id="app">
 
-    <aside id="settings-panel">
-      <h2>Settings</h2>
+  <!-- ============ PREVIEW ============ -->
+  <main id="preview">
+    <canvas id="stage"></canvas>
 
-      <div class="control-row">
-        <label for="body-type">Body type</label>
-        <div class="control-input">
-          <select id="body-type">
-            <option value="rocky">Rocky / Terrestrial</option>
-            <option value="gas">Gas Giant</option>
-            <option value="youngstar">Young Star</option>
-            <option value="oldstar">Old Star (Red Giant)</option>
-          </select>
-          <label class="lock"><input type="checkbox" id="lock-body-type" title="Lock body type against Randomize">🔒</label>
-        </div>
-      </div>
+    <!-- THE INFO CARD. It floats over the preview rather than taking a third
+         grid column, because the render is the thing and the card annotates
+         it. Every line is read off the same values that drew the picture — see
+         js/gen/stats.js. Toggled by the Labels & Info section, and by `I`. -->
+    <aside id="info-panel" aria-label="Body information"></aside>
 
-      <div class="control-row">
-        <label for="seed">Seed</label>
-        <div class="control-input">
-          <input type="text" id="seed" value="ember-1" spellcheck="false">
-          <label class="lock"><input type="checkbox" id="lock-seed" title="Lock seed against Randomize">🔒</label>
-        </div>
-      </div>
+    <div id="preview-meta">
+      <span id="meta-name">—</span>
+      <span id="meta-detail"></span>
+    </div>
 
-      <div class="control-row">
-        <label for="palette">Palette</label>
-        <div class="control-input">
-          <select id="palette"></select>
-          <label class="lock"><input type="checkbox" id="lock-palette" title="Lock palette against Randomize">🔒</label>
-        </div>
-      </div>
-
-      <div class="control-row">
-        <label for="wobble">Boundary wobble <span class="val" id="wobble-val"></span></label>
-        <div class="control-input">
-          <input type="range" id="wobble" min="0" max="100" value="50">
-          <label class="lock"><input type="checkbox" id="lock-wobble" title="Lock wobble against Randomize">🔒</label>
-        </div>
-      </div>
-
-      <div class="control-row">
-        <label for="detail">Layer richness <span class="val" id="detail-val"></span></label>
-        <div class="control-input">
-          <input type="range" id="detail" min="0" max="100" value="50">
-          <label class="lock"><input type="checkbox" id="lock-detail" title="Lock layer richness against Randomize">🔒</label>
-        </div>
-      </div>
-
-      <div class="control-row">
-        <label for="body-name">Name</label>
-        <div class="control-input">
-          <input type="text" id="body-name" value="" spellcheck="false" placeholder="(auto from seed)">
-          <label class="lock"><input type="checkbox" id="lock-name" title="Lock name against Randomize">🔒</label>
-        </div>
-      </div>
-
-      <div class="control-row">
-        <label for="resolution">Resolution (vertical px)</label>
-        <div class="control-input">
-          <input type="number" id="resolution" min="240" max="2160" step="10" value="720">
-        </div>
-      </div>
-
-      <button id="randomize-btn" class="big-btn">🎲 Randomize (unlocked only)</button>
-
-      <h2>Export</h2>
-      <button id="export-169-btn" class="big-btn">Export 16:9 — cutaway + lore panel (PNG)</button>
-      <button id="export-11-btn" class="big-btn">Export 1:1 — body only, transparent (PNG)</button>
-    </aside>
+    <!-- EXPORT CONFIRMATION. Every export is invisible from inside the page —
+         a file lands in the downloads folder, a clipboard changes silently —
+         so each one says what it did here, over the render where the user is
+         actually looking. See js/ui/exportui.js. -->
+    <div id="export-toast" class="toast" hidden></div>
   </main>
 
-  <script src="script.js"></script>
+  <!-- ============ SETTINGS PANEL ============ -->
+  <aside id="panel">
+
+    <!-- Pinned. These never scroll away; that was a v2 failure. -->
+    <div id="panel-pinned">
+      <button id="randomize-btn" class="big-btn primary"
+              title="Roll a new body. Locked controls are left alone. (Space)">
+        <span class="btn-icon">&#127922;</span> Randomize
+      </button>
+      <div class="export-wrap">
+        <button id="export-btn" class="big-btn"
+                title="Save the current render as a PNG. (Ctrl+S)">
+          <span class="btn-icon">&#128190;</span> Export <span class="caret">&#9662;</span>
+        </button>
+        <div id="export-menu" class="menu" hidden>
+          <button data-export="current">Export PNG &middot; current settings</button>
+          <button data-export="composed">Export PNG &middot; body + info card</button>
+          <button data-export="card">Export PNG &middot; info card only</button>
+          <button data-export="square">Export PNG &middot; 1:1, body only</button>
+          <div class="menu-sep"></div>
+          <button data-export="factsheet">Save factsheet &middot; Markdown</button>
+          <button data-export="clipboard">Copy current-settings PNG to clipboard</button>
+          <button data-export="settings">Copy seed + settings as text</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accordion. Multi-open; each section scrolls inside itself. -->
+    <div id="panel-scroll">
+
+      <!-- ---------- BODY ---------- -->
+      <section class="section open" data-section="body">
+        <h2 class="section-head"><span class="chev">&#9656;</span> Body</h2>
+        <div class="section-body">
+
+          <div class="control-row" title="The kind of body being generated. Each archetype has its own layer stack.">
+            <label for="archetype">Archetype</label>
+            <select id="archetype">
+              <optgroup label="Solid">
+                <option value="planet">Planet</option>
+              </optgroup>
+            </select>
+            <label class="lock" title="Lock: Randomize will not change the archetype.">
+              <input type="checkbox" id="lock-archetype"><span class="lock-icon">&#128274;</span>
+            </label>
+          </div>
+
+          <div class="control-row" title="Any text. The same seed with the same settings always produces the same image.">
+            <label for="seed">Seed</label>
+            <input type="text" id="seed" value="first-light" spellcheck="false">
+            <button id="seed-roll" class="mini-btn" title="Roll a new random seed.">&#127922;</button>
+            <label class="lock" title="Lock: Randomize will keep this seed.">
+              <input type="checkbox" id="lock-seed"><span class="lock-icon">&#128274;</span>
+            </label>
+          </div>
+
+          <!-- THE PRESET GALLERY. Built from js/data/presets.js at runtime, so
+               adding a preset stays one data edit. Applying one respects locks,
+               leaves the seed alone (so presets are comparable on one body) and
+               stores no active-preset state — see js/ui/presets.js. -->
+          <div class="control-row stacked" title="Named starting configurations. Applying one sets several controls at once; the seed is left alone, locked controls are not overwritten, and everything stays editable afterwards.">
+            <label>Presets</label>
+            <div class="preset-gallery" id="preset-gallery"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- STRUCTURE ---------- -->
+      <section class="section open" data-section="structure">
+        <h2 class="section-head"><span class="chev">&#9656;</span> Structure</h2>
+        <div class="section-body">
+
+          <div class="control-row" title="How much each layer's thickness varies from its mid-range value. 0% makes every body the same proportions.">
+            <label for="thickness-variation">Layer thickness variation</label>
+            <input type="range" id="thickness-variation" min="0" max="100" value="70">
+            <output data-readout="thickness-variation"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-thickness-variation"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="Chance that optional layers, such as the atmosphere, are present at all.">
+            <label for="optional-layers">Optional layers</label>
+            <input type="range" id="optional-layers" min="0" max="100" value="75">
+            <output data-readout="optional-layers"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-optional-layers"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="Push the core smaller or larger within its range. A bigger core means higher gravity.">
+            <label for="core-bias">Core size bias</label>
+            <input type="range" id="core-bias" min="-100" max="100" value="0">
+            <output data-readout="core-bias"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-core-bias"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="0% is a desert or airless world with no ocean at all. High values drown the crust in a global sea.">
+            <label for="ocean-depth">Ocean depth</label>
+            <input type="range" id="ocean-depth" min="0" max="100" value="40">
+            <output data-readout="ocean-depth"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-ocean-depth"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <!-- STARLIGHT SITS ABOVE TIDAL LOCKING because it is the more
+               fundamental of the two: locking redistributes heat around a
+               body, but Starlight decides how much there is to redistribute.
+               It is what makes cold regions conditional, so a Venus gets no
+               polar caps by arithmetic rather than by a rule. -->
+          <div class="control-row" title="How much light and heat reaches this world. 100% is seared like Mercury or Venus; around half is temperate like Earth; low values are a frozen outer-system world. 0% means there is no star at all - a rogue planet drifting unlit, warmed only by its own interior heat.">
+            <label for="starlight">Starlight</label>
+            <input type="range" id="starlight" min="0" max="100" value="55">
+            <output data-readout="starlight"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-starlight"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="The spectral character of the star's light. A red dwarf gives dim, ruddy light and delivers less energy per unit of Starlight; a blue giant is harsh and bright and delivers more. It tints the whole body, not only the sky.">
+            <label for="star-colour">Star colour</label>
+            <select id="star-colour">
+              <option value="red-dwarf">Red dwarf</option>
+              <option value="orange">Orange dwarf</option>
+              <option value="sunlike" selected>Sunlike</option>
+              <option value="white">White</option>
+              <option value="blue-giant">Blue giant</option>
+            </select>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-star-colour"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="How violent the star is - flares, wind and hard radiation. This is not temperature: an active star is not necessarily a hot one. It scours surface cover away and drives the radiation hazard, and with Exotic oceans on it pushes the sea toward chemically strange colours.">
+            <label for="star-activity">Star activity</label>
+            <input type="range" id="star-activity" min="0" max="100" value="30">
+            <output data-readout="star-activity"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-star-activity"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="How far the world's axis is tipped over. At 0% the two polar caps are symmetric. Turned up, one cap grows while the other shrinks - a seasonal snapshot. Past halfway the poles become the WARM regions and the equator freezes, which is an Uranus-like world.">
+            <label for="axial-tilt">Axial tilt</label>
+            <input type="range" id="axial-tilt" min="0" max="100" value="0">
+            <output data-readout="axial-tilt"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-axial-tilt"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <!-- Tidal locking sits beside Ocean depth because the two are
+               physically coupled: locking is what boils the sea off one face
+               and freezes it onto the other. -->
+          <div class="control-row" title="How tidally locked the world is. 0% is an ordinary rotating planet like Earth. As it rises, one face bakes and the other freezes: the ocean boils off the hot side and pools frozen on the cold side, ice spreads down from the night pole, and a habitable ribbon runs between them.">
+            <label for="tidal-lock">Tidal locking</label>
+            <input type="range" id="tidal-lock" min="0" max="100" value="0">
+            <output data-readout="tidal-lock"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-tidal-lock"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="Where the hot face points. Rolled per body; set it deliberately to aim the dayside at the viewer.">
+            <label for="tidal-facing">Lock facing</label>
+            <input type="range" id="tidal-facing" min="0" max="360" value="90">
+            <output data-readout="tidal-facing"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-tidal-facing"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="0% is a dead world: solid core, static mantle, thick crust, grey. 100% is molten: liquid core, violent convection, thin fractured crust.">
+            <label for="interior-heat">Interior heat</label>
+            <input type="range" id="interior-heat" min="0" max="100" value="55">
+            <output data-readout="interior-heat"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-interior-heat"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="Multiplies each layer's own wobble. 100% is as authored; this is a taste control, not a fix.">
+            <label for="boundary-irregularity">Boundary irregularity</label>
+            <input type="range" id="boundary-irregularity" min="0" max="200" value="100">
+            <output data-readout="boundary-irregularity"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-boundary-irregularity"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="Skip the final random rotation so the poles stay at top and bottom.">
+            <label for="keep-upright">Keep upright</label>
+            <input type="checkbox" id="keep-upright">
+            <!-- No lock: Randomize never touches this, so there is nothing to
+                 lock it against. A lock icon that guards nothing is noise. -->
+          </div>
+
+          <div class="control-row" title="Manual rotation of the whole body. Disabled while Keep upright is on.">
+            <label for="rotation">Rotation</label>
+            <input type="range" id="rotation" min="0" max="360" value="0">
+            <output data-readout="rotation"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-rotation"><span class="lock-icon">&#128274;</span></label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- COLOUR ---------- -->
+      <section class="section open" data-section="colour">
+        <h2 class="section-head"><span class="chev">&#9656;</span> Colour</h2>
+        <div class="section-body">
+
+          <div class="control-row" title="The hue of the surface and outermost material. Everything else is derived from it.">
+            <label for="primary-hue">Primary hue</label>
+            <input type="range" id="primary-hue" min="0" max="360" value="210">
+            <output data-readout="primary-hue"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-primary-hue"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="How the core's hue relates to the surface hue. Auto uses the archetype's own preference.">
+            <label for="hue-relationship">Hue relationship</label>
+            <select id="hue-relationship">
+              <option value="auto">Auto</option>
+              <option value="complement">Complement</option>
+              <option value="analogous">Analogous</option>
+              <option value="triad">Triad</option>
+              <option value="split">Split complement</option>
+              <option value="monochrome">Monochrome</option>
+            </select>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-hue-relationship"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="A manual nudge on top of the hue relationship, for when the derived core colour isn't quite right.">
+            <label for="secondary-offset">Secondary hue offset</label>
+            <input type="range" id="secondary-offset" min="-180" max="180" value="0">
+            <output data-readout="secondary-offset"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-secondary-offset"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="Scales the archetype's saturation profile. The relationships between layers are preserved, so the body stays recognisable.">
+            <label for="saturation">Saturation</label>
+            <input type="range" id="saturation" min="0" max="200" value="100">
+            <output data-readout="saturation"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-saturation"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="Scales the archetype's lightness profile, the same way Saturation scales its saturation profile.">
+            <label for="brightness">Brightness</label>
+            <input type="range" id="brightness" min="0" max="200" value="100">
+            <output data-readout="brightness"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-brightness"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <!-- EXOTIC OCEANS IS OFF BY DEFAULT, and that is deliberate.
+               The ocean's blue-green hue range is the one authored hue range
+               in the palette and it exists for a measured reason: without it,
+               a sea on a rust-coloured world came out brown, which was the
+               single thing that most stopped these reading as planets. The
+               realistic default stays the default; this makes the strange case
+               opt-in. See PROGRESS.md D39. -->
+          <div class="control-row" title="Off: the sea keeps its realistic blue-green range, which is what makes these read as planets. On: the ocean's hue rolls anywhere on the wheel and its brightness ceiling lifts, so pale, milky, white and near-black seas become possible - and a high Star activity pushes it further toward looking chemically wrong.">
+            <label for="exotic-oceans">Exotic oceans</label>
+            <input type="checkbox" id="exotic-oceans">
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-exotic-oceans"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="How strongly adjacent layers differ from one another. Low values make the body read as one material.">
+            <label for="contrast">Contrast between layers</label>
+            <input type="range" id="contrast" min="0" max="200" value="100">
+            <output data-readout="contrast"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-contrast"><span class="lock-icon">&#128274;</span></label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- TRAITS ---------- -->
+      <section class="section open" data-section="traits">
+        <h2 class="section-head"><span class="chev">&#9656;</span> Traits</h2>
+        <div class="section-body">
+
+          <div class="control-row" title="How many traits Randomize gives a body. Structural traits like tidal locking count double, because they change so much more of the picture.">
+            <label for="trait-count">Trait count</label>
+            <input type="range" id="trait-count" min="0" max="4" value="2">
+            <output data-readout="trait-count"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-trait-count"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" id="row-reroll-traits">
+            <button type="button" id="reroll-traits" class="minor-btn"
+                    title="Roll a new set of traits, keeping the seed, colours and structure exactly as they are.">Re-roll traits</button>
+          </div>
+
+          <!-- The trait list is built from data/traits.js at runtime, so
+               adding a trait stays a single edit to that file. Incompatible
+               traits are HIDDEN rather than greyed — a long list of
+               unavailable options is noise (TRAIT-SYSTEM.md).
+
+               Each row is a TRI-STATE: ticked forces the trait on, the red X
+               excludes it from Randomize, and neither leaves it free to roll.
+               A lock would be the wrong control here — "keep this value" and
+               "never pick this" are different things. -->
+          <p class="trait-hint">Tick to force a trait on. Click &times; to keep Randomize from ever picking it.</p>
+          <div class="trait-list" id="trait-list"></div>
+        </div>
+      </section>
+
+      <!-- ---------- DETAIL ---------- -->
+      <section class="section open" data-section="detail">
+        <h2 class="section-head"><span class="chev">&#9656;</span> Detail</h2>
+        <div class="section-body">
+
+          <div class="control-row" title="The master control. Every layer detail interprets this in its own terms — more convection cells, more grain, more veins. The default already looks dense.">
+            <label for="detail-density">Detail density</label>
+            <input type="range" id="detail-density" min="0" max="100" value="65">
+            <output data-readout="detail-density"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-detail-density"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="How many size classes elements are drawn in: a few large, more medium, many small. 3 is the sweet spot. Lowering this drops the largest elements first.">
+            <label for="size-tiers">Size tiers</label>
+            <input type="range" id="size-tiers" min="1" max="4" value="3">
+            <output data-readout="size-tiers"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-size-tiers"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="How strongly layer movement is drawn. Subtle uses headless motion lines; Diagrammatic uses full arrows, like a textbook cutaway.">
+            <label for="flow-indicators">Flow indicators</label>
+            <select id="flow-indicators">
+              <option value="none">None</option>
+              <option value="subtle">Subtle</option>
+              <option value="balanced" selected>Balanced</option>
+              <option value="diagrammatic">Diagrammatic</option>
+            </select>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-flow-indicators"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="How much grain, stipple and speckle each layer carries. This adds material rather than only darkening what is already there.">
+            <label for="texture-strength">Texture strength</label>
+            <input type="range" id="texture-strength" min="0" max="150" value="100">
+            <output data-readout="texture-strength"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-texture-strength"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="A global multiplier on every detail element's opacity. Lower for a softer, more textural look; higher for a bolder diagram.">
+            <label for="element-opacity">Element opacity</label>
+            <input type="range" id="element-opacity" min="25" max="150" value="100">
+            <output data-readout="element-opacity"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-element-opacity"><span class="lock-icon">&#128274;</span></label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- LABELS &amp; INFO ---------- -->
+      <section class="section" data-section="labels">
+        <h2 class="section-head"><span class="chev">&#9656;</span> Labels &amp; Info</h2>
+        <div class="section-body">
+          <div class="control-row" title="The stat card over the preview. Every figure on it is read off the same values that drew the picture, so it can never contradict the render.">
+            <label for="show-info">Show info panel</label>
+            <input type="checkbox" id="show-info" checked>
+          </div>
+
+          <div class="control-row" title="Compact shows the six measured lines; Standard adds the climate sentence and what is underfoot; Full adds the flavour notes - notable condition, resources and approach.">
+            <label for="info-detail">Info detail level</label>
+            <select id="info-detail">
+              <option value="compact">Compact</option>
+              <option value="standard" selected>Standard</option>
+              <option value="full">Full</option>
+            </select>
+          </div>
+
+          <p class="phase-note">Layer labels and the scale bar arrive in Phase 8.</p>
+        </div>
+      </section>
+
+      <!-- ---------- OUTPUT ---------- -->
+      <section class="section" data-section="output">
+        <h2 class="section-head"><span class="chev">&#9656;</span> Output</h2>
+        <div class="section-body">
+
+          <div class="control-row" title="What sits behind the body in the render.">
+            <label for="background">Background</label>
+            <select id="background">
+              <option value="starfield">Starfield</option>
+              <option value="solid">Solid colour</option>
+              <option value="gradient">Gradient</option>
+              <option value="transparent">Transparent</option>
+            </select>
+            <!-- NO LOCK. Randomize never changes the background type - it is a
+                 framing choice rather than a property of the body, and rolling
+                 it would flip a deliberate transparent export back to a
+                 starfield. A lock icon that guards nothing is noise, the same
+                 reasoning Keep upright already follows. -->
+          </div>
+
+          <div class="control-row" title="The background colour, used by the Solid and Gradient modes. Randomize rolls it within a dark, space-like range so it never fights the body.">
+            <label for="background-color">Background colour</label>
+            <input type="color" id="background-color" value="#05070e">
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-background-color"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="How much of the frame the body fills.">
+            <label for="body-size">Body size in frame</label>
+            <input type="range" id="body-size" min="40" max="95" value="78">
+            <output data-readout="body-size"></output>
+          </div>
+
+          <div class="control-row" title="Zoom into the body for a close-up. Drag the preview to pan, or use the mouse wheel over it. Past about 10x the render turns abstract — smooth bands rather than fine detail — which is deliberate. Exports honour the framing you set here.">
+            <label for="zoom">Zoom</label>
+            <input type="range" id="zoom" min="0" max="1000" value="0">
+            <output data-readout="zoom"></output>
+          </div>
+
+          <div class="control-row framing-actions" title="Return to the default framing: the whole body, centred, at 1x zoom.">
+            <button type="button" id="reset-framing" title="Return to the default framing: the whole body, centred, at 1x zoom.">Reset framing</button>
+          </div>
+
+          <!-- PAN IS A REAL CONTROL, HIDDEN BY CSS RATHER THAN BY TYPE.
+               Nobody pans a picture by typing numbers, so there is no slider —
+               but ui/share.js builds the settings string by sweeping
+               "#panel input, #panel select" for values that differ from their
+               default, so pan has to be an ordinary input for framing to reach
+               a shared string at all.
+
+               NOT type="hidden", which looks like the obvious way to do this
+               and silently breaks it: on a hidden input `defaultValue` MIRRORS
+               `value` live, so `el.value === el.defaultValue` is permanently
+               true and the sweep would skip pan every time. Framing would then
+               appear to share correctly — zoom is a range and survives — while
+               losing the pan half, which is the worst kind of bug: the string
+               still looks right. A number input hidden by CSS keeps the
+               default semantics the sweep depends on. -->
+          <input type="number" id="pan-x" class="offscreen" value="0" step="0.001" tabindex="-1" aria-hidden="true" title="Horizontal framing offset, in body radii. Set by dragging the preview.">
+          <input type="number" id="pan-y" class="offscreen" value="0" step="0.001" tabindex="-1" aria-hidden="true" title="Vertical framing offset, in body radii. Set by dragging the preview.">
+
+          <div class="control-row" title="Vertical size of the exported image in pixels. Element counts never change with resolution — the preview is the real render.">
+            <label for="resolution">Resolution</label>
+            <select id="resolution">
+              <option value="720">720 px</option>
+              <option value="1080" selected>1080 px</option>
+              <option value="1440">1440 px</option>
+              <option value="2160">2160 px</option>
+            </select>
+          </div>
+
+          <div class="control-row" title="Shape of the exported image.">
+            <label for="aspect">Aspect ratio</label>
+            <select id="aspect">
+              <option value="16:9" selected>16:9</option>
+              <option value="1:1">1:1</option>
+              <option value="4:3">4:3</option>
+              <option value="3:2">3:2</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- RANDOMIZE SETTINGS ---------- -->
+      <section class="section" data-section="randomize">
+        <h2 class="section-head"><span class="chev">&#9656;</span> Randomize settings</h2>
+        <div class="section-body">
+          <div class="bulk-locks">
+            <button id="lock-all" class="mini-btn wide" title="Lock every control, so Randomize changes nothing.">Lock all</button>
+            <button id="unlock-all" class="mini-btn wide" title="Unlock every control.">Unlock all</button>
+            <button id="invert-locks" class="mini-btn wide" title="Flip every lock to its opposite state.">Invert</button>
+          </div>
+          <p class="phase-note">Randomize scope and the archetype pool arrive with the MVP.</p>
+        </div>
+      </section>
+
+    </div>
+  </aside>
+</div>
+
+<!-- ==================================================================
+     Script load order IS the dependency order. There is no bundler and
+     no ES modules: these files run exactly as they are written.
+     index.html is the single source of truth for the file list —
+     test/domtest.mjs reads these tags, and build_release.bat copies
+     js/ and lib/ wholesale.
+     ================================================================== -->
+
+<!-- vendored third-party -->
+<script src="lib/simplex-noise.js"></script>
+<script src="lib/delaunay.js"></script>
+
+<!-- core -->
+<script src="js/core/math.js"></script>
+<script src="js/core/rng.js"></script>
+<script src="js/core/color.js"></script>
+
+<!-- data -->
+<script src="js/data/stars.js"></script>
+<script src="js/data/archetypes.js"></script>
+<script src="js/data/elements.js"></script>
+<script src="js/data/traits.js"></script>
+<script src="js/data/presets.js"></script>
+<script src="js/data/phrasebook.js"></script>
+<script src="js/data/flavour.js"></script>
+
+<!-- generation -->
+<script src="js/gen/structure.js"></script>
+<script src="js/gen/frosting.js"></script>
+<script src="js/gen/palette.js"></script>
+<script src="js/gen/terrain.js"></script>
+<script src="js/gen/zonegeom.js"></script>
+<script src="js/gen/zones.js"></script>
+<script src="js/gen/climate.js"></script>
+<script src="js/gen/climatesummary.js"></script>
+<script src="js/gen/elemgen.js"></script>
+<script src="js/gen/traitroll.js"></script>
+<script src="js/gen/details.js"></script>
+<script src="js/gen/climatetext.js"></script>
+<script src="js/gen/hazard.js"></script>
+<script src="js/gen/stats.js"></script>
+
+<!-- drawing -->
+<script src="js/draw/canvas.js"></script>
+<script src="js/draw/layers.js"></script>
+<script src="js/draw/primitives.js"></script>
+<script src="js/draw/details.js"></script>
+<script src="js/draw/grain.js"></script>
+<script src="js/draw/film.js"></script>
+<script src="js/draw/zonepaint.js"></script>
+<script src="js/draw/scene.js"></script>
+<script src="js/draw/card.js"></script>
+
+<!-- ui -->
+<script src="js/ui/accordion.js"></script>
+<script src="js/ui/controls.js"></script>
+<script src="js/ui/traitpicker.js"></script>
+<script src="js/ui/randomize.js"></script>
+<script src="js/ui/presets.js"></script>
+<script src="js/ui/infopanel.js"></script>
+<script src="js/ui/export.js"></script>
+<script src="js/ui/share.js"></script>
+<script src="js/ui/framing.js"></script>
+<script src="js/ui/exportui.js"></script>
+
+<script src="js/main.js"></script>
 </body>
 </html>

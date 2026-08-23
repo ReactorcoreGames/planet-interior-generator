@@ -1,0 +1,195 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0b0d14;
+  color: #d8dcea;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh;
+}
+
+#app-header {
+  padding: 14px 22px 8px;
+  border-bottom: 1px solid #1e2233;
+}
+#app-header h1 {
+  font-size: 22px;
+  letter-spacing: 2px;
+  font-weight: 600;
+  color: #f0e8d8;
+}
+#app-header .tagline {
+  font-size: 12px;
+  color: #7c84a0;
+  letter-spacing: 1px;
+}
+
+#app-main {
+  display: flex;
+  gap: 18px;
+  padding: 18px 22px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+#preview-pane {
+  flex: 1 1 640px;
+  min-width: 320px;
+}
+#preview-canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid #232842;
+  border-radius: 6px;
+  background: #05060b;
+}
+#preview-caption {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #666e8c;
+  letter-spacing: 0.5px;
+}
+
+#settings-panel {
+  flex: 0 0 320px;
+  background: #11141f;
+  border: 1px solid #232842;
+  border-radius: 8px;
+  padding: 16px;
+}
+#settings-panel h2 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #8b93b4;
+  margin: 14px 0 10px;
+}
+#settings-panel h2:first-child { margin-top: 0; }
+
+.control-row { margin-bottom: 11px; }
+.control-row > label {
+  display: block;
+  font-size: 12px;
+  color: #a8afc8;
+  margin-bottom: 4px;
+}
+.control-row .val { color: #6d759a; }
+
+.control-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.control-input select,
+.control-input input[type="text"],
+.control-input input[type="number"] {
+  flex: 1;
+  background: #0b0e18;
+  color: #dde1f0;
+  border: 1px solid #2a3050;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 13px;
+  min-width: 0;
+}
+.control-input input[type="range"] { flex: 1; accent-color: #c98a4b; }
+
+.lock {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+  opacity: 0.55;
+}
+.lock:has(input:checked) { opacity: 1; filter: drop-shadow(0 0 3px #c98a4b); }
+.lock input { cursor: pointer; }
+
+/* Inline help affordance — the "?" next to a label. The tooltip itself is a
+   native title attribute, which works offline with no JS. */
+.help {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  line-height: 13px;
+  text-align: center;
+  border-radius: 50%;
+  background: #232a44;
+  color: #8b93b4;
+  font-size: 10px;
+  cursor: help;
+  margin-left: 2px;
+  user-select: none;
+}
+.help:hover { background: #33406b; color: #dde3f5; }
+
+.hint {
+  font-size: 11px;
+  color: #6d759a;
+  margin-top: 4px;
+  line-height: 1.35;
+}
+
+.inline-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #a8afc8;
+  cursor: pointer;
+  margin-bottom: 5px;
+  user-select: none;
+}
+.inline-check input { cursor: pointer; }
+
+/* Applied when a control has no effect under the current settings. */
+.disabled-hint { opacity: 0.45; }
+#overlay-suboptions {
+  border-left: 2px solid #232842;
+  padding-left: 10px;
+  margin-bottom: 11px;
+  transition: opacity 0.15s;
+}
+
+.control-input input[type="color"] {
+  flex: 1;
+  height: 30px;
+  padding: 2px;
+  background: #0b0e18;
+  border: 1px solid #2a3050;
+  border-radius: 4px;
+  cursor: pointer;
+  min-width: 0;
+}
+.control-input input:disabled,
+.control-input select:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.branding {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid #1e2233;
+  font-size: 11px;
+  color: #5f6683;
+  text-align: center;
+}
+.branding a { color: #7d86ab; text-decoration: none; }
+.branding a:hover { color: #c98a4b; }
+
+.big-btn {
+  display: block;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 10px 12px;
+  background: #1b2136;
+  border: 1px solid #34406b;
+  color: #e6e9f5;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: background 0.15s;
+}
+.big-btn:hover { background: #26304f; }
+#randomize-btn { background: #3a2a18; border-color: #6b512e; }
+#randomize-btn:hover { background: #4d3820; }

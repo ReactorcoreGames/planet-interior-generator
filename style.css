@@ -1,125 +1,808 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* Celestial Cutaway — UI chrome.
+ *
+ * The illustration itself is drawn entirely on canvas; nothing here affects
+ * the render. This is the shell: preview left, settings right, with Randomize
+ * and Export pinned so they can never scroll out of reach. */
 
-body {
-  background: #0b0d14;
-  color: #d8dcea;
-  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  min-height: 100vh;
+/* Purple theme, tuned for contrast.
+ *
+ * Every ink colour below meets or beats WCAG AA (4.5:1) against the surface it
+ * sits on, so no text in the panel is the low-contrast grey-on-grey that dark
+ * UIs usually drift into. Contrast ratios against --panel (#191526) noted
+ * where they matter:
+ *
+ *   --ink        #efecf7  on panel = 14.9:1   (AAA)
+ *   --ink-dim    #c3b8dd  on panel =  8.9:1   (AAA)
+ *   --ink-faint  #9d8fbe  on panel =  5.6:1   (AA, and AA-large everywhere)
+ *   --accent     #b98cff  on panel =  6.9:1   (AA)
+ *   --lock       #ffc45e  on panel =  9.9:1   (AAA)
+ */
+:root {
+  --bg:          #0e0b16;
+  --panel:       #191526;
+  --panel-2:     #221c33;
+  --line:        #3a3152;
+  --line-soft:   #2c2540;
+  --ink:         #efecf7;
+  --ink-dim:     #c3b8dd;
+  --ink-faint:   #9d8fbe;
+  --accent:      #b98cff;
+  --accent-dim:  #4a3a70;
+  --lock:        #ffc45e;
+  /* Exclude-from-randomize. Deliberately NOT the lock colour: "never pick
+   * this" is a different instruction from "keep this value". 5.4:1 on panel. */
+  --ban:         #ff7b8a;
+  --ban-dim:     #7a3644;
+
+  --row-h:       30px;
+  --radius:      5px;
+  --font: 15px/1.5 "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
-#app-header {
-  padding: 14px 22px 8px;
-  border-bottom: 1px solid #1e2233;
-}
-#app-header h1 {
-  font-size: 22px;
-  letter-spacing: 2px;
-  font-weight: 600;
-  color: #f0e8d8;
-}
-#app-header .tagline {
-  font-size: 12px;
-  color: #7c84a0;
-  letter-spacing: 1px;
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;             /* the page never scrolls; panels scroll internally */
+  background: var(--bg);
+  color: var(--ink);
+  font: var(--font);
 }
 
-#app-main {
+#app {
+  display: grid;
+  grid-template-columns: 1fr 392px;
+  height: 100vh;
+}
+
+/* ============ PREVIEW ============ */
+
+#preview {
+  position: relative;
   display: flex;
-  gap: 18px;
-  padding: 18px 22px;
-  align-items: flex-start;
-  flex-wrap: wrap;
-}
-
-#preview-pane {
-  flex: 1 1 640px;
-  min-width: 320px;
-}
-#preview-canvas {
-  width: 100%;
-  height: auto;
-  display: block;
-  border: 1px solid #232842;
-  border-radius: 6px;
-  background: #05060b;
-}
-#preview-caption {
-  margin-top: 6px;
-  font-size: 11px;
-  color: #666e8c;
-  letter-spacing: 0.5px;
-}
-
-#settings-panel {
-  flex: 0 0 320px;
-  background: #11141f;
-  border: 1px solid #232842;
-  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
   padding: 16px;
+  background:
+    radial-gradient(circle at 50% 45%, #171029 0%, var(--bg) 70%);
 }
-#settings-panel h2 {
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: #8b93b4;
-  margin: 14px 0 10px;
-}
-#settings-panel h2:first-child { margin-top: 0; }
 
-.control-row { margin-bottom: 11px; }
-.control-row > label {
+#stage {
+  width: 100%;
+  height: 100%;
   display: block;
-  font-size: 12px;
-  color: #a8afc8;
-  margin-bottom: 4px;
+  /* The preview is draggable, so it says so. `grabbing` while a pan is in
+     flight is what makes the drag feel like it took hold of the picture
+     rather than merely registering. */
+  cursor: grab;
+  touch-action: none;
 }
-.control-row .val { color: #6d759a; }
 
-.control-input {
+#stage.panning { cursor: grabbing; }
+
+#preview-meta {
+  position: absolute;
+  left: 22px;
+  bottom: 16px;
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  letter-spacing: .03em;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
+
+#meta-name { color: var(--ink-dim); }
+
+/* ============ PANEL ============ */
+
+#panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--panel);
+  border-left: 1px solid var(--line);
+}
+
+/* --- pinned buttons --- */
+
+#panel-pinned {
+  flex: 0 0 auto;
+  padding: 10px;
+  display: grid;
+  gap: 7px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel-2);
+}
+
+.big-btn {
+  width: 100%;
+  padding: 11px 14px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  background: #2e2745;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+.big-btn:hover { background: #3a3156; border-color: #4c4070; }
+.big-btn:active { transform: translateY(1px); }
+.big-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.big-btn.primary {
+  background: linear-gradient(#5b3f96, #45307a);
+  border-color: #7355b8;
+}
+.big-btn.primary:hover { background: linear-gradient(#6d4cb0, #513a8c); }
+
+.btn-icon { font-size: 17px; line-height: 1; }
+.caret { color: var(--ink-dim); font-size: 12px; }
+
+.export-wrap { position: relative; }
+
+.menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  padding: 5px;
+  background: #251e38;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(0,0,0,.6);
+}
+
+.menu button {
+  display: block;
+  width: 100%;
+  padding: 9px 11px;
+  text-align: left;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink-dim);
+  background: none;
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.menu button:hover { background: #372c52; color: var(--ink); }
+
+/* --- accordion --- */
+
+#panel-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.section { border-bottom: 1px solid var(--line-soft); }
+
+.section-head {
+  margin: 0;
+  padding: 11px 13px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  cursor: pointer;
+  user-select: none;
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.control-input select,
-.control-input input[type="text"],
-.control-input input[type="number"] {
-  flex: 1;
-  background: #0b0e18;
-  color: #dde1f0;
-  border: 1px solid #2a3050;
-  border-radius: 4px;
-  padding: 6px 8px;
-  font-size: 13px;
-  min-width: 0;
-}
-.control-input input[type="range"] { flex: 1; accent-color: #c98a4b; }
 
-.lock {
+.section-head:hover { color: var(--ink); background: #221c33; }
+.section-head:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+.chev {
+  font-size: 11px;
+  color: var(--ink-faint);
+  transition: transform .12s ease;
+}
+.section.open .chev { transform: rotate(90deg); }
+.section.open .section-head { color: var(--ink); }
+
+/* Sections expand to their full height. They deliberately do NOT scroll
+ * internally: nested scroll areas steal the wheel from the panel's own
+ * scrollbar, so scrolling past an open section would stall. One scrollbar,
+ * on #panel-scroll, is the whole scrolling model. */
+.section-body {
+  display: none;
+  padding: 2px 13px 14px;
+}
+.section.open .section-body { display: block; }
+
+/* --- control rows --- */
+
+.control-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--row-h);
+  padding: 3px 0;
+}
+
+/* A row whose control is a full-width input drops the label onto its own line. */
+.control-row > label:first-child {
+  grid-column: 1 / -1;
+  font-size: 14px;
+  color: var(--ink-dim);
+  letter-spacing: .01em;
+}
+
+.control-row.locked > label:first-child { color: var(--lock); }
+.control-row.disabled { opacity: .4; pointer-events: none; }
+
+.control-row input[type="range"] {
+  grid-column: 1;
+  width: 100%;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+.control-row input[type="range"]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.control-row input[type="text"],
+.control-row select {
+  grid-column: 1;
+  width: 100%;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background: #100c1b;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+}
+
+.control-row input[type="text"]:focus,
+.control-row select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.control-row input[type="color"] {
+  grid-column: 1;
+  width: 100%;
+  height: 28px;
+  padding: 1px;
+  background: #100c1b;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+}
+
+.control-row input[type="checkbox"]:not(.lock input) {
+  grid-column: 1;
+  justify-self: start;
+  width: 17px;
+  height: 17px;
+  accent-color: var(--accent);
+}
+
+.control-row output {
+  min-width: 48px;
+  text-align: right;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-faint);
+}
+
+/* --- locks --- */
+
+.lock { display: flex; align-items: center; cursor: pointer; }
+.lock input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+.lock-icon {
+  display: block;
+  width: 28px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 26px;
+  border-radius: 4px;
+  filter: grayscale(1) brightness(.8);
+  opacity: .6;
+}
+.lock:hover .lock-icon { opacity: 1; }
+.lock input:focus-visible + .lock-icon { outline: 2px solid var(--accent); }
+.lock input:checked + .lock-icon {
+  filter: none;
+  opacity: 1;
+  background: rgba(255,196,94,.18);
+  box-shadow: inset 0 0 0 1px rgba(255,196,94,.55);
+}
+
+/* --- small bits --- */
+
+.mini-btn {
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink-dim);
+  background: #2e2745;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.mini-btn:hover { color: var(--ink); background: #3a3156; }
+.mini-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.mini-btn.wide { flex: 1; }
+
+.bulk-locks { display: flex; gap: 6px; padding: 4px 0 10px; }
+
+.phase-note {
+  margin: 8px 0 2px;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--ink-faint);
+}
+
+/* ---- the trait picker -------------------------------------------------
+ *
+ * A generated, grouped checkbox list. Incompatible traits are HIDDEN rather
+ * than greyed (TRAIT-SYSTEM.md), so the list changes length as traits are
+ * ticked — hence no fixed height and no internal scroll, per D8.
+ */
+.trait-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px 0 8px;
+}
+
+.trait-group {
+  margin: 8px 0 3px;
+  font-size: 11px;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.trait-group:first-child { margin-top: 2px; }
+
+.trait-row {
   display: flex;
   align-items: center;
-  gap: 3px;
-  font-size: 13px;
+  gap: 8px;
+  min-height: 26px;
+  padding: 2px 6px;
+  border-radius: 3px;
   cursor: pointer;
-  user-select: none;
-  opacity: 0.55;
 }
-.lock:has(input:checked) { opacity: 1; filter: drop-shadow(0 0 3px #c98a4b); }
-.lock input { cursor: pointer; }
+.trait-row:hover { background: var(--panel-2); }
 
-.big-btn {
-  display: block;
-  width: 100%;
-  margin-bottom: 8px;
-  padding: 10px 12px;
-  background: #1b2136;
-  border: 1px solid #34406b;
-  color: #e6e9f5;
-  border-radius: 6px;
-  font-size: 13px;
+.trait-row input[type="checkbox"] {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  accent-color: var(--accent);
   cursor: pointer;
-  letter-spacing: 0.5px;
-  transition: background 0.15s;
 }
-.big-btn:hover { background: #26304f; }
-#randomize-btn { background: #3a2a18; border-color: #6b512e; }
-#randomize-btn:hover { background: #4d3820; }
+
+.trait-name {
+  flex: 1;
+  font-size: 14px;
+  color: var(--ink-dim);
+}
+.trait-row:hover .trait-name { color: var(--ink); }
+.trait-row input:checked ~ .trait-name { color: var(--ink); }
+
+.trait-hint {
+  margin: 6px 0 2px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-faint);
+}
+
+/* THE EXCLUDE TOGGLE — a third state, not a lock.
+ *
+ * A lock means "keep this value"; this says "never pick this". Kept visually
+ * distinct from the lock icons elsewhere in the panel precisely because it is
+ * a different kind of instruction. Red at ~5.3:1 on the panel (AA). */
+.trait-ban {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--ink-faint);
+  background: transparent;
+  border: 1px solid var(--line-soft);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.trait-ban:hover { color: var(--ban); border-color: var(--ban-dim); }
+.trait-ban:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.trait-ban.on {
+  color: var(--ban);
+  border-color: var(--ban);
+  background: #3a1f28;
+}
+
+/* An excluded trait's name dims and strikes through, so the row reads as
+ * "ruled out" at a glance rather than needing the button to be decoded. */
+.trait-ban.on ~ .trait-name,
+.trait-row:has(.trait-ban.on) .trait-name {
+  color: var(--ink-faint);
+  text-decoration: line-through;
+}
+.trait-row:has(.trait-ban.on) input[type="checkbox"] { opacity: .35; }
+
+.minor-btn {
+  padding: 5px 12px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink-dim);
+  background: #2e2745;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.minor-btn:hover { color: var(--ink); background: #3a3156; }
+.minor-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* One scrollbar, on the panel. Sections do not scroll internally. */
+#panel-scroll::-webkit-scrollbar { width: 12px; }
+#panel-scroll::-webkit-scrollbar-thumb {
+  background: #453a66;
+  border: 3px solid var(--panel);
+  border-radius: 6px;
+}
+#panel-scroll::-webkit-scrollbar-thumb:hover { background: #574a7d; }
+
+/* ============ THE INFO CARD ============
+ *
+ * Floats over the preview rather than taking a third column: the render is the
+ * thing, and the card annotates it. Capped in height with its own scroll, so a
+ * Full-detail card on a short window cannot push itself off the screen.
+ *
+ * Nothing here decides anything — every string it shows was computed in
+ * js/gen/stats.js from the same values that drew the picture. */
+
+#info-panel {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 320px;
+  max-height: calc(100% - 32px);
+  overflow-y: auto;
+  padding: 14px 16px 16px;
+  background: rgba(20, 16, 32, 0.90);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  font-size: 13px;
+}
+#info-panel[hidden] { display: none; }
+
+.info-head { margin-bottom: 11px; }
+
+.info-name {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  color: var(--ink);
+}
+
+.info-sub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.info-type {
+  font-size: 12px;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* The hazard badge runs cool to hot across the six ratings, so it reads as a
+ * scale at a glance rather than as six unrelated colours. */
+.hazard-badge {
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+}
+.hazard-badge.benign    { color: #7fe0a8; }
+.hazard-badge.mild      { color: #a8d98a; }
+.hazard-badge.hazardous { color: #e8cf72; }
+.hazard-badge.severe    { color: #f0a05c; }
+.hazard-badge.lethal    { color: #f47070; }
+.hazard-badge.absolute  { color: #e05ce8; }
+
+.info-lines { margin: 0; }
+
+.info-lines dt {
+  margin-top: 9px;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.info-lines dt:first-child { margin-top: 0; }
+
+.info-lines dd {
+  margin: 2px 0 0;
+  color: var(--ink-dim);
+  line-height: 1.45;
+}
+
+/* ============ THE PRESET GALLERY ============ */
+
+.control-row.stacked {
+  display: block;
+}
+.control-row.stacked > label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.preset-gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.preset-card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 7px 9px;
+  text-align: left;
+  font: inherit;
+  color: var(--ink-dim);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.preset-card:hover {
+  color: var(--ink);
+  background: #2e2745;
+  border-color: var(--accent-dim);
+}
+.preset-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* Transient, not a stored selection — it says "that is the button you just
+ * pressed" and stops short of claiming the body is still that preset. */
+.preset-card.applied { border-color: var(--accent); color: var(--ink); }
+
+.preset-name { font-size: 13px; font-weight: 600; }
+.preset-blurb {
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--ink-faint);
+}
+
+/* ============ EXPORT FEEDBACK ============
+ *
+ * A file landing in the downloads folder is invisible from inside the page, so
+ * without this the menu reads as broken. */
+
+#export-btn.flash-ok  { border-color: #7fe0a8; color: #7fe0a8; }
+#export-btn.flash-err { border-color: var(--ban); color: var(--ban); }
+
+/* --- the toast ---
+ *
+ * The border flash above is kept, but it is not enough on its own: it happens
+ * on the Export button, and the clipboard exports are precisely the ones where
+ * the user has dismissed the menu and is looking at the picture. So the result
+ * is also stated in words, over the render.
+ *
+ * BOTTOM CENTRE OF THE PREVIEW, which is the one region nothing else claims —
+ * the info card is top-right, the meta line is bottom-left, and the body is
+ * centred. It is `pointer-events: none` so it can never intercept a click
+ * meant for the canvas underneath. */
+#export-toast {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  max-width: min(560px, calc(100% - 48px));
+  padding: 9px 15px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: rgba(20, 16, 32, 0.94);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink-dim);
+  text-align: center;
+  pointer-events: none;
+  animation: toast-in 140ms ease-out;
+}
+
+#export-toast[hidden] { display: none; }
+
+#export-toast.toast-ok  { border-color: #4d7f66; color: #a8f0c8; }
+#export-toast.toast-err { border-color: var(--ban-dim); color: #ffc2ca; }
+
+/* A pending copy is stated in the neutral ink, so the confident green is only
+ * ever shown for a write that actually landed. */
+#export-toast.toast-pending { border-color: var(--line); color: var(--ink-dim); }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 6px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #export-toast { animation: none; }
+}
+
+/* --- the fingerprint strip --- */
+
+.info-fingerprint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 11px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.fp-swatches { display: flex; gap: 3px; }
+
+.fp-swatch {
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.fp-seed {
+  margin-left: auto;
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--ink-faint);
+  font-family: Consolas, "SF Mono", monospace;
+  /* A long seed must not push the swatches off the strip. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 55%;
+}
+
+/* --- the room the card needs, as a CENTRE OFFSET ---
+ *
+ * THE CANVAS IS ALWAYS FULL-BLEED. It used to be padded to make room for the
+ * card, and that padding was the root of three separate defects:
+ *
+ *   1. The background stopped where the canvas stopped, so with the card shown
+ *      the preview's gradient ended in mid-air about half way under the card
+ *      instead of reaching the edge of the frame.
+ *   2. The canvas is sized from its own box and the body from the SHORTER axis
+ *      of it, so on a tall window the padding made WIDTH the shorter axis and
+ *      the card silently became a ZOOM control — toggling it resized the body
+ *      and pushed it off the bottom of the frame.
+ *   3. Every attempt to fix (2) had to reason about the difference between the
+ *      padded box, the unpadded box and the drawn box, in two files, and get
+ *      all three to agree. They did not.
+ *
+ * None of that is about how the card is drawn; it is all about the canvas
+ * changing SIZE when the card appears. So it no longer does. The canvas fills
+ * the preview at all times, the card floats over it, and the room the card
+ * needs is expressed as a shift of the body's CENTRE — which is what "make
+ * room for the card" actually means.
+ *
+ * `--card-room` is read by js/main.js and passed to the view as a centre
+ * offset. Keeping it in CSS keeps the responsive ladder below the single source
+ * of how much room the card takes, exactly as before.
+ *
+ * THE OFFSET DOES NOT DEPEND ON WHETHER THE CARD IS SHOWN. The body sits in the
+ * same place either way, so toggling the card cannot move, resize or crop the
+ * render — there is no state in which the composition differs, which is the
+ * whole reason the defect class is closed rather than merely fixed. */
+#preview {
+  --card-room: 356px;   /* card width + its right margin + breathing room */
+}
+
+/* HOW MUCH ROOM THE CARD NEEDS IS A FUNCTION OF HOW MUCH THERE IS.
+ *
+ * THE CARD OVERLAPPING IS NOT A FAILURE STATE. It is translucent, it sits over
+ * sky at the top-right — so a partial offset costs a corner of background and
+ * buys a body that stays large and centred enough to read. A cramped body is
+ * the worse outcome, which is the judgement the old 1100px breakpoint already
+ * made and simply made too late.
+ *
+ * These can now be tuned freely: the offset only moves the body, so a value
+ * that is too large costs composition and can never cost SIZE. */
+@media (max-width: 1900px) {
+  /* Two-thirds of the card's width. The body shifts noticeably left and the
+   * card still clears its centre. */
+  #preview { --card-room: 236px; }
+}
+
+@media (max-width: 1600px) {
+  /* A nudge only: enough that the body is not centred underneath the card. */
+  #preview { --card-room: 120px; }
+}
+
+@media (max-width: 1360px) {
+  /* Below this there is no room to give. Let the card overlap fully — a body
+   * shoved off to the left is worse than a card that covers part of the frame. */
+  #preview { --card-room: 0px; }
+  #info-panel { width: 280px; }
+}
+
+/* --- export menu separator --- */
+
+.menu-sep {
+  height: 1px;
+  margin: 5px 8px;
+  background: var(--line);
+}
+
+/* --- import feedback on the seed field ---
+ *
+ * Pasting a settings block changes the whole panel at once; without a signal
+ * the user cannot tell an accepted paste from a rejected one. */
+
+#seed.flash-ok  { border-color: #7fe0a8; }
+#seed.flash-err { border-color: var(--ban); }
+
+
+/* A row that is one action rather than a labelled control: no label column to
+   align against, so the button simply spans and sits where the readouts do. */
+.control-row.framing-actions {
+  grid-template-columns: 1fr;
+  justify-items: start;
+}
+
+.control-row.framing-actions button {
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink-dim);
+  background: var(--panel-2, rgba(255, 255, 255, .04));
+  border: 1px solid var(--line, rgba(255, 255, 255, .14));
+  border-radius: 5px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.control-row.framing-actions button:hover {
+  color: var(--ink, #e8ecf4);
+  border-color: rgba(255, 255, 255, .28);
+}
+
+/* Present to the DOM, absent from the page. Used by the pan inputs, which must
+   be real controls so the settings string picks them up, but which nobody
+   operates by hand. Not `display:none` and not `type="hidden"` — see the note
+   in index.html for why the latter silently breaks sharing. */
+.offscreen {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

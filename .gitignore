@@ -1,0 +1,29 @@
+# Dev-only test tooling. The app itself has zero runtime dependencies —
+# these exist so renders can be verified headlessly during development.
+node_modules/
+package-lock.json
+
+# Generated preview renders
+shots/
+
+# Release output (build_release.bat copies into here; nothing is compiled)
+dist/
+
+# Local server binary, if dropped in for the launcher
+mongoose.exe
+
+# Working notes
+*WIP*.md
+
+# Editor / OS noise
+.vscode/
+.idea/
+.claude/
+Thumbs.db
+desktop.ini
+*.swp
+
+# Throwaway diagnostic probes. Anything worth keeping is folded into a
+# named harness in test/ instead — a probe that mattered twice belongs in
+# the suite, and one that mattered once belongs in the bin.
+test/_tmp/

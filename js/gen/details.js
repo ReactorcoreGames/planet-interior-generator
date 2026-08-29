@@ -120,6 +120,68 @@ CC.Details = (function () {
      * one contributor when the dial is up. See gen/climate.js. */
     var climateField = CC.Climate.build(archetype, body, params, seed, zones);
 
+    /* THE FROSTING'S ZONE TABLE, RESOLVED HERE — the D22 contract, cashed.
+     *
+     * It used to be a `var ZONES` in draw/film.js together with an Earth-ish
+     * SNOWLINE of 0.42 and SHELF of -0.16, and D22 recorded that it must move
+     * into archetype data when a second family started depositing. Phase 5 is
+     * that family: a giant's buried floor wants TWO zones and thresholds
+     * nothing like a planet's.
+     *
+     * Resolved in generation rather than read in draw/, which is D23's rule —
+     * the renderer receives a plain table of numbers and still learns nothing
+     * about what a zone means. Order is the declaration order in the
+     * archetype, outermost-down. */
+    /* ONE TABLE PER FROSTED SURFACE, not one per body.
+     *
+     * Every archetype until the moon had a single frosted surface, so a single
+     * table was the whole truth. An ice-shelled moon has two facing each other
+     * across a dark ocean — a rock floor with brine pools in its trenches, and
+     * the shell's underside hung with accreted ice — and they differ in
+     * colour, character AND direction. `CC.Frosting.specFor` picks the right
+     * spec per role and falls back to `layers.film`, so a body with one
+     * frosting resolves every layer to it exactly as before.
+     *
+     * `filmZones` stays a single table for that common case, because
+     * draw/film.js's fallback path and every existing caller expect one; the
+     * per-role map beside it is what a two-surface body reads. */
+    var filmProfile = archetype.colorProfile;
+    /* WHICH LAYERS CARRY TERRAIN, asked the SAME WAY the loop below asks it.
+     *
+     * This first read `CC.Elements.reliefFor(role)` alone, which is where a
+     * role's shared terrain lives — and missed every layer whose field is
+     * declared on the layer as `reliefSpec` instead. The ice shell is exactly
+     * that case, so its underside got no zone table, and the accreted ice
+     * facing the brine pools across the ocean never drew at all.
+     *
+     * Nothing reported it: the palette resolved all six zone colours, the
+     * terrain field was built, the mask was built, and the one missing link
+     * was a key absent from a lookup. D159's shape — correct at both ends and
+     * undefined in between — arriving in the frosting rather than in an
+     * element recipe.
+     *
+     * The two questions must be one question, so both sites now read the same
+     * chain: the layer's own spec first, then the role's. */
+    var filmRoles = [];
+    for (var fr = 0; fr < body.layers.length; fr++) {
+      var flr = body.layers[fr];
+      if (flr.reliefSpec || CC.Elements.reliefFor(flr.role)) {
+        filmRoles.push(flr.role);
+      }
+    }
+    var filmSpecs = CC.Frosting.specsByRole(filmProfile, filmRoles, body.has);
+
+    var filmZoneByRole = {};
+    for (var fk in filmSpecs) {
+      if (!Object.prototype.hasOwnProperty.call(filmSpecs, fk)) continue;
+      var ft = CC.Frosting.zoneTable(filmSpecs[fk]);
+      if (ft) filmZoneByRole[fk] = ft;
+    }
+
+    var filmZones = CC.Frosting.zoneTable(
+      archetype.colorProfile && archetype.colorProfile.layers &&
+      archetype.colorProfile.layers.film);
+
     var byRole = {};
     var terrain = {};
     var film = {};
@@ -133,7 +195,18 @@ CC.Details = (function () {
       /* Surface terrain, where the role declares one. Built per layer and
        * keyed by role, so a layer's terrain never depends on what else is in
        * the stack. */
-      var relief = CC.Elements.reliefFor(role);
+      /* AN ARCHETYPE MAY STATE ITS OWN TERRAIN, and the moon is the first that
+       * has to. The elements table is keyed by ROLE globally, so `crust` is
+       * one recipe shared by every body that has one — which is right for
+       * strata and fractures, and wrong for the shape of the ground. A moon's
+       * surface is craters on craters with no landmasses at all; a planet's is
+       * continents with craters on top. Those are different fields, not one
+       * field at a different amplitude, so `elementScale` could not say it.
+       *
+       * `reliefSpec` on the layer overrides the role's, exactly as
+       * `elementScale` overrides its counts. A layer that declares none gets
+       * the role's, which is every layer that existed before the moon. */
+      var relief = (layer && layer.reliefSpec) || CC.Elements.reliefFor(role);
       if (relief) {
         /* Erosion rides atmosphere thickness: a thick-atmosphere world gets
          * rounded terrain, an airless one keeps sharp ridges. Reading it from
@@ -284,10 +357,30 @@ CC.Details = (function () {
       var recipes = CC.Elements.elementsFor(role);
       if (!recipes.length) continue;
 
+      /* AN ARCHETYPE MAY TURN ONE OF A SHARED ROLE'S MARKS UP OR DOWN.
+       *
+       * Element recipes are keyed by ROLE, not by archetype, and that is
+       * deliberate: it is what makes a `corona` mean the same thing on all
+       * four stars and is why adding a body family adds no drawing code.
+       *
+       * It has one gap, and this closes it. Several bodies genuinely differ
+       * in HOW MUCH of a shared role's own vocabulary they have — the polish
+       * work's named example is that a young star's limb should be visibly
+       * more violent than a patient dwarf's, and both wear the same corona.
+       * Without this the only ways to say that are a per-archetype role
+       * (which duplicates the whole recipe to change one number) or a role
+       * check in the generator (which is the thing the architecture forbids).
+       *
+       * `elementScale: { <kind>: { count, size } }` on the layer spec, so it
+       * is DATA and it is per layer rather than per family. Absent on every
+       * existing archetype, so no current render moves. */
+      var eScale = (layer && layer.elementScale) || null;
+
       var list = [];
 
       for (var e = 0; e < recipes.length; e++) {
         var recipe = recipes[e];
+        var scale = eScale ? eScale[recipe.kind] : null;
 
         /* ONE STREAM PER (ROLE, ELEMENT KIND, INDEX).
          *
@@ -298,6 +391,11 @@ CC.Details = (function () {
         var rng = CC.RNG.stream(seed, "detail/" + role + "/" + recipe.kind + "/" + e);
 
         var count = CC.ElemGen.countFor(recipe, density);
+        /* The archetype's own multiplier on this kind, resolved before the
+         * texture and flow multipliers so those still mean what they mean. */
+        if (scale && scale.count !== undefined) {
+          count = Math.round(count * scale.count);
+        }
 
         /* The two global multipliers from the Detail panel. Applied to COUNT
          * here and to alpha at draw time, so texture strength genuinely adds
@@ -324,8 +422,36 @@ CC.Details = (function () {
          * shadow rather than as varied material. */
         var phase = rng() * TAU;
 
+        /* `params` RIDES ALONG because one element kind is parameter-driven.
+         *
+         * Every other element reads only its recipe and its layer, and that is
+         * the right default — an element that consulted the settings could
+         * contradict the layer it sits in. The mosaic is the exception on
+         * purpose: Cohesion is not a decoration on the fragments, it is what
+         * decides how many there are and how much of the body is hole, so the
+         * element cannot be built without it (docs/celestials/solid-bodies.md
+         * folds `rubble-pile` and `void-riddled` into that one axis).
+         *
+         * Passed through `opts` rather than added to `build`'s signature, so
+         * gen/traitroll.js — which calls the same dispatch — needs no change
+         * and no builder that ignores it can be broken by it. */
         var made = CC.ElemGen.build(recipe, layer, plan, count, rng,
-                                    { phase: phase });
+                                    { phase: phase, params: params });
+
+        /* SIZE IS SCALED AFTER THE BUILD, NOT BY REWRITING THE RECIPE.
+         *
+         * The recipe is shared data — mutating it would change the mark on
+         * every other archetype that uses the same role, and the failure
+         * would depend on load order, which is the worst kind of bug to
+         * find. `length` moves with `size` because the two are the same
+         * statement for the elements that carry both (a plume's height is
+         * its size with per-instance chaos already folded in). */
+        if (scale && scale.size !== undefined && scale.size !== 1) {
+          for (var sm = 0; sm < made.length; sm++) {
+            made[sm].size *= scale.size;
+            if (made[sm].length !== undefined) made[sm].length *= scale.size;
+          }
+        }
 
         /* Elements carry which recipe made them, so the renderer can honour
          * the Flow indicators dropdown without re-deriving intent. */
@@ -434,7 +560,33 @@ CC.Details = (function () {
       byRole[r] = (byRole[r] || []).concat(placed.byRole[r]);
       total += placed.byRole[r].length;
     }
-    total += placed.outward.length + placed.surface.length + placed.damage.length;
+
+    /* ---- draw order within a layer ---------------------------------------
+     *
+     * A trait may declare `under: true`, which sinks it beneath everything
+     * else in its layer — including the layer's own details and any other
+     * trait.
+     *
+     * `violent-banding` is the first user and shows why it is needed: it is a
+     * set of broad concentric belts across the whole troposphere, and drawn in
+     * trait order it painted straight over the storms sitting in that same
+     * layer. Banding is the BACKGROUND a storm sits on, not something laid on
+     * top of it.
+     *
+     * A stable partition rather than a sort, so nothing else about the
+     * existing order moves — the elements a layer generated for itself keep
+     * their relative order, and so do the traits. */
+    for (var ur in byRole) {
+      if (!Object.prototype.hasOwnProperty.call(byRole, ur)) continue;
+      var list = byRole[ur];
+      var below = [], above = [];
+      for (var ui = 0; ui < list.length; ui++) {
+        (list[ui].under ? below : above).push(list[ui]);
+      }
+      if (below.length) byRole[ur] = below.concat(above);
+    }
+    total += placed.outward.length + placed.surface.length +
+             placed.damage.length + placed.spanning.length;
 
     /* ---- resolve zone membership -----------------------------------------
      *
@@ -450,6 +602,105 @@ CC.Details = (function () {
     if (zones) {
       applyZones(byRole, placed.outward, placed.surface, placed.damage,
                  zones, archetype, body);
+    }
+
+    /* ---- ELEMENTS REMOVED, RATHER THAN RECOLOURED ------------------------
+     *
+     * Every other thing done to an element here is a PERTURBATION — a hue
+     * delta, a displacement — because that is the standing rule (gen/zones.js
+     * rule 1: zones perturb, they do not replace). This pass deletes, and it
+     * earns the exception the same way a scoured dayside does: some places are
+     * places where LESS IS HAPPENING, and the only honest way to draw less
+     * happening is for there to be less.
+     *
+     * A CORONAL HOLE IS WHAT IT WAS BUILT FOR. A hole is a sector where the
+     * magnetic field is open and the wind escapes freely, so the corona
+     * genuinely has fewer plumes there — the feature IS the absence.
+     *
+     * IT CANNOT BE DARK PAINT, and that is not an aesthetic preference. The
+     * corona is composited with `screen` (ATMOSPHERE_BLEND in draw/scene.js),
+     * and under `screen` dark paint is very nearly a no-op — it can only ever
+     * add light. That is why the first implementation had to be a flat,
+     * hard-edged, unfaded `darker` wedge, which the user correctly called out
+     * as a pie slice: a SOFT dark region on a screen-blended layer is simply
+     * invisible, which is D121s `dust-formation` failure (maxdelta 19) waiting
+     * to happen a second time. Removing elements works with the blend instead
+     * of against it and needs no paint at all.
+     *
+     * IT RUNS OUTSIDE `applyZones`, and that matters: `applyZones` is called
+     * only when the body has an angular axis, so a star with coronal holes and
+     * no companion would have skipped thinning entirely and the trait would
+     * have done nothing on most bodies — the silent D77 failure again.
+     *
+     * Two sources, composed: the zone field's `thinAt`, and the sectors any
+     * trait declaring `thins` produced. */
+    var thinSectors = [];
+    for (var ts = 0; ts < (placed.thinning || []).length; ts++) {
+      var sec0 = placed.thinning[ts];
+      var trait0 = CC.Traits.get(sec0.trait);
+      /* The trait names an ANCHOR and only this stage knows which layer that
+       * turned out to be — `anchor` may be a list (D77), so a dwarf's optional
+       * corona and an old giant's absence of one are both answered by asking
+       * rather than by assuming. */
+      var lay0 = trait0 ? CC.TraitRoll.anchorLayer(trait0, body) : null;
+      if (!lay0) continue;
+      sec0.role = lay0.role;
+      thinSectors.push(sec0);
+    }
+
+    if ((zones && zones.thinAt) || thinSectors.length) {
+      /* HOW MANY OF THIS ROLE'S ELEMENTS SURVIVE AT A BEARING.
+       *
+       * A trait sector is `{angle, half, keep, feather}`. Within `half` of the
+       * centre the survival rate is `keep`; from there it eases back to 1 over
+       * `feather` more, so the hole has a soft rim rather than a cut line. The
+       * hard edge is precisely what made the wedge version read as a slice of
+       * pie, so the feather is the point rather than a refinement.
+       *
+       * Sectors apply only to the role the trait anchored to, so a coronal
+       * hole thins the corona and leaves the photosphere's granulation alone. */
+      var keepAt = function (angle, role) {
+        var keep = (zones && zones.thinAt) ? zones.thinAt(angle) : 1;
+        for (var t = 0; t < thinSectors.length; t++) {
+          var sec = thinSectors[t];
+          if (sec.role && sec.role !== role) continue;
+          /* Shortest angular distance, so a sector spanning 0 works. */
+          var d = Math.abs(((angle - sec.angle + Math.PI * 3) % (Math.PI * 2))
+                           - Math.PI);
+          var edge = sec.half * (1 + sec.feather);
+          if (d >= edge) continue;
+          var u = d <= sec.half ? 0 : (d - sec.half) / (edge - sec.half);
+          var k = sec.keep + (1 - sec.keep) * (u * u * (3 - 2 * u));
+          if (k < keep) keep = k;
+        }
+        return keep;
+      };
+
+      /* DETERMINISTIC, from the element's own angle and index rather than from
+       * a stream: the survival test has to give the same answer on every
+       * render of a seed, and two renders must not disagree about which plumes
+       * exist. Two summed sines rather than a hash, for the reason D117
+       * records — a broken pseudo-random still draws, it just draws something
+       * suspiciously tidy. */
+      var thinOut = function (list, role) {
+        var kept = [];
+        for (var i = 0; i < list.length; i++) {
+          var el = list[i];
+          if (el.angle === undefined) { kept.push(el); continue; }
+          var keep = keepAt(el.angle, role);
+          if (keep >= 0.999) { kept.push(el); continue; }
+          var h = Math.sin(el.angle * 37.13 + i * 0.717)
+                + Math.sin(el.angle * 11.71 + i * 2.113);
+          /* h runs -2..2; mapped to 0..1 and compared against the rate. */
+          if ((h + 2) * 0.25 < keep) kept.push(el);
+        }
+        return kept;
+      };
+
+      for (var trole in byRole) {
+        if (!Object.prototype.hasOwnProperty.call(byRole, trole)) continue;
+        byRole[trole] = thinOut(byRole[trole], trole);
+      }
     }
 
     /* ---- the climate summary ---------------------------------------------
@@ -489,6 +740,13 @@ CC.Details = (function () {
        * draw time; it still receives plain functions of angle and learns
        * nothing about what a climate is (D23). */
       climateField: climateField,
+      /* The deposition character and thresholds for this archetype's
+       * frosting, or null if it has none. See CC.Frosting.zoneTable. */
+      filmZones: filmZones,
+      /* The same thing per frosted surface. draw/film.js prefers this and
+       * falls back to `filmZones`, so a one-frosting body is unaffected and a
+       * two-surface one gets a different table on each face. */
+      filmZoneByRole: filmZoneByRole,
 
       /* HOW MUCH SURFACE COVER SURVIVES AT A BEARING — the climate's scouring
        * and the zone's, composed into ONE function so the renderer asks once.
@@ -516,6 +774,10 @@ CC.Details = (function () {
       /* Elements beyond the body — rings, debris. Drawn in their own step of
        * the scene order rather than inside a layer's clip. */
       outward: placed.outward,
+      /* Traits that cross layer boundaries — the great storm. Drawn in their
+       * own pass, clipped to the body rather than to any one band, so a
+       * feature spanning two layers is one feature. */
+      spanningTraits: placed.spanning,
       /* Surface-attached traits — polar caps, impact basins. Drawn after the
        * fluid layers, which would otherwise paint over them. */
       surfaceTraits: placed.surface,
@@ -571,9 +833,55 @@ CC.Details = (function () {
       }
     }
 
+    /* ELEMENTS RIDE THE TIDAL SWELL, AND THEY HAVE TO BE TOLD TO.
+     *
+     * `swellAt` displaces a banded layer's BOUNDARY per bearing, but
+     * gen/elemgen.js `radiusAt` places every element against
+     * `layer.inner + t * layer.thickness` — the layer's nominal, unswollen
+     * band. The renderer clips to the swollen shape, so the crescent a layer
+     * GAINS on the facing side contained no elements at all and drew as flat
+     * bare fill with a hard edge, while the trailing side crowded its marks
+     * into a band narrower than the one they were spread across.
+     *
+     * That is D75/D119 arriving on schedule — the surface moved and everything
+     * measured against it went stale — and it is the reason this doc runs
+     * before the traits one. Fixing it here rather than in `radiusAt` keeps it
+     * to one place: every builder rolls its own angle, so threading the field
+     * through six call sites would be six chances to miss one, and this loop
+     * already visits every element with the role it belongs to.
+     *
+     * Scaled by the element's own DEPTH IN THE BAND. A mark sitting at the
+     * layer's outer edge should follow the boundary exactly; one at its inner
+     * edge should barely move, because that edge is the layer below's
+     * boundary and belongs to the layer below's swell. Displacing the whole
+     * band rigidly would shear it off the layer beneath it. */
+    function rideSwell(list, role) {
+      var layer = null;
+      for (var li = 0; li < body.layers.length; li++) {
+        if (body.layers[li].role === role) { layer = body.layers[li]; break; }
+      }
+      if (!layer || layer.outward) return;
+      var t = layer.thickness || 0;
+      if (t <= 0) return;
+      for (var i = 0; i < list.length; i++) {
+        var el = list[i];
+        if (el.radius === undefined) continue;
+        /* Where in its own band this element sits, 0 at the floor and 1 at
+         * the boundary — the same normalization `radiusAt` placed it with. */
+        var depth = (el.radius - layer.inner) / t;
+        if (depth < 0) depth = 0; else if (depth > 1) depth = 1;
+        var d = zones.swellAt(el.angle, role) * t * depth;
+        el.radius += d;
+        /* A spanning element carries its own inner edge, which has to move
+         * with it or the mark stretches instead of translating. */
+        if (el.inner !== undefined) el.inner += d;
+      }
+    }
+
     for (var role in byRole) {
       if (!Object.prototype.hasOwnProperty.call(byRole, role)) continue;
       tag(byRole[role], role);
+      if (zones.swellAt) rideSwell(byRole[role], role);
     }
     /* Outward traits sit beyond every layer, so they take the shallowest
      * strength the field offers rather than a role's depth. */

@@ -218,11 +218,56 @@ CC.Palette = (function () {
      * Read from the archetype rather than inferred from a role name, the same
      * contract gen/climate.js follows (D27). */
     var climateSpec = null;
+    var arch = null;
     if (body && body.archetype && CC.Archetypes) {
-      var ca = CC.Archetypes.get(body.archetype);
-      climateSpec = (ca && ca.climate) || null;
+      arch = CC.Archetypes.get(body.archetype);
+      climateSpec = (arch && arch.climate) || null;
     }
     if (climateSpec && climateSpec.starlit === false) starlight = 0;
+
+    /* THE THERMAL FIELD, BUILT ONCE AND USED TWICE.
+     *
+     * The frosting stage at the bottom of this file already rebuilt it from
+     * the archetype, for the reason recorded there: `Palette.build` is called
+     * from eight places and none of them has the field to hand, and both
+     * builds are pure and keyed to the same seed so they agree by definition.
+     * `climateLean` below needs the same field, so it is hoisted here and the
+     * frosting reuses it rather than constructing a second copy.
+     *
+     * Cheap, deterministic, and it means the layer colours and the deposition
+     * colours are looking at literally the same numbers — which is the whole
+     * point of D42 (one physical fact, one threshold). */
+    var thermal = null;
+    if (CC.Climate && arch) {
+      var taxis = arch.axes && arch.axes.tidalLock;
+      var torder = (arch.colorProfile && arch.colorProfile.order) || [];
+      var tzones = (taxis && CC.Zones)
+        ? CC.Zones.build(taxis, body, torder, params, seed) : null;
+      thermal = CC.Climate.build(arch, body, params, seed, tzones);
+    }
+
+    /* HOW WINTRY AND HOW SCORCHED THIS BODY IS AS A WHOLE.
+     *
+     * `climateLean` colours a LAYER, and a layer is a band all the way round —
+     * it has no bearing of its own to ask about. So the two figures are
+     * averaged over the disc rather than sampled at a point, which is the
+     * honest reading of "how cold is this world" for something that has one
+     * colour everywhere.
+     *
+     * Read from `chillAt` and `scorchAt`, never from a second ramp against
+     * `tempAt` (D42). Sixteen bearings: enough that a latitude term or a
+     * tidal-lock field registers, cheap enough to do unconditionally. */
+    var chillMean = 0, scorchMean = 0;
+    if (thermal && thermal.chillAt) {
+      var SAMPLES = 16;
+      for (var ci = 0; ci < SAMPLES; ci++) {
+        var ca2 = (ci / SAMPLES) * Math.PI * 2;
+        chillMean += thermal.chillAt(ca2);
+        scorchMean += thermal.scorchAt(ca2);
+      }
+      chillMean /= SAMPLES;
+      scorchMean /= SAMPLES;
+    }
     var starCast = star
       ? star.cast * clamp(starlight / 0.35, 0, 1)
       : 0;
@@ -512,6 +557,56 @@ CC.Palette = (function () {
       var s = lerp(spec.sat[0], spec.sat[1], lrng());
       var v = lerp(spec.val[0], spec.val[1], lrng());
 
+      /* WHAT THE MATERIAL IS, AS A FUNCTION OF HOW MUCH LIGHT ARRIVES.
+       *
+       * `climateLean` is `heatLean`'s counterpart on the other heat source.
+       * `heatLean` says a layer's material changes with the body's own
+       * interior heat; this says it changes with the STAR. Both perturb the
+       * rolled colour rather than replacing it (zones.js rule 1), so the same
+       * seed under three Starlight settings gives three visibly different
+       * worlds that are still recognisably one world.
+       *
+       *   climateLean: { chill:  { hue, amount, sat, val },
+       *                  scorch: { hue, amount, sat, val } }
+       *
+       * The gas giant's cloud decks are the first user and the reason it
+       * exists: ammonia, ammonium hydrosulphide and water condense at
+       * different temperatures, so which deck is VISIBLE is a fact about
+       * temperature. A cold giant shows a pale high ammonia deck; a hot one
+       * has its condensation level driven below the visible layer and shows
+       * the darker chromophore-stained gas underneath. Different material,
+       * not the same material tinted — which is what the phase's
+       * done-condition asks Starlight to change.
+       *
+       * IT READS `chillAt` / `scorchAt`, the same two figures the frosting
+       * reads, and authors no threshold of its own (D42).
+       *
+       * Weighted by (1 - depth), for the same reason the star cast is: light
+       * reaches the envelope and not the core, and a core that changed colour
+       * with the star would read as a wash over the picture. Self-lit layers
+       * are exempt entirely, as they are from every other reflective rule
+       * (D13). */
+      if (spec.climateLean && !emissiveSpec(spec)) {
+        var lightReachC = 1 - depth;
+        var endSpec = null, endAmt = 0;
+        if (chillMean >= scorchMean) {
+          endSpec = spec.climateLean.chill; endAmt = chillMean;
+        } else {
+          endSpec = spec.climateLean.scorch; endAmt = scorchMean;
+        }
+        if (endSpec && endAmt > 0) {
+          var travel = clamp(endAmt * (endSpec.amount === undefined
+                                       ? 0.5 : endSpec.amount)
+                             * lightReachC, 0, 0.95);
+          if (endSpec.hue) {
+            var destC = wrapHue(lerp(endSpec.hue[0], endSpec.hue[1], lrng()));
+            h = mixHue(h, destC, travel);
+          }
+          if (endSpec.sat) s = clamp(s + endSpec.sat * travel, 0, 1);
+          if (endSpec.val) v = clamp(v + endSpec.val * travel, 0.03, 1);
+        }
+      }
+
       /* Interior heat drives saturation directly: a hot world glows toward
        * the top of its range and a dead one drains toward grey. Weighted by
        * depth, so heat shows most in the layers nearest the core — which is
@@ -698,6 +793,22 @@ CC.Palette = (function () {
         h: h, s: s, v: v,
         hex: CC.Color.hsvToHex(h, s, v),
         depth: depth,
+        /* HOW HARD THIS LAYER'S ALTERNATING BANDS SEPARATE, 1 being the
+         * detail stage's ordinary lighter/darker step.
+         *
+         * A gas giant bands hard and an ice giant barely at all, and that is
+         * the single largest difference between the two silhouettes — so it
+         * is one authored number rather than a second code path. Published on
+         * the colour because that is what the detail stage already receives;
+         * nothing in draw/ asks which archetype it is looking at.
+         *
+         * IT SHRINKS AS THE DECK SINKS. A scorched giant's visible bands wash
+         * out because the condensation level has been driven below them,
+         * which is the visible half of the cloud-species story: the same
+         * physical fact that changed the colour also flattens the banding. */
+        bandContrast: spec.bandContrast === undefined
+          ? 1
+          : spec.bandContrast * (1 - scorchMean * 0.55),
         /* What this layer looks like at its inner (hotter) edge, or null if
          * it does not carry a thermal gradient. `heatSpec` is retained so the
          * adjacency pass below can rebuild it from the moved value. */
@@ -817,7 +928,43 @@ CC.Palette = (function () {
      * cannot disturb their RNG streams or the adjacency pass. It lives in
      * gen/frosting.js — four zones' worth of colour rules is its own stage.
      * See PROGRESS.md D18/D19/D20. */
-    var filmSpec = profile.layers && profile.layers.film;
+    /* EVERY DISTINCT FROSTING ON THE BODY, NOT ONLY THE GLOBAL ONE.
+     *
+     * An ice-shelled moon frosts two surfaces with two different materials, so
+     * two sets of zone colours have to exist at once. They do not collide
+     * because each table names its own zones — `regolithRim` and `brineRock`
+     * and `accretionTip` are distinct keys — which is the same reason the
+     * planet's four and the giant's two have always been able to coexist in
+     * one palette namespace.
+     *
+     * The global `layers.film` is included first, so an archetype with one
+     * frosting resolves exactly the one spec it always did, in the same RNG
+     * order, and no existing body's colours move. */
+    var filmSpecs = [];
+    var filmSeen = [];
+    function addFilmSpec(s) {
+      if (!s || filmSeen.indexOf(s) >= 0) return;
+      filmSeen.push(s);
+      filmSpecs.push(s);
+    }
+    addFilmSpec(profile.layers && profile.layers.film);
+    if (profile.layers) {
+      for (var flr in profile.layers) {
+        if (!Object.prototype.hasOwnProperty.call(profile.layers, flr)) continue;
+        var fspec = profile.layers[flr];
+        if (!fspec || typeof fspec !== "object") continue;
+        addFilmSpec(fspec.film);
+        if (fspec.film_when) {
+          for (var fw in fspec.film_when) {
+            if (!Object.prototype.hasOwnProperty.call(fspec.film_when, fw)) continue;
+            addFilmSpec(fspec.film_when[fw]);
+          }
+        }
+      }
+    }
+
+    for (var fs = 0; fs < filmSpecs.length; fs++) {
+    var filmSpec = filmSpecs[fs];
     if (filmSpec && CC.Frosting) {
       /* THE FROSTING NEEDS TO KNOW HOW COLD IT IS.
        *
@@ -838,15 +985,9 @@ CC.Palette = (function () {
        * stage. `Palette.build` is called from eight places and none of them
        * has the field to hand; both builds are pure, cheap and keyed to the
        * same seed, so the two constructions agree by definition. */
-      var fclimate = null;
-      if (CC.Climate && body.archetype && CC.Archetypes) {
-        var farch = CC.Archetypes.get(body.archetype);
-        var faxis = farch && farch.axes && farch.axes.tidalLock;
-        var forder = (farch && farch.colorProfile && farch.colorProfile.order) || [];
-        var fzones = (faxis && CC.Zones)
-          ? CC.Zones.build(faxis, body, forder, params, seed) : null;
-        fclimate = CC.Climate.build(farch, body, params, seed, fzones);
-      }
+      /* Hoisted to the top of build() so `climateLean` can read the same
+       * field. Identical construction, one copy. */
+      var fclimate = thermal;
 
       CC.Frosting.resolve(filmSpec, out, layers, params, seed, heat, primary,
                           satScale, valScale, {
@@ -854,18 +995,93 @@ CC.Palette = (function () {
                             makeLighter: makeLighter,
                             makeDarker: makeDarker,
                             makeRgba: makeRgba
-                          }, fclimate);
+                          }, fclimate,
+                          /* The first spec keeps the original stream name, so
+                           * every existing body's frosting colours are
+                           * byte-identical to before this loop existed. */
+                          fs === 0 ? "colour/film" : "colour/film/" + fs);
+    }
+    }
+
+    /* WHAT THIS BODY EMITS — the colour a mirror in orbit would reflect, or
+     * null for a body that shines by nothing of its own.
+     *
+     * PUBLISHED HERE RATHER THAN LOOKED UP BY THE RENDERER, and that is the
+     * whole reason it exists. An orbital mirror's glass face is the star's own
+     * light, so the primitive drawing it needs the star's colour — and the one
+     * thing js/draw/ may never do is ask for a layer by role name. `emissive`
+     * is already computed per layer above, so this is a property of the BODY
+     * expressed in terms the renderer is allowed to hold.
+     *
+     * TWO TESTS, AND EACH ONE WAS MEASURED RATHER THAN REASONED:
+     *
+     *   VISIBLE FROM OUTSIDE. A rocky planet's molten core is `emissive` too,
+     *     so the naive version reported an ordinary planet as emitting a
+     *     bright orange nothing outside it could see. A cutaway shows the core
+     *     to the READER; it does not show it to a mirror. So the layer has to
+     *     reach the body's own surface, and a world whose only self-lit layer
+     *     is buried correctly answers nothing at all.
+     *   BRIGHTEST, NOT OUTERMOST. "Outermost" is the intuitive rule and it is
+     *     wrong here, because on a star EVERY layer is self-lit — so it picked
+     *     the corona, and on an old giant the shed envelope, both of which are
+     *     faint haloes rather than the light the star radiates. Measured, the
+     *     giant reported #46423a at v=0.27 against a photosphere at v=0.65.
+     *     What a mirror reflects is the body's LIGHT, so the test is value.
+     *
+     * Both together mean this reads as "the brightest thing about this body
+     * that can be seen from space", which is what the word means. */
+    var emitted = null;
+    for (var ei = 0; ei < body.layers.length; ei++) {
+      var el_ = body.layers[ei];
+      var ec = out[el_.role];
+      if (!ec || !ec.emissive) continue;
+      if (el_.outer < body.surface - 1e-6) continue;
+      if (!emitted || ec.v > emitted.v) emitted = ec;
+    }
+
+    /* THE BODY'S DEEP INTERIOR COLOUR — the hue of the hot machinery under the
+     * visible surface, published for marks that need to look like they came
+     * from DOWN THERE rather than from the layer they are drawn over.
+     *
+     * A coronal hole's field lines are the case this exists for. They are
+     * diagrammatic marks — the same register as the mantle's flow arrows —
+     * and the whole point of them is that they belong to a different part of
+     * the star than the corona they cross. Borrowing an interior hue says
+     * that; inventing a colour would say only "this is not part of the
+     * picture", which is D123's complaint about the magenta prominences.
+     *
+     * A CHAIN RATHER THAN A ROLE NAME, and that is the D77 lesson: `radiative`
+     * exists on main-sequence and young stars and on NEITHER of the other two.
+     * A dwarf is fully convective — real physics, not an omission — and an old
+     * giant has an h-shell instead. Naming one role would have coloured this
+     * trait correctly on half the family and left it falling back to the
+     * corona's own hue on the rest, which is the silent failure where
+     * everything except the render says it worked.
+     *
+     * The chain runs from the most specific to the most general, and the last
+     * entry is the fusion core, which every star in the generator has. */
+    var deep = null;
+    var DEEP_ROLES = ["radiative", "h-shell", "tachocline", "convective",
+                      "fusion-core", "core", "outer-core", "mantle"];
+    for (var di = 0; di < DEEP_ROLES.length; di++) {
+      if (out[DEEP_ROLES[di]]) { deep = out[DEEP_ROLES[di]]; break; }
     }
 
     return {
       layers: out,
       anchors: { primary: primary, secondary: secondary, tertiary: tertiary },
       relation: relName,
+      /* The outermost self-lit layer's colour, or null. See above. */
+      emitted: emitted,
+      /* The hot interior's colour, for marks that must read as belonging to a
+       * deeper part of the body than the layer they cross. See above. */
+      deep: deep,
       /* Colour for a role, with a neutral fallback so the renderer never has
        * to check whether a layer was coloured. */
       get: function (role) {
         return out[role] || {
           h: 0, s: 0, v: 0.45, hex: "#737373", depth: 0.5, hotEdge: null,
+          bandContrast: 1,
           lighter: function () { return "#9a9a9a"; },
           darker: function () { return "#3a3a3a"; },
           rgba: function (a) { return CC.Color.rgba("#737373", a); }

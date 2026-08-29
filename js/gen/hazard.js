@@ -71,6 +71,60 @@ CC.Hazard = (function () {
      * different problem from merely cold: it freezes the working fluid in
      * anything you brought with you. */
     var hot = facts.tempMax, cold = facts.tempMin;
+
+    /* A GIANT'S CLOUD TOPS ARE COLD, AND THAT IS NOT NEWS.
+     *
+     * The temperature rungs and floors below are calibrated against a surface
+     * a person might stand on, where -190 C is an extraordinary fact. On a gas
+     * giant it is Tuesday: the spec's own range for an ordinary one is -180 to
+     * -60, so every single giant would have cleared the "at least Severe"
+     * floor and most would have hit Lethal on temperature alone. The rating
+     * would have stopped carrying information for the whole family, which is
+     * exactly the failure the frequency table above was retuned to fix.
+     *
+     * This is D45's trap in a new place: when a formula's input changes range,
+     * its weights are no longer calibrated even though nothing about them
+     * changed. So the cold end is measured against what is ordinary FOR THIS
+     * FAMILY. The hot end is untouched — a giant hot enough to melt lead at
+     * its cloud tops is genuinely remarkable, and should read as such. */
+    var gaseous = facts.family === "gaseous";
+    if (gaseous) cold += 150;
+
+    /* A STAR IS OFF THE TOP OF THIS LADDER, AND SAYING SO IS THE HONEST
+     * ANSWER RATHER THAN A SPECIAL CASE.
+     *
+     * D75's trap once more, at the opposite end from the giants': the heat
+     * rungs top out at 400 C, and the COOLEST star in the family is 2,000.
+     * Every star clears every rung, so the summed score is a constant and the
+     * rating stops carrying information across the family — the exact failure
+     * the frequency table was retuned to fix.
+     *
+     * The difference from the gaseous case is that shifting the rungs would be
+     * dishonest here. A giant's cloud tops being cold genuinely is not news; a
+     * star being lethal genuinely IS the fact, and every star in this
+     * generator is uniformly, unambiguously fatal to approach. So the family
+     * takes the ceiling outright and the score below is not consulted for
+     * temperature at all.
+     *
+     * ABSOLUTE STAYS RESERVED for the compact objects of Phase 8 — "nothing
+     * survives approach" describes a black hole, and a rating a star can
+     * reach is a rating that means something different on the card it appears
+     * on. A star is Lethal, which is the top of the scale a body with a
+     * surface can reach, and it is the same reasoning that stops a hot planet
+     * reaching Absolute. */
+    if (facts.family === "stellar") {
+      /* Activity is the ONE thing that still separates one star from another
+       * here, and it separates Severe from Lethal rather than deciding whether
+       * the place is dangerous. A quiet star is still fatal; an active one is
+       * fatal further out and with less warning. */
+      var starScore = 8 + (facts.activity > 0.5 ? 1 : 0);
+      return {
+        rating: RATINGS[facts.activity > 0.35 ? 4 : 3],
+        score: starScore,
+        radiation: clamp(0.55 + facts.activity * 0.45, 0, 1)
+      };
+    }
+
     if (hot > 400) score += 3;
     else if (hot > 120) score += 2;
     else if (hot > 55) score += 1;
@@ -85,6 +139,16 @@ CC.Hazard = (function () {
     else if (facts.atmosphere.pressure > 12) score += 2;
     else if (!facts.atmosphere.breathable) score += 1;
 
+    /* THE GIANT'S EQUIVALENT OF "HOW MUCH AIR IS THERE" IS "HOW SOON DOES IT
+     * CRUSH YOU". Pressure is the family's defining danger, and unlike a
+     * planet's it is not a property of a surface — it is a depth budget. A
+     * shallow crush point on something 90,000 km across is a genuinely nasty
+     * body to work. */
+    if (gaseous) {
+      if (facts.crushKm < 1200) score += 2;
+      else if (facts.crushKm < 2600) score += 1;
+    }
+
     /* INTERIOR HEAT AT 0 MEANS NO DYNAMO, so a dead world's radiation rating
      * must be worse — HAZARDS.md names this chain explicitly, and it is
      * satisfying precisely because a visual choice about the core produces a
@@ -95,7 +159,9 @@ CC.Hazard = (function () {
     if (rad > 0.72) score += 2;
     else if (rad > 0.42) score += 1;
 
-    /* Gravity you cannot stand in, or so little you cannot stay down. */
+    /* Gravity you cannot stand in, or so little you cannot stay down. On a
+     * body with no surface the same figure means "a well you cannot climb out
+     * of", which is a danger in its own right and scores the same. */
     if (facts.gravity > 2.4 || facts.gravity < 0.06) score += 1;
 
     /* Thermal shock across the terminator is its own danger and is exactly

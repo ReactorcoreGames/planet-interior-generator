@@ -1,115 +1,24 @@
-/* Plain-language stats — the info card, read off the picture.
+/* Solid bodies — the stat template for the rocky family.
  *
- * THE ONE RULE THIS FILE EXISTS TO KEEP (HAZARDS.md): a number beside the
- * render is never rolled. Every figure here is derived from something that
- * shaped the image — the drawn layer radii, `details.climate`, the trait list,
- * the settings that produced all three. A card saying "frozen at the poles"
- * over a render with no ice is worse than a card with no temperature on it, so
- * there is no second source it could drift from.
+ * THE MINDSET: you land on it. Every question here is a surface question —
+ * what is underfoot, how much of it is dry, where the coastline runs, whether
+ * the air is worth breathing, whether you could set a ship down. That is the
+ * right frame for a planet and the wrong one for a gas giant, which is why
+ * the templates are split at all; see js/gen/stats/registry.js.
  *
- * DERIVED FROM THE DRAWN RADII, NOT FROM PHYSICS (D5). The proportions are
- * textbook-diagram proportions: the crust is ~7% of the radius where a real
- * one is 0.5%. Quoting a real crust depth against a drawn crust this thick
- * would be exactly the contradiction the rule forbids. So gravity comes from
- * the drawn core fraction, "what's underfoot" comes from which layer is
- * actually outermost, and the atmosphere line comes from whether that layer
- * exists in `body.layers` at all.
+ * `moon`, `ice-moon` and `asteroid` will share this template when they land at
+ * Phase 7 — an airless moon is still a body you stand on. They may want their
+ * own line sets, which is a `levels` edit rather than a new file.
  *
- * METRIC, WITH A COMPARISON. "Hot enough to melt lead", never "601 K". The
- * phrasebook at the bottom of HAZARDS.md is the source for the comparisons;
- * this file implements it as lookup ladders rather than prose.
- *
- * WHAT DOES GET ROLLED, and why that is not a contradiction: the *flavour*
- * pools — notable condition, resource note, approach note, and the name. Those
- * describe nothing the picture asserts, so a roll cannot disagree with it. But
- * each pool is FILTERED by the derived facts first, so a rogue world never
- * draws "two sunrises per day". The roll picks among things that are already
- * true.
- *
- * Loaded after gen/details.js, whose `climate` summary it reads. */
+ * The registry must load before this file. */
 
 var CC = CC || {};
 
-CC.Stats = (function () {
+(function () {
   "use strict";
 
   var clamp = CC.Math.clamp;
-
-  /* ---- the temperature mapping ---------------------------------------- */
-
-  /* Climate temperatures are normalized 0..1 (HAZARDS.md: "turning that into a
-   * figure is the archetype's business, because a star's 0.9 is not a planet's
-   * 0.9"). This is the planet family's mapping, and it is anchored on the
-   * climate module's OWN state thresholds rather than on invented stops — so
-   * the boundary between "hot" and "temperate" on the card lands exactly where
-   * the boundary between hot and temperate ground lands in the render.
-   *
-   * TEMPERATE (0.34) -> -20 C and HOT (0.62) -> +50 C sets the habitable band
-   * to roughly Earth's own range. The curve outside that is stretched, because
-   * a boiled world is far further from temperate than a merely warm one. */
-  var C_TEMPERATE = -20;
-  var C_HOT = 50;
-
-  function toCelsius(t) {
-    var C = CC.Climate;
-    var lo = C.TEMPERATE, hi = C.HOT;
-    /* Linear through the habitable band, then a power stretch at both ends so
-     * the extremes reach the figures the family claims (-180 to +460, and
-     * further with traits). */
-    if (t >= lo && t <= hi) {
-      return C_TEMPERATE + (t - lo) / (hi - lo) * (C_HOT - C_TEMPERATE);
-    }
-    if (t > hi) {
-      var up = (t - hi) / (1 - hi);
-      return C_HOT + Math.pow(up, 1.35) * 560;
-    }
-    var dn = (lo - t) / (lo - 0);
-    return C_TEMPERATE - Math.pow(dn, 1.15) * 205;
-  }
-
-  /* ---- size and gravity, read off the drawn body ----------------------- */
-
-  /* Radius. Rolled once from the archetype's authored range, on its own RNG
-   * stream so it is stable against every other control — a colour change must
-   * not resize the world. The core bias nudges it, because a body pushed
-   * toward a big metal core reads as a denser, smaller world. */
-  function radiusKm(archetype, settings) {
-    var range = archetype.radiusKm || [2400, 9800];
-    var rng = CC.RNG.stream(settings.seed, "stats-size");
-    var t = rng();
-    /* A square-root spread, so the middle of the range is commoner than either
-     * end — a contact sheet of twenty Earths and twenty giants is less useful
-     * than a spread with a middle. */
-    t = (t + rng()) / 2;
-    return Math.round(range[0] + t * (range[1] - range[0]));
-  }
-
-  /* GRAVITY IS READ OFF THE DRAWN CORE (D5). Surface gravity goes as density
-   * times radius, and the one density signal the picture actually carries is
-   * how much of the body is metal — the core and outer core against the whole.
-   * So a render with a huge core produces a heavy world, and dragging Core size
-   * bias visibly changes both the picture and this number together.
-   *
-   * The constants are chosen so an Earth-sized body with an Earth-ish core
-   * fraction lands near 1.0 g, and the family's authored 0.3-2.5 g range is
-   * reachable at the extremes. This is calibration, not physics. */
-  function gravityOf(body, radius) {
-    var metal = 0;
-    for (var i = 0; i < body.layers.length; i++) {
-      var l = body.layers[i];
-      if (l.role === "core" || l.role === "outer-core") {
-        metal = Math.max(metal, l.outer);
-      }
-    }
-    /* Fraction of the body's VOLUME that is metal, which is what density
-     * responds to — the cube is why a modest change in the drawn core radius
-     * makes a real difference to the figure. */
-    var metalVol = Math.pow(metal, 3);
-    /* 0.29 is roughly what Earth's drawn stack gives; scale around it. */
-    var density = 0.72 + metalVol * 1.55;
-    var g = density * (radius / 6100);
-    return clamp(g, 0.04, 6.0);
-  }
+  var toCelsius = CC.Stats.toCelsius;
 
   /* ---- day length ------------------------------------------------------ */
 
@@ -334,139 +243,140 @@ CC.Stats = (function () {
     return "Sea and land in roughly equal measure - coastline in both directions.";
   }
 
-  /* ---- the card -------------------------------------------------------- */
+  /* ---- the template ---------------------------------------------------- */
 
-  /* `body` and `details` are what got drawn; `settings` is what produced them.
-   * Nothing else is consulted, which is the whole guarantee. */
-  /* THE COLOUR FINGERPRINT — the body's own palette, as a row of swatches.
-   *
-   * It is a *detail* rather than a stat: it asserts nothing, and there is no
-   * figure on it to contradict anything. What it does is make the card
-   * identifiably THIS world at a glance, the way a colour bar on a book spine
-   * does — two Garden Worlds with different seeds produce visibly different
-   * rows even when every line of text matches.
-   *
-   * READ FROM `colorProfile.order`, NOT from the built layer list, and the
-   * difference matters for the same reason it mattered in D12: `order` encodes
-   * DEPTH, so the swatches always run surface-to-centre in a stable sequence.
-   * Walking `body.layers` instead would reorder the row whenever a layer
-   * appeared or vanished, and a fingerprint that changes shape when you drag
-   * Ocean depth is not a fingerprint.
-   *
-   * Layers that are absent are skipped rather than blanked — the row is what
-   * this body is made of, so a world with no ocean simply has no ocean swatch. */
-  function fingerprintOf(body, palette, archetype) {
-    var out = [];
-    if (!palette || !palette.layers) return out;
-    var order = (archetype.colorProfile && archetype.colorProfile.order) || [];
+  CC.Stats.registerTemplate("solid", {
+    build: function (body, details, settings, archetype, rng, shared) {
+      var climate = details.climate;
+      var radius = shared.radius;
+      /* IRON IS WHAT MAKES A PLANET HEAVY — the core and the liquid shell
+       * around it. See gravityOf in the registry for why the dense-role list
+       * is the family's call rather than a constant. */
+      var gravity = shared.gravityOf(body, radius, ["core", "outer-core"]);
+      var lo = toCelsius(climate.min), hi = toCelsius(climate.max);
+      var locked = (settings.tidalLock || 0) > 0.45;
 
-    for (var i = 0; i < order.length; i++) {
-      var role = order[i];
-      var entry = palette.layers[role];
-      if (!entry || !entry.hex) continue;
-      /* Present in the DRAWN stack, not merely declared in the profile. */
-      if (!body.has(role)) continue;
-      out.push({ role: role, hex: entry.hex });
+      var atmosphere = atmosphereOf(body, settings, climate);
+      var day = dayLength(settings, rng);
+
+      /* ONE MEASURE OF HOW MUCH SEA THERE IS, shared by the Surface line, the
+       * resource pool and the approach note — so none of them can describe a
+       * different amount of water from the others. */
+      var landFraction = landFractionOf(body, details);
+      var hasOcean = landFraction < 0.995;
+
+      var traits = (details.traits || []).map(function (t) { return t.id; });
+
+      /* The fact bundle every text pool is filtered against. Assembled once so
+       * no pool can consult anything the card does not also show. */
+      var facts = {
+        family: "solid",
+        radius: radius, gravity: gravity,
+        tempMin: lo, tempMax: hi, spread: climate.spread,
+        frozenFraction: climate.frozenFraction,
+        temperate: climate.states.temperate || 0,
+        radiation: climate.radiation,
+        interiorHeat: settings.interiorHeat,
+        axialTilt: settings.axialTilt || 0,
+        starlight: settings.starlight,
+        sunless: settings.starlight <= 0.001,
+        locked: locked, day: day,
+        atmosphere: atmosphere, breathable: !!atmosphere.breathable,
+        hasOcean: hasOcean, oceanFraction: 1 - landFraction,
+        landFraction: landFraction,
+        traits: traits,
+        /* A dry world with air and an active star has weather that strips
+         * paint; neither half alone does. */
+        dust: atmosphere.present && !hasOcean && (settings.starActivity || 0) > 0.4
+      };
+
+      var hazard = CC.Hazard.of(facts);
+      facts.hazardScore = hazard.score;
+      facts.radiation = hazard.radiation;
+
+      /* THE ORDER OF THE LINES IS THE HAZARDS.md SOLID-BODY TEMPLATE,
+       * verbatim. `label` is what the panel prints; `value` is the sentence. */
+      var lines = [
+        { key: "size", label: "Size",
+          value: (radius * 2).toLocaleString("en-US") + " km across - " +
+                 CC.Phrasebook.sizeSaying(radius) },
+        { key: "gravity", label: "Gravity",
+          value: gravity.toFixed(2) + "x Earth - " +
+                 CC.Phrasebook.saying(CC.Phrasebook.GRAVITY, gravity) },
+        { key: "temp", label: "Surface temp",
+          value: CC.ClimateText.temperatureLine(climate, lo, hi, locked) },
+        { key: "climate", label: "Climate",
+          value: CC.ClimateText.climateLine(climate, locked, settings.axialTilt || 0) },
+        /* THE SECOND TEMPERATURE, WHERE THERE IS ONE.
+         *
+         * An ice-shelled moon has two and the card has to state both, or it
+         * contradicts the picture it sits beside: a frozen surface with a
+         * liquid ocean drawn under it reads as an error unless the card says
+         * why. The row above describes the SHELL'S SURFACE, which is frozen —
+         * that is why there is a shell; this one describes the water beneath,
+         * which is liquid because the shell insulates it and the interior
+         * warms it from below.
+         *
+         * PRESENT ONLY WHEN THE CLIMATE DECLARES ONE. `climate.subsurface` is
+         * null on every body that has a single temperature, so no archetype
+         * name is checked here and nothing else in the family grows a row. */
+        { key: "subsurface", label: "Beneath the ice",
+          value: CC.ClimateText.subsurfaceLine(climate) },
+        { key: "day", label: "Day length", value: day.text },
+        { key: "atmosphere", label: "Atmosphere", value: atmosphere.text },
+        { key: "surface", label: "Surface",
+          value: surfaceOf(body, details, climate) },
+        { key: "notable", label: "Notable", value: CC.Flavour.notableOf(facts, rng) },
+        { key: "resources", label: "Resources", value: CC.Flavour.resourceOf(facts, rng) },
+        { key: "approach", label: "Approach", value: CC.Flavour.approachOf(facts, rng) },
+        { key: "danger", label: "Biggest danger", value: CC.Flavour.dangerOf(facts, rng) }
+      ];
+
+      /* A ROW WHOSE VALUE IS NULL IS NOT A ROW.
+       *
+       * `subsurface` is the first line in the generator that only some bodies
+       * in a family have — an ice-shelled moon has two temperatures and every
+       * other solid body has one. Dropping it here rather than branching at
+       * the top means the template still declares one line order and the card
+       * still prints whatever it is handed (D53: the panel decides nothing). */
+      var kept = [];
+      for (var li = 0; li < lines.length; li++) {
+        if (lines[li].value !== null && lines[li].value !== undefined) {
+          kept.push(lines[li]);
+        }
+      }
+      lines = kept;
+
+      return { lines: lines, facts: facts, hazard: hazard, levels: LEVELS };
     }
-    return out;
-  }
+  });
 
-  function build(body, details, settings, archetype, palette) {
-    var climate = details.climate;
-    var rng = CC.RNG.stream(settings.seed, "stats-flavour");
+  /* WHICH LINES EACH DETAIL LEVEL SHOWS. Moved here from draw/card.js, which
+   * was the last place in draw/ holding a list of one family's line keys.
+   *
+   * The split runs from "things the picture asserts" out to "things the
+   * picture permits", so turning the level down never removes a fact and
+   * leaves an inference standing on it. `full` is null, meaning every line in
+   * the template's own order. */
+  var LEVELS = {
+    compact: ["size", "gravity", "temp", "day", "atmosphere", "danger"],
+    /* `subsurface` earns a place in `standard` because on the one body that
+     * has it, it is the whole point of the picture — an ocean nobody can see
+     * from outside. It is absent on every other body, so this costs them
+     * nothing. */
+    standard: ["size", "gravity", "temp", "subsurface", "climate", "day",
+               "atmosphere", "surface", "danger"],
+    full: null
+  };
 
-    var radius = radiusKm(archetype, settings);
-    var gravity = gravityOf(body, radius);
-    var lo = toCelsius(climate.min), hi = toCelsius(climate.max);
-    var locked = (settings.tidalLock || 0) > 0.45;
-
-    var atmosphere = atmosphereOf(body, settings, climate);
-    var day = dayLength(settings, rng);
-
-    /* ONE MEASURE OF HOW MUCH SEA THERE IS, shared by the Surface line, the
-     * resource pool and the approach note — so none of them can describe a
-     * different amount of water from the others. */
-    var landFraction = landFractionOf(body, details);
-    var hasOcean = landFraction < 0.995;
-    var oceanFraction = 1 - landFraction;
-
-    var traits = (details.traits || []).map(function (t) { return t.id; });
-
-    /* The fact bundle every text pool is filtered against. Assembled once so
-     * no pool can consult anything the card does not also show. */
-    var facts = {
-      radius: radius, gravity: gravity,
-      tempMin: lo, tempMax: hi, spread: climate.spread,
-      frozenFraction: climate.frozenFraction,
-      temperate: climate.states.temperate || 0,
-      radiation: climate.radiation,
-      interiorHeat: settings.interiorHeat,
-      axialTilt: settings.axialTilt || 0,
-      starlight: settings.starlight,
-      sunless: settings.starlight <= 0.001,
-      locked: locked, day: day,
-      atmosphere: atmosphere, breathable: !!atmosphere.breathable,
-      hasOcean: hasOcean, oceanFraction: oceanFraction,
-      landFraction: landFraction,
-      traits: traits,
-      /* A dry world with air and an active star has weather that strips paint;
-       * neither half alone does. */
-      dust: atmosphere.present && !hasOcean && (settings.starActivity || 0) > 0.4
-    };
-
-    var hazard = CC.Hazard.of(facts);
-    facts.hazardScore = hazard.score;
-    facts.radiation = hazard.radiation;
-
-    /* THE ORDER OF THE LINES IS THE HAZARDS.md SOLID-BODY TEMPLATE, verbatim.
-     * `label` is what the panel prints; `value` is the sentence. */
-    var lines = [
-      { key: "size", label: "Size",
-        value: (radius * 2).toLocaleString("en-US") + " km across - " + CC.Phrasebook.sizeSaying(radius) },
-      { key: "gravity", label: "Gravity",
-        value: gravity.toFixed(2) + "x Earth - " + CC.Phrasebook.saying(CC.Phrasebook.GRAVITY, gravity) },
-      { key: "temp", label: "Surface temp",
-        value: CC.ClimateText.temperatureLine(climate, lo, hi, locked) },
-      { key: "climate", label: "Climate",
-        value: CC.ClimateText.climateLine(climate, locked, settings.axialTilt || 0) },
-      { key: "day", label: "Day length", value: day.text },
-      { key: "atmosphere", label: "Atmosphere", value: atmosphere.text },
-      { key: "surface", label: "Surface", value: surfaceOf(body, details, climate) },
-      { key: "notable", label: "Notable", value: CC.Flavour.notableOf(facts, rng) },
-      { key: "resources", label: "Resources", value: CC.Flavour.resourceOf(facts, rng) },
-      { key: "approach", label: "Approach", value: CC.Flavour.approachOf(facts, rng) },
-      { key: "danger", label: "Biggest danger", value: CC.Flavour.dangerOf(facts, rng) }
-    ];
-
-    return {
-      name: CC.Flavour.nameOf(settings),
-      typeLabel: archetype.label || archetype.id,
-      hazard: hazard.rating,
-      hazardScore: hazard.score,
-      lines: lines,
-      /* The body's palette as a swatch row, plus the seed that produced it —
-       * the card's "fingerprint" strip. Not a stat: it asserts nothing, it
-       * simply makes the card identifiably this world. */
-      fingerprint: fingerprintOf(body, palette, archetype),
-      seed: settings.seed,
-      /* The raw figures, so a probe can assert the card against the render
-       * without parsing English. */
-      facts: facts
-    };
-  }
-
-  return {
-    build: build,
-    toCelsius: toCelsius,
-    gravityOf: gravityOf,
-    radiusKm: radiusKm,
+  /* Exported for the probes, which must ask the REAL function rather than
+   * reimplementing "is there a sea" — a probe that duplicates the logic it
+   * tests agrees with itself and not with the renderer, which has cost this
+   * project two rounds already (D27, D35). */
+  CC.Stats.solid = {
     atmosphereOf: atmosphereOf,
-    /* Exported so the probe asks the REAL function rather than reimplementing
-     * "is there a sea" — a probe that duplicates the logic it tests agrees
-     * with itself and not with the renderer, which has cost this project two
-     * rounds already (D27, D35). */
     landFractionOf: landFractionOf,
-    fingerprintOf: fingerprintOf,
-    RATINGS: CC.Hazard.RATINGS
+    surfaceOf: surfaceOf,
+    dayLength: dayLength
   };
 })();

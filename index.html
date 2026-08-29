@@ -35,11 +35,21 @@
   <!-- ============ SETTINGS PANEL ============ -->
   <aside id="panel">
 
-    <!-- Pinned. These never scroll away; that was a v2 failure. -->
+    <!-- Pinned. These never scroll away; that was a v2 failure.
+         TWO COLUMNS, 2fr / 1fr. The left column keeps the two actions that
+         make a picture — Randomize and Export. The right column holds the two
+         that change the INTERFACE: Help, and the accordion collapse toggle.
+         The toggle sits directly beside Export on purpose, so "shrink the
+         panel down to what I need for exporting" is one press away from the
+         export itself. -->
     <div id="panel-pinned">
       <button id="randomize-btn" class="big-btn primary"
               title="Roll a new body. Locked controls are left alone. (Space)">
         <span class="btn-icon">&#127922;</span> Randomize
+      </button>
+      <button id="help-btn" class="big-btn side-btn"
+              title="What this is and how to use it.">
+        <span class="btn-icon">&#10067;</span> Help
       </button>
       <div class="export-wrap">
         <button id="export-btn" class="big-btn"
@@ -57,6 +67,13 @@
           <button data-export="settings">Copy seed + settings as text</button>
         </div>
       </div>
+      <!-- ALTERNATES rather than reflects. See js/ui/accordion.js: the label
+           states what the next click does, which stays true even after the
+           user has opened and closed sections by hand. -->
+      <button id="sections-btn" class="big-btn side-btn"
+              title="Switch between tweaking and exporting: collapse everything but Output, or expand it all again.">
+        <span class="btn-icon">&#8597;</span> <span id="sections-label">Collapse</span>
+      </button>
     </div>
 
     <!-- Accordion. Multi-open; each section scrolls inside itself. -->
@@ -72,6 +89,18 @@
             <select id="archetype">
               <optgroup label="Solid">
                 <option value="planet">Planet</option>
+                <option value="moon">Moon</option>
+                <option value="asteroid">Asteroid</option>
+              </optgroup>
+              <optgroup label="Gaseous">
+                <option value="gas-giant">Gas giant</option>
+                <option value="ice-giant">Ice giant</option>
+              </optgroup>
+              <optgroup label="Stellar">
+                <option value="young-star">Young star</option>
+                <option value="main-star">Main sequence star</option>
+                <option value="old-giant-star">Old giant star</option>
+                <option value="dwarf-star">Dwarf star</option>
               </optgroup>
             </select>
             <label class="lock" title="Lock: Randomize will not change the archetype.">
@@ -123,6 +152,26 @@
             <input type="range" id="core-bias" min="-100" max="100" value="0">
             <output data-readout="core-bias"></output>
             <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-core-bias"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <!-- COHESION. The asteroid's characterful control, and the one place
+               in the panel where a single slider drives four things at once:
+               how many fragments the interior breaks into, how large they are,
+               how much of the body is void between them, and how wide the
+               joints open. docs/celestials/solid-bodies.md folds the
+               rubble-pile and void-riddled traits into it for exactly that
+               reason - the four move together or the two ends of the dial read
+               as the same picture with a nudge.
+
+               It sits with the other STRUCTURE controls because that is what it
+               is: it decides what the body is made of, not how it is drawn.
+               Bodies with no mosaic simply ignore it, the same way a gas giant
+               ignores Ocean depth. -->
+          <div class="control-row" title="How solidly the body holds together. At 0% it is a loose rubble pile - many small fragments with large voids between them. At 100% it is a single monolithic block. Asteroids only.">
+            <label for="cohesion">Cohesion</label>
+            <input type="range" id="cohesion" min="0" max="100" value="45">
+            <output data-readout="cohesion"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-cohesion"><span class="lock-icon">&#128274;</span></label>
           </div>
 
           <div class="control-row" title="0% is a desert or airless world with no ocean at all. High values drown the crust in a global sea.">
@@ -389,25 +438,64 @@
         <h2 class="section-head"><span class="chev">&#9656;</span> Output</h2>
         <div class="section-body">
 
-          <div class="control-row" title="What sits behind the body in the render.">
+          <div class="control-row" title="What sits behind the body in the render. Solid, Gradient and Nebula all use the two colours below; Stars can be layered over any of them.">
             <label for="background">Background</label>
             <select id="background">
-              <option value="starfield">Starfield</option>
               <option value="solid">Solid colour</option>
               <option value="gradient">Gradient</option>
+              <option value="nebula">Nebula</option>
               <option value="transparent">Transparent</option>
             </select>
             <!-- NO LOCK. Randomize never changes the background type - it is a
                  framing choice rather than a property of the body, and rolling
                  it would flip a deliberate transparent export back to a
-                 starfield. A lock icon that guards nothing is noise, the same
-                 reasoning Keep upright already follows. -->
+                 nebula. A lock icon that guards nothing is noise, the same
+                 reasoning Keep upright already follows.
+
+                 "starfield" is GONE AS A MODE but still accepted as an input
+                 by drawBackground and by the preset/share loader, where it
+                 means solid + stars. Stars became a checkbox because they are
+                 an overlay rather than a background: as a mode they made
+                 stars-over-nebula unreachable and greyed out a colour picker
+                 that was in fact being used. -->
           </div>
 
-          <div class="control-row" title="The background colour, used by the Solid and Gradient modes. Randomize rolls it within a dark, space-like range so it never fights the body.">
+          <div class="control-row" title="The main background colour. Solid fills with it, Gradient starts from it, Nebula uses it for the voids and the first cloud colour. Randomize rolls it within a dark, space-like range so it never fights the body.">
             <label for="background-color">Background colour</label>
             <input type="color" id="background-color" value="#05070e">
             <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-background-color"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="The second colour. Gradient ends on it; Nebula uses it for the second cloud system, layered against the first.">
+            <label for="background-color2">Second colour</label>
+            <input type="color" id="background-color2" value="#141a33">
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-background-color2"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="Which way the gradient runs. 0 is bottom-to-top, 180 is top-to-bottom.">
+            <label for="background-angle">Gradient angle</label>
+            <input type="range" id="background-angle" min="0" max="359" value="180">
+            <output data-readout="background-angle"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-background-angle"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="How big the nebula's clouds are. Low gives fine mottled filaments; high gives a few vast billows crossing the frame. Costs nothing either way — it scales the noise, not the number of samples. Nebula backgrounds only; this is the CLOUDS, not the stars.">
+            <label for="nebula-scale">Nebula cloud size</label>
+            <input type="range" id="nebula-scale" min="0" max="100" value="50">
+            <output data-readout="nebula-scale"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-nebula-scale"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="Stars over whatever background is chosen. Off for Transparent, which is meant as a clean cutout.">
+            <label for="stars">Stars</label>
+            <input type="checkbox" id="stars" checked>
+          </div>
+
+          <div class="control-row" title="How many stars fill the frame.">
+            <label for="star-density">Star density</label>
+            <input type="range" id="star-density" min="0" max="100" value="60">
+            <output data-readout="star-density"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-star-density"><span class="lock-icon">&#128274;</span></label>
           </div>
 
           <div class="control-row" title="How much of the frame the body fills.">
@@ -483,6 +571,114 @@
   </aside>
 </div>
 
+<!-- ============ HELP / WELCOME MODAL ============
+     Sits OUTSIDE #app so the backdrop covers the whole window rather than
+     one grid cell.
+
+     WIDE ON PURPOSE. This is the one place the app explains itself, and an
+     explanation crammed into a 400px column reads like a legal notice. It
+     takes most of the viewport and lays its body out in columns on a wide
+     screen, collapsing to one column when there is no room.
+
+     The prose under "Using it" is a PLACEHOLDER until the remaining phases
+     land — the controls it would describe are still moving. Everything else
+     here is finished. -->
+<div id="help-overlay" class="overlay" role="dialog" aria-modal="true"
+     aria-labelledby="help-title" hidden>
+  <div id="help-panel" class="modal">
+
+    <header class="modal-head">
+      <div>
+        <h1 id="help-title">Celestial Cutaway</h1>
+        <p class="modal-sub">Cross-section illustrations of worlds that don&rsquo;t exist.</p>
+      </div>
+      <button id="help-close" class="modal-close" title="Close (Esc)" aria-label="Close">&times;</button>
+    </header>
+
+    <div class="modal-body">
+
+      <section class="help-col help-intro">
+        <h2>What this is</h2>
+        <p>
+          A generator for <strong>cutaway diagrams of celestial bodies</strong> &mdash;
+          the kind of picture that shows a planet sliced open, its core, mantle,
+          oceans and air laid out in labelled bands. Point it at a seed and it
+          builds a whole world: the layers, their colours, the things drifting
+          around inside them, and a card of readable facts about the result.
+        </p>
+        <p>
+          It is meant for <strong>science-fiction worldbuilding, tabletop games
+          and game development</strong> &mdash; anywhere you need a world to look
+          like it was surveyed rather than invented on the spot. Every image is
+          reproducible: the same seed and settings always draw the same body.
+        </p>
+        <p>
+          It runs entirely in your browser. Nothing is uploaded, nothing is
+          tracked, and it works with the network unplugged.
+        </p>
+      </section>
+
+      <section class="help-col help-usage" id="help-usage">
+        <h2>Using it</h2>
+        <p class="help-placeholder">
+          A proper walkthrough lands once the remaining body families are
+          finished &mdash; the controls are still moving, and a guide written
+          now would be wrong by the time you read it. The short version:
+        </p>
+        <ul class="help-list">
+          <li><strong>Randomize</strong> rolls a new world. Start there and
+              press it until something catches your eye.</li>
+          <li><strong>Locks</strong> (the padlock beside a control) tell
+              Randomize to leave that setting alone, so you can roll everything
+              except the parts you liked.</li>
+          <li><strong>Presets</strong> set several controls at once without
+              touching your seed, so you can compare treatments of one world.</li>
+          <li><strong>Export</strong> saves a PNG &mdash; the body alone, the
+              body with its info card, or the card by itself.</li>
+        </ul>
+        <h3>Keyboard</h3>
+        <ul class="help-keys">
+          <li><kbd>Space</kbd><span>Randomize</span></li>
+          <li><kbd>I</kbd><span>Show or hide the info card</span></li>
+          <li><kbd>1</kbd>&ndash;<kbd>8</kbd><span>Open or close a settings section</span></li>
+          <li><kbd>Ctrl</kbd>+<kbd>S</kbd><span>Export a PNG</span></li>
+          <li><kbd>Ctrl</kbd>+<kbd>C</kbd><span>Copy the render to the clipboard</span></li>
+          <li><kbd>Esc</kbd><span>Close this window</span></li>
+        </ul>
+      </section>
+
+      <section class="help-col help-brand">
+        <h2>Reactorcore</h2>
+        <p>
+          Made by <strong>Reactorcore Games</strong>. If this was useful, the
+          rest of the workshop is worth a look.
+        </p>
+        <div class="brand-links">
+          <a class="brand-link" href="https://reactorcore.itch.io/" target="_blank" rel="noopener noreferrer">
+            <span class="brand-icon">&#9733;</span>
+            <span><strong>itch.io</strong><em>Games and tools</em></span>
+          </a>
+          <a class="brand-link" href="https://github.com/ReactorcoreGames" target="_blank" rel="noopener noreferrer">
+            <span class="brand-icon">&#9881;</span>
+            <span><strong>GitHub</strong><em>Source, including this</em></span>
+          </a>
+        </div>
+        <p class="help-fine">
+          Images you generate are yours to use. The generator itself is open &mdash;
+          plain HTML, CSS and JavaScript, no build step. Open the folder and read it.
+        </p>
+      </section>
+
+    </div>
+
+    <footer class="modal-foot">
+      <span class="help-version">v3 &middot; in development</span>
+      <button id="help-dismiss" class="big-btn primary modal-ok">Get started</button>
+    </footer>
+
+  </div>
+</div>
+
 <!-- ==================================================================
      Script load order IS the dependency order. There is no bundler and
      no ES modules: these files run exactly as they are written.
@@ -502,12 +698,41 @@
 
 <!-- data -->
 <script src="js/data/stars.js"></script>
-<script src="js/data/archetypes.js"></script>
-<script src="js/data/elements.js"></script>
-<script src="js/data/traits.js"></script>
+<script src="js/data/archetypes/registry.js"></script>
+<script src="js/data/archetypes/solid.js"></script>
+<script src="js/data/archetypes/solid-moon-film.js"></script>
+<script src="js/data/archetypes/solid-moon.js"></script>
+<script src="js/data/archetypes/solid-asteroid.js"></script>
+<script src="js/data/archetypes/gaseous.js"></script>
+<script src="js/data/archetypes/stellar-common.js"></script>
+<script src="js/data/archetypes/stellar-young.js"></script>
+<script src="js/data/archetypes/stellar-main.js"></script>
+<script src="js/data/archetypes/stellar-giant.js"></script>
+<script src="js/data/archetypes/stellar-dwarf.js"></script>
+<script src="js/data/elements/registry.js"></script>
+<script src="js/data/elements/solid.js"></script>
+<script src="js/data/elements/solid-moon.js"></script>
+<script src="js/data/elements/solid-asteroid.js"></script>
+<script src="js/data/elements/gaseous.js"></script>
+<script src="js/data/elements/stellar-common.js"></script>
+<script src="js/data/elements/stellar-envelope.js"></script>
+<script src="js/data/elements/stellar-interior.js"></script>
+<script src="js/data/traits/registry.js"></script>
+<script src="js/data/traits/orbital.js"></script>
+<script src="js/data/traits/solid.js"></script>
+<script src="js/data/traits/solid-asteroid.js"></script>
+<script src="js/data/traits/gaseous.js"></script>
+<script src="js/data/traits/stellar-magnetic.js"></script>
+<script src="js/data/traits/stellar-spots.js"></script>
+<script src="js/data/traits/stellar-evolved.js"></script>
+<script src="js/data/traits/stellar-built.js"></script>
 <script src="js/data/presets.js"></script>
 <script src="js/data/phrasebook.js"></script>
-<script src="js/data/flavour.js"></script>
+<script src="js/data/flavour/registry.js"></script>
+<script src="js/data/flavour/solid.js"></script>
+<script src="js/data/flavour/solid-asteroid.js"></script>
+<script src="js/data/flavour/gaseous.js"></script>
+<script src="js/data/flavour/stellar.js"></script>
 
 <!-- generation -->
 <script src="js/gen/structure.js"></script>
@@ -515,6 +740,7 @@
 <script src="js/gen/palette.js"></script>
 <script src="js/gen/terrain.js"></script>
 <script src="js/gen/zonegeom.js"></script>
+<script src="js/gen/zoneswell.js"></script>
 <script src="js/gen/zones.js"></script>
 <script src="js/gen/climate.js"></script>
 <script src="js/gen/climatesummary.js"></script>
@@ -523,21 +749,37 @@
 <script src="js/gen/details.js"></script>
 <script src="js/gen/climatetext.js"></script>
 <script src="js/gen/hazard.js"></script>
-<script src="js/gen/stats.js"></script>
+<script src="js/gen/stats/registry.js"></script>
+<script src="js/gen/stats/solid.js"></script>
+<script src="js/gen/stats/asteroid.js"></script>
+<script src="js/gen/stats/gaseous.js"></script>
+<script src="js/gen/stats/stellar-derive.js"></script>
+<script src="js/gen/stats/stellar.js"></script>
 
 <!-- drawing -->
 <script src="js/draw/canvas.js"></script>
 <script src="js/draw/layers.js"></script>
 <script src="js/draw/primitives.js"></script>
+<script src="js/draw/primitives/orbital.js"></script>
+<script src="js/draw/primitives/mosaic.js"></script>
+<script src="js/draw/primitives/stellar.js"></script>
+<script src="js/draw/primitives/stellar-foreign.js"></script>
+<script src="js/draw/primitives/stellar-limb.js"></script>
+<script src="js/draw/primitives/stellar-flare.js"></script>
+<script src="js/draw/primitives/stellar-wind.js"></script>
+<script src="js/draw/primitives/stellar-field.js"></script>
 <script src="js/draw/details.js"></script>
 <script src="js/draw/grain.js"></script>
 <script src="js/draw/film.js"></script>
 <script src="js/draw/zonepaint.js"></script>
+<script src="js/draw/zonepaint/sea.js"></script>
+<script src="js/draw/emissive.js"></script>
 <script src="js/draw/scene.js"></script>
 <script src="js/draw/card.js"></script>
 
 <!-- ui -->
 <script src="js/ui/accordion.js"></script>
+<script src="js/ui/help.js"></script>
 <script src="js/ui/controls.js"></script>
 <script src="js/ui/traitpicker.js"></script>
 <script src="js/ui/randomize.js"></script>

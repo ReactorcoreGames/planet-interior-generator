@@ -48,7 +48,7 @@ should be a data change, not a code change.
 | 3 — Detail elements | ✅ | [roadmap/phases-0-4.md](roadmap/phases-0-4.md) |
 | 4 — Traits | ✅ | [roadmap/phases-0-4.md](roadmap/phases-0-4.md) |
 | 🎯 MVP | ✅ built, test pending | [roadmap/mvp.md](roadmap/mvp.md) |
-| 5 — Second family: gaseous | | [roadmap/phase-5-gaseous.md](roadmap/phase-5-gaseous.md) |
+| 5 — Second family: gaseous | ✅ | [roadmap/phase-5-gaseous.md](roadmap/phase-5-gaseous.md) |
 | 6 — Stars | | [roadmap/phase-6-stars.md](roadmap/phase-6-stars.md) |
 | 7 — Remaining families (moon, asteroid, compact, nebula) | | [roadmap/phase-7-remaining-families.md](roadmap/phase-7-remaining-families.md) |
 | 8 — Overlay, scale, polish | framing built early (Session I) | [roadmap/phase-8-polish.md](roadmap/phase-8-polish.md) |
@@ -60,7 +60,18 @@ should be a data change, not a code change.
 
 ## Current status
 
-Session G (MVP polish) is built. Next up per the suggested session boundaries:
-Session H, Phases 5–6 (gaseous and stars) — see
-[roadmap/scope-and-risk.md](roadmap/scope-and-risk.md#suggested-session-boundaries)
-for the full session plan.
+**Phase 5 is complete** — the gaseous family shipped in Session K and its
+presets in Session L. The generalisation test passed: nothing in `draw/` needed
+a gas-giant branch, and the phase left behind six general mechanisms and three
+primitives every later family can use.
+
+**Phase 6 is complete** — the stellar family shipped in Session M, with all
+five done-conditions checked rather than asserted; see
+[session-m-stars.md](progress/session-m-stars.md).
+
+**Next up: Phase 7 — moon, ice moon, asteroid.** The superseded pointer below
+is kept for the reasoning it carries. See
+[roadmap/phase-6-stars.md](roadmap/phase-6-stars.md), and read
+[roadmap/climate-foundation.md](roadmap/climate-foundation.md) first — a star
+is the thing the climate system has been taking its input FROM, so this phase
+inherits more of it than any other.

@@ -32,6 +32,16 @@ var CC = CC || {};
       thicknessVariation: (c.get("thickness-variation") || 0) / 100,
       optionalLayers: (c.get("optional-layers") || 0) / 100,
       coreBias: (c.get("core-bias") || 0) / 100,
+      /* HOW SOLIDLY THE BODY HOLDS TOGETHER. Drives the Voronoi cell count,
+       * the cell size, the void fraction and the seam width together — see
+       * buildMosaic in gen/elemgen.js, and the note beside the control in
+       * index.html for why those four are one slider rather than four.
+       *
+       * It sits in the Structure section and belongs to the DETAIL stage, the
+       * same divergence tidal locking has: it decides what fills a layer, not
+       * where the layer's boundaries are, so it must stay out of
+       * `structureKey` or dragging it would re-roll the whole stack. */
+      cohesion: (c.get("cohesion") === undefined ? 45 : c.get("cohesion")) / 100,
       oceanDepth: (c.get("ocean-depth") || 0) / 100,
       interiorHeat: (c.get("interior-heat") || 0) / 100,
       boundaryIrregularity: (c.get("boundary-irregularity") || 0) / 100,
@@ -85,8 +95,19 @@ var CC = CC || {};
       showInfo: c.get("show-info") === undefined ? true : !!c.get("show-info"),
       infoDetail: c.get("info-detail") || "standard",
 
-      background: c.get("background") || "starfield",
+      /* THE BACKGROUND IS A STACK: a base colour, an optional field, and an
+       * optional star overlay. `background` names only the FIELD now — stars
+       * ride on top of any of them. See draw/canvas.js drawBackground. */
+      background: c.get("background") || "solid",
       backgroundColor: c.get("background-color") || "#05070e",
+      backgroundColor2: c.get("background-color2") || "#141a33",
+      backgroundAngle: c.get("background-angle") === undefined ? 180 : c.get("background-angle"),
+      stars: c.get("stars") === undefined ? true : !!c.get("stars"),
+      starfieldDensity: (c.get("star-density") === undefined ? 60 : c.get("star-density")) / 100,
+      /* How big the nebula's clouds are — the noise frequency, not how much
+       * of the frame is covered (which the two colour pickers already reach).
+       * Nebula field only; every other background ignores it. */
+      nebulaScale: (c.get("nebula-scale") === undefined ? 50 : c.get("nebula-scale")) / 100,
       bodySize: (c.get("body-size") || 78) / 100,
 
       /* FRAMING IS OUTPUT-STAGE STATE and appears in no cache key, which is
@@ -170,7 +191,7 @@ var CC = CC || {};
     return [structureKey(s), s.detailDensity, s.sizeTiers, s.flowIndicators,
             s.textureStrength,
             (s.traits || []).join(","), (s.traitExcluded || []).join(","),
-            s.traitCount, s.tidalLock, s.tidalFacing,
+            s.traitCount, s.tidalLock, s.tidalFacing, s.cohesion,
             /* The climate field lives in this stage: it modulates the
              * snowline and the frosting rather than a layer radius, exactly as
              * tidal locking does. */
@@ -355,6 +376,10 @@ var CC = CC || {};
     { id: "thickness-variation", stage: "structure", format: pct },
     { id: "optional-layers", stage: "structure", format: pct },
     { id: "core-bias", stage: "structure", format: function (v) { return (v > 0 ? "+" : "") + Math.round(v); } },
+    /* STRUCTURE SECTION, DETAIL STAGE — the same divergence tidal locking has,
+     * and for the same reason. Cohesion decides what a layer is made of, not
+     * where its boundaries are. */
+    { id: "cohesion", stage: "detail", format: pct },
     { id: "ocean-depth", stage: "structure", format: pct },
     { id: "interior-heat", stage: "structure", format: pct },
     { id: "boundary-irregularity", stage: "structure", format: pct },
@@ -404,6 +429,11 @@ var CC = CC || {};
     { id: "info-detail", stage: "output" },
     { id: "background", stage: "output" },
     { id: "background-color", stage: "output" },
+    { id: "background-color2", stage: "output" },
+    { id: "background-angle", stage: "output", format: deg },
+    { id: "stars", stage: "output" },
+    { id: "nebula-scale", stage: "output", format: pct },
+    { id: "star-density", stage: "output", format: pct },
     { id: "body-size", stage: "output", format: pct },
     /* Framing is output-stage: it re-frames, it never regenerates. */
     { id: "zoom", stage: "output", format: CC.Framing.zoomLabel },
@@ -417,14 +447,21 @@ var CC = CC || {};
     canvas = document.getElementById("stage");
 
     CC.Accordion.init(document);
+
+    /* The section toggle and the help modal. Both are pure interface: neither
+     * touches the pipeline, so neither asks for a redraw. */
+    if (CC.Help) CC.Help.init();
+    setupSectionToggle();
+
     CC.Controls.bindAll(CONTROL_SPECS);
     CC.Controls.setChangeHandler(function (id) {
       if (id === "keep-upright") syncRotationEnabled();
-      if (id === "background") syncBackgroundColour();
+      if (id === "background" || id === "stars") syncBackgroundColour();
       if (id === "archetype") {
         var a = CC.Controls.get("archetype") || "planet";
         if (CC.TraitPicker) CC.TraitPicker.setArchetype(a);
         if (CC.PresetGallery) CC.PresetGallery.setArchetype(a);
+        CC.Controls.syncAxisDials();
       }
       requestDraw();
     });
@@ -435,7 +472,24 @@ var CC = CC || {};
       CC.TraitPicker.init(document.getElementById("trait-list"), function () {
         requestDraw();
       });
+      /* AND IT MUST BE TOLD WHICH BODY IT IS LOOKING AT, at init and not only
+       * on change.
+       *
+       * The picker defaults to `planet` internally and only ever heard about
+       * archetype CHANGES, so a page loaded with the control already restored
+       * to `gas-giant` showed the PLANET's trait list — nothing had changed,
+       * so nothing told it. The user found this by pressing F5 with a gas
+       * giant selected, which is the one path no code here exercises.
+       *
+       * `PresetGallery` two blocks down already did exactly this; the picker
+       * was simply missing the same line. */
+      CC.TraitPicker.setArchetype(CC.Controls.get("archetype") || "planet");
     }
+
+    /* AT INIT AS WELL AS ON CHANGE — see syncAxisDials, and D79/D114 before
+     * it: a page restored with a star already selected fires no change event,
+     * so a change-only hook is a control still wearing the planet's label. */
+    CC.Controls.syncAxisDials();
 
     if (CC.InfoPanel) CC.InfoPanel.init(document.getElementById("info-panel"));
 
@@ -530,13 +584,66 @@ var CC = CC || {};
     }
   }
 
+  /* THE SECTION TOGGLE ALTERNATES; IT DOES NOT REFLECT.
+   *
+   * The label is a statement about what the next press will do, which stays
+   * true no matter what the user has done to individual sections by hand — the
+   * alternative, describing the accordion's current state, has no honest
+   * answer once the panel is half-open. See js/ui/accordion.js.
+   *
+   * The one exception is the initial label, which the accordion derives from
+   * the RESTORED layout: on load there has been no click to alternate from, so
+   * a panel that reopened with sections showing must offer Collapse and a
+   * panel that reopened shut must offer Expand. */
+  function setupSectionToggle() {
+    var btn = document.getElementById("sections-btn");
+    var label = document.getElementById("sections-label");
+    if (!btn) return;
+
+    function syncLabel() {
+      if (!label) return;
+      var next = CC.Accordion.pendingMode();
+      label.textContent = (next === CC.Accordion.EXPAND) ? "Expand" : "Collapse";
+      btn.title = (next === CC.Accordion.EXPAND)
+        ? "Open every settings section."
+        : "Close every settings section.";
+    }
+
+    btn.addEventListener("click", function () {
+      CC.Accordion.cycle();
+      syncLabel();
+    });
+
+    syncLabel();
+  }
+
   function syncRotationEnabled() {
     CC.Controls.setEnabled("rotation", !CC.Controls.get("keep-upright"));
   }
 
+  /* WHAT IS GREYED OUT IS ONLY WHAT THE STACK CANNOT USE. Transparent is the
+   * one field that ignores the colours entirely, because it paints nothing.
+   * Every other field reads colour 1, and gradient and nebula both read
+   * colour 2 — so the second picker stays live for both rather than being a
+   * gradient-only control that a nebula happens to borrow.
+   *
+   * Under Transparent the star controls go too: a starfield on alpha zero is
+   * not a cutout, and drawBackground refuses to draw one, so an enabled
+   * checkbox there would be a control that does nothing. */
   function syncBackgroundColour() {
     var mode = CC.Controls.get("background");
-    CC.Controls.setEnabled("background-color", mode === "solid" || mode === "gradient");
+    var paints = mode !== "transparent";
+
+    /* The checkerboard lives in CSS behind the canvas, so Transparent looks
+     * transparent instead of looking black. Nothing is drawn into the render
+     * for it — see style.css #stage.transparent-bg. */
+    if (canvas) canvas.classList.toggle("transparent-bg", !paints);
+    CC.Controls.setEnabled("background-color", paints);
+    CC.Controls.setEnabled("background-color2", mode === "gradient" || mode === "nebula");
+    CC.Controls.setEnabled("background-angle", mode === "gradient");
+    CC.Controls.setEnabled("nebula-scale", mode === "nebula");
+    CC.Controls.setEnabled("stars", paints);
+    CC.Controls.setEnabled("star-density", paints && !!CC.Controls.get("stars"));
   }
 
   function on(id, evt, fn) {

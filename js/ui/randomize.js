@@ -22,6 +22,13 @@ CC.Randomize = (function () {
     { id: "thickness-variation", lo: 35, hi: 100 },
     { id: "optional-layers", lo: 30, hi: 100 },
     { id: "core-bias", lo: -80, hi: 80 },
+    /* COHESION IS ROLLED THE WHOLE WAY, for the reason Starlight is: the whole
+     * span is the interesting output. A loose rubble pile riddled with voids
+     * and a solid monolithic fragment are two genuinely different pictures
+     * from one number, and a narrow band around the default would only ever
+     * produce the middle one. It costs nothing on the bodies that have no
+     * mosaic, which simply ignore it. */
+    { id: "cohesion", lo: 0, hi: 100 },
     { id: "ocean-depth", lo: 0, hi: 100 },
     { id: "interior-heat", lo: 0, hi: 100 },
     { id: "rotation", lo: 0, hi: 360 },
@@ -69,7 +76,25 @@ CC.Randomize = (function () {
     { id: "detail-density", lo: 52, hi: 82 },
     { id: "size-tiers", lo: 3, hi: 4 },
     { id: "texture-strength", lo: 80, hi: 125 },
-    { id: "element-opacity", lo: 85, hi: 115 }
+    { id: "element-opacity", lo: 85, hi: 115 },
+    /* THE BACKGROUND'S OWN NUMBERS ROLL TOO. Both are framing rather than
+     * body, but unlike the background TYPE neither can produce a wrong
+     * picture at any value — a gradient runs some way and a starfield has
+     * some many stars — so there is no reason to pin them.
+     *
+     * The angle rolls its whole circle. Density stays off its floor: a
+     * starfield the user has switched ON and which then rolls to nearly no
+     * stars reads as the checkbox having failed, not as a sparse sky. */
+    { id: "background-angle", lo: 0, hi: 359 },
+    { id: "star-density", lo: 30, hi: 95 },
+    /* NEBULA CLOUD SIZE ROLLS ITS WHOLE MIDDLE. Unlike Star density there is
+     * no floor to keep off: every value here draws the same AMOUNT of gas,
+     * just at a different size, so no roll can produce the "it failed to
+     * render" picture a near-empty starfield would. Both ends are trimmed for
+     * a different reason — the extremes stop reading as a nebula at all, one
+     * flat wash at the bottom and mottled static at the top — so the roll
+     * stays inside the range where the field has structure. */
+    { id: "nebula-scale", lo: 15, hi: 85 }
   ];
 
   var HUE_RELATIONS = ["auto", "complement", "analogous", "triad", "split", "monochrome"];
@@ -122,11 +147,39 @@ CC.Randomize = (function () {
      * than across the wheel, for the same reason Saturation is narrow: the body
      * is the subject, and a bright background turns the picture into a colour
      * clash. Hue is free, value is not. */
+    var bgHue = rng() * 360;
     if (!CC.Controls.isLocked("background-color")) {
-      var bgHue = rng() * 360;
-      var bgSat = 0.25 + rng() * 0.45;
-      var bgVal = 0.045 + rng() * 0.055;   /* near-black, always */
+      var bgSat = 0.30 + rng() * 0.50;
+      /* THE DARK END IS THE COMMON CASE, NOT THE ONLY ONE. The original band
+       * topped out at 0.10 value, which is near-black in every roll — the
+       * control looked broken because a user could not see it changing. Most
+       * rolls still land dark, since a bright backdrop turns the picture into
+       * a colour clash, but one in four now reaches a genuinely lit sky: the
+       * blue-behind-the-planet look that Solid + Stars exists to give. */
+      var bgVal = rng() < 0.75 ? (0.05 + rng() * 0.09) : (0.16 + rng() * 0.20);
       CC.Controls.set("background-color", CC.Color.hsvToHex(bgHue, bgSat, bgVal));
+    }
+
+    /* THE SECOND COLOUR IS ROLLED AS A RELATION, NOT INDEPENDENTLY. Two free
+     * hues produce a clash about as often as they produce a pair, and the
+     * gradient and the nebula both read as one atmosphere rather than as two
+     * unrelated washes. So it is the first hue walked a short way around the
+     * wheel — near-analogous most of the time, occasionally far enough to be
+     * a deliberate two-tone.
+     *
+     * It is allowed to be a little brighter than colour 1 because it is the
+     * far end of a gradient and the core of a nebula: if both ends sit in the
+     * same near-black band there is no gradient to see. Still dark enough
+     * that the body stays the subject. */
+    if (!CC.Controls.isLocked("background-color2")) {
+      var spread = rng() < 0.75 ? 18 + rng() * 45 : 90 + rng() * 90;
+      var h2 = (bgHue + (rng() < 0.5 ? -spread : spread) + 360) % 360;
+      var s2 = 0.35 + rng() * 0.50;
+      /* Brighter than colour 1 on purpose and by a wider margin: it is the far
+       * end of a gradient and the CORE of a nebula, and cores that sit in the
+       * same near-black band as the voids give a nebula with nothing to see. */
+      var v2 = 0.12 + rng() * 0.26;
+      CC.Controls.set("background-color2", CC.Color.hsvToHex(h2, s2, v2));
     }
 
     /* EXOTIC OCEANS IS ROLLED, BUT RARELY. The realistic blue-green sea is the

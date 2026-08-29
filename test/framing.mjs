@@ -26,6 +26,9 @@ const srcs = [...html.matchAll(/<script\s+src=["']([^"']+)["']/gi)]
 
 const sandbox = { console, Math, Date, parseInt, parseFloat, isNaN, isFinite };
 sandbox.self = sandbox;
+// lib/simplex-noise.js publishes itself onto `window`; the nebula background
+// reads it from there, so the sandbox needs one or that background throws.
+sandbox.window = sandbox;
 sandbox.globalThis = sandbox;
 createContext(sandbox);
 for (const src of srcs) {

@@ -1,49 +1,26 @@
-/* Archetype definitions — pure data.
+/* Solid bodies — the rocky family.
  *
- * An archetype is a recipe, not code. It declares a standard layer stack and a
- * colour profile; the structure stage turns it into a concrete body and the
- * renderer draws whatever comes out. Adding the twelfth body type should be an
- * edit to this file and nothing else.
+ * `planet` today; `moon`, `ice-moon` and `asteroid` land at Phase 7. See
+ * docs/celestials/solid-bodies.md for the spec and js/data/archetypes/registry.js
+ * for what every field means.
  *
- * LAYER PROPERTIES (see docs/ARCHITECTURE.md for the full table)
- *
- *   role       layer identity — drives details, colour and label
- *   frac       [min, max] outer radius as a fraction of body radius
- *   boundary   perfect | near-perfect | slight | irregular | heavy | extreme
- *              | soft-gradient
- *
- * PRESENCE — how a layer decides whether it exists at all. One mechanism,
- * three forms, evaluated by one code path in gen/structure.js:
- *
- *   (omitted)              always present
- *   presence: 1.0          a 100% roll at max slider; scales down with Optional layers
- *   presence: { param, above, fade }
- *                          present only while the named parameter is above the
- *                          threshold; `fade` gives it a soft entry rather than
- *                          popping in
- *
- * This matters more than it looks. Ocean depth and Interior heat are the first
- * two users of the parameter form, but Cohesion, Operational status and Hull
- * integrity all want the same thing later. Making presence a first-class
- * layer property means those are data edits rather than special cases in the
- * stack builder.
- *
- * THICKNESS — likewise three forms:
- *
- *   frac: [min, max]       rolled, scaled by Layer thickness variation
- *   frac: { param, ... }   driven by a parameter instead of rolled
- *   bias: "core-bias"      a named control pushes the roll within its range */
+ * The registry must load before this file. */
 
 var CC = CC || {};
 
-CC.Archetypes = (function () {
+(function () {
   "use strict";
 
   var PLANET = {
     id: "planet",
     label: "Planet",
     family: "solid",
-    tags: ["solid-surface", "solid-interior"],
+    tags: ["solid-surface", "solid-interior", "dusty-rings", "orbit-debris"],
+    /* Which stat template writes this body's card — see
+     * js/gen/stats/registry.js for why a template is a MINDSET rather than a
+     * list of rows. "solid" is the default, stated explicitly here because
+     * the planet is the body every other family is contrasted against. */
+    statTemplate: "solid",
 
     /* Radius in km, for stats and the scale bar. */
     radiusKm: [2400, 9800],
@@ -497,6 +474,39 @@ CC.Archetypes = (function () {
          * not four unrelated paints. */
         film:         {
           surface: true,
+          /* WHERE THE ZONE BOUNDARIES SIT, as a fraction of the terrain's own
+           * range. These were `SNOWLINE = 0.42` and `SHELF = -0.16` in
+           * draw/film.js until Phase 5; they are Earth-ish numbers and D22
+           * recorded that they had to become per-archetype data once a second
+           * family started depositing. Unchanged in value — they are simply
+           * now stated as facts about a planet.
+           *
+           * Both are OFFSETS FROM SEA LEVEL, not absolute radii, so they
+           * follow the sea as Ocean depth moves it: raise the sea and the
+           * shore rises with it. On a world with no sea at all the level line
+           * falls back to the terrain mean, which puts the two underwater
+           * zones out of reach and leaves peaks and land dividing the surface
+           * between them. */
+          line: 0.42,           /* the snowline, above sea level */
+          shelf: -0.16,         /* the shelf edge, below it */
+          /* EACH ZONE CARRIES ITS DEPOSITION CHARACTER ALONGSIDE ITS COLOUR,
+           * which is the other half of the D22 move: the five knobs and the
+           * colour they pair with are one statement about a material, and
+           * having them in two files a thousand lines apart is what made the
+           * planet's numbers look like constants of the renderer.
+           *
+           *   depth   how thick it lies, as a fraction of the host layer
+           *   smooth  how much flatter than the rock its top surface is. High
+           *           values pool and level out; low ones drape and follow
+           *   bleed   how far its underside fingers down into the rock
+           *   patch   how much of the mask's variation reaches the alpha. Low
+           *           is an even coat, high is broken and blotchy
+           *   grain   amplitude of the fine wobble on the top surface — the
+           *           difference between a poured glaze and a crumbly one
+           *
+           * Authored to contrast with their neighbours: snow lies smooth and
+           * even, vegetation is patchy and draped, reefs are lumpy, abyssal
+           * ooze is thick and almost featureless. */
           zones: {
             /* Snow and ice. Achromatic and bright on a cold world; on a hot
              * one `snow` does nothing and this stays bare high ground in the
@@ -514,21 +524,29 @@ CC.Archetypes = (function () {
              * Narrow bands, ordered peak > shallow > land > deep and centred
              * low, leave the lift room to work and keep the order stable. */
             frostPeak:    { hueOffset:  18, sat: [0.20, 0.55],
-                            val: [0.60, 0.72], snow: true },
+                            val: [0.60, 0.72], snow: true,
+                            depth: 0.30, smooth: 0.85, bleed: 0.35,
+                            patch: 0.35, grain: 0.10 },
             /* The ordinary surface: vegetation, soil, dust. The zone the old
              * single `film` colour corresponds to, and the alias target. */
             frostLand:    { hueOffset:   0, sat: [0.48, 0.90],
-                            val: [0.38, 0.50] },
+                            val: [0.38, 0.50],
+                            depth: 0.34, smooth: 0.45, bleed: 0.95,
+                            patch: 0.85, grain: 0.30 },
             /* Shelf and shoreline — reefs, algal mats, bright shallow water
              * sediment. Offset furthest, because a coast that differs clearly
              * from the land above it is what makes the zones legible. */
             frostShallow: { hueOffset: -52, sat: [0.55, 0.95],
-                            val: [0.48, 0.60], aquatic: true },
+                            val: [0.48, 0.60], aquatic: true,
+                            depth: 0.26, smooth: 0.35, bleed: 0.70,
+                            patch: 0.95, grain: 0.45 },
             /* The abyssal floor: ooze and deep sediment. Darker and duller —
              * it is the one zone that is mostly seen THROUGH the sea, which
              * darkens whatever is under it. */
             frostDeep:    { hueOffset: -84, sat: [0.35, 0.70],
-                            val: [0.26, 0.38], aquatic: true }
+                            val: [0.26, 0.38], aquatic: true,
+                            depth: 0.40, smooth: 0.92, bleed: 0.30,
+                            patch: 0.30, grain: 0.08 }
           }
         },
         /* The mantle is the layer the eye spends most of its time on, and it
@@ -595,10 +613,5 @@ CC.Archetypes = (function () {
     }
   };
 
-  var ALL = { planet: PLANET };
-
-  function get(id) { return ALL[id] || PLANET; }
-  function ids() { return Object.keys(ALL); }
-
-  return { get: get, ids: ids, PLANET: PLANET };
+  CC.Archetypes.register(PLANET);
 })();

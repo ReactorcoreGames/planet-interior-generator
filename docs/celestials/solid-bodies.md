@@ -527,11 +527,50 @@ inward until the next begins, and proportions are stylized
 | Layer role | Frac range | Optional | Boundary | Notes |
 |---|---|---|---|---|
 | `atmosphere` | surface +0.03…0.06 | 15% | soft gradient | thin if present |
-| `ice-shell` | 0.90–0.94 | 40% | near-perfect | the Europa case; becomes the surface when present |
-| `ocean` | 0.79–0.85 | with `ice-shell` | perfect circle | subsurface, dark — sits *below* the ice |
-| `crust` | 0.68–0.76 | — | near-perfect | heavily cratered. **Becomes the surface (0.90–0.94) when there is no ice-shell**, with the mantle dropping to 0.74–0.82 to match |
-| `mantle` | 0.58–0.66 | — | irregular | often cold, sluggish |
-| `core` | 0.26–0.40 | — | near-perfect | small, may be inert |
+| `ice-shell` | 0.925–0.950 | **cold-gated**, see below | near-perfect | the Europa case; becomes the surface when present. Carries `relief`, so its peaks reach the drawn surface at ~1.0 |
+| `ocean` | 0.800–0.850 | with `ice-shell` | perfect circle | subsurface, dark — sits *below* the ice |
+| `crust` | 0.900–0.945 | — | near-perfect | heavily cratered. **Drops to 0.680–0.740 when an ice-shell is present**, with the mantle dropping to 0.540–0.620 to match |
+| `mantle` | 0.740–0.820 | — | irregular | often cold, sluggish |
+| `core` | 0.260–0.400 | — | near-perfect | small, may be inert |
+
+> **THIS TABLE WAS CORRECTED IN PHASE 7, and the reasoning is recorded here
+> the way D4's was** — an uncorrected table gets re-read literally by a later
+> session, which is exactly how the moon's and asteroid's survived unrevisited
+> for as long as they did.
+>
+> The old figures **composed** — no layer inverted at any combination of
+> extremes, so D4's fault was genuinely absent. Three different faults were
+> found by building the stack and printing what came out:
+>
+> 1. **Nothing sat above the ice-shell.** It was authored at 0.90–0.94 as the
+>    surface, leaving 6–10% of the radius empty; the atmosphere is optional and
+>    `outward`, so it does not count. `gen/structure.js` renormalizes the
+>    surface to exactly 1.0 (D3), so the whole stack was silently multiplied by
+>    up to 1.11 and the drawn radii were nowhere near the tabled ones. **The
+>    authored number is not the drawn number** — D122 arriving in the structure
+>    stage rather than in a mark's alpha.
+> 2. **The ice-branch crust could roll 0.020 thick** while its own prose calls
+>    it heavily cratered, and the **ocean could roll 0.030** — the one layer
+>    that must never come out as a line, since the hidden sea is the entire
+>    reason the branch exists. Both against D5's "every layer legible".
+> 3. **The shell's own relief re-created fault 1 after it was fixed.** Terrain
+>    peaks count toward the surface, so a shell authored at 1.000 with
+>    `relief: 0.11` measured 1.055 and was drawn at 0.947. The range is now
+>    authored half the relief low so renormalization brings it back to 1.0.
+>
+> Measured after the corrections: every layer on both branches clears 0.056 of
+> the radius at its worst roll. `npm run test:docs` now composes each **branch**
+> separately, since composing `frac_when` variants as one flat list compares
+> layers that never coexist.
+
+**The ice-shell is gated on temperature, not rolled.** `presence: { colder }`
+— a shell of ice is the evidence that the body is cold, so rolling it
+independently of the climate produced ice-shelled moons at 610 °C. Measured
+with a flat 40% roll, only **11%** of ice moons actually showed the thing the
+branch is for (a frozen shell over a liquid sea); the rest were warm bodies
+wearing a lid. Gated, that figure is **65%**, with 83% frozen surfaces and 81%
+liquid oceans — and the remainder are honest, because a dead moon's sea *does*
+freeze through and the card says so.
 
 **The ordering branch.** With an `ice-shell` the stack is ice → ocean → crust →
 mantle → core; without it, crust sits directly at the surface. The crust's
@@ -574,11 +613,33 @@ what makes it worth its structural exception:
   **upward** as accreted ice — coloured tips hanging down into the water.
 
 Two frosted surfaces facing each other across a dark ocean, and the viewer only
-ever sees it because the body is cut open. The upward deposit is the one piece
-that needs new work: `draw/film.js` settles material outward from the rock, so
-an underside wants a `direction: -1` on the zone spec to mirror it. A few sign
-changes rather than a rewrite — but real, and worth scoping up front. See
-[PROGRESS.md](../PROGRESS.md) D22.
+ever sees it because the body is cut open.
+
+**Built in Phase 7.** `direction: -1` on the zone spec is what states the
+inverted case, and it turned out to be what the spec predicted: a handful of
+sign changes rather than a rewrite. `drawFrosting` now works in the deposit's
+**own frame** — "up" means away from the surface the material grew on — with
+`dir` the only place the two cases differ, so pooling, shedding, zone weights
+and feathering are all the same arithmetic seen in a mirror. Three things
+needed the sign besides the radii: the terrain field (a bump on an underside is
+a dip the ice gathers in), the rock floor the ribbons clamp against, and the
+band clip, which had to be **opened downward** or the hanging material was
+clipped to nothing — the same trap the outward clip already cost a round on.
+
+Two zone tables also had to become **per-role**. They were resolved once per
+body, which was the whole truth while every archetype had one frosted surface;
+`CC.Frosting.specFor` now picks a spec per role (`layers[role].film_when` →
+`layers[role].film` → `layers.film`), with the body-wide fallback last so
+nothing that worked before moved. Each spec gets **its own RNG stream** — shared,
+the brine floor and the accreted ice rolled identical hues and the two surfaces
+came out as one material drawn twice.
+
+The fault that hid it for a round: `filmZoneByRole` was built by asking
+`CC.Elements.reliefFor(role)`, which finds a role's *shared* terrain and misses
+a layer whose field is declared on the layer as `reliefSpec` — which is exactly
+the ice shell. The palette resolved all six zone colours, the terrain and mask
+were built, and the accreted ice never drew because a key was absent from a
+lookup. D159's shape, in the frosting rather than in an element recipe.
 
 ### Colour profile
 
@@ -611,10 +672,35 @@ Note that the contrast rule floors every zone at `host.s + 0.14` and a step
 above the rock in value, so "desaturated" has a deliberate limit: a frosting
 that matches its rock in both value and saturation is invisible, which is the
 failure D19 exists to prevent. **Author dullness by narrowing the ranges and
-the gaps between zones, not by trying to defeat the rule.** Moon zones should
-also drop the `snow` flag — a dead airless body has no weather to deposit it,
-and whitened caps would be telling the wrong story. See
-[PROGRESS.md](../PROGRESS.md) D22.
+the gaps between zones, not by trying to defeat the rule.**
+
+**Built as TWO zones — `regolithRim` and `regolithFloor`** — because a planet's
+four exist to divide ground either side of a sea and a moon has no sea. High
+`smooth` (0.62 / 0.94) and near-zero `patch` (0.12 / 0.06): a dust sheet levels
+and is not blotchy. Measured on a bare moon, the deposit's settled span comes
+out at 0.091 against a rock span of 0.155, with 50% of bearings pooling and 50%
+shedding — regolith filling crater floors and swept off rims, from
+`depositTop` alone and with no crater-fill code.
+
+**`hueFrom: "host"` is new here, and it is the one place the free frosting hue
+is wrong.** A planet's cover is vegetation and reefs — things with chemistry of
+their own — so "orange grass or pink forests are a feature" (D19), and
+constraining the hue was the failure that made every world the same ochre.
+Regolith is not that: it is the rock itself, ground to dust, so its hue is the
+rock's *by definition*. Measured before the flag existed, the zones came out at
+hue 138 and 97 over rock at 169 — moss on stone. Reading the host's hue and
+narrowing the authored offsets to ±5/−11 puts both zones within ~20° of the
+ground, which is the *subtle mineral tint on grey* this section asks for.
+
+**`snow` IS KEPT, and D22's reasoning for dropping it is superseded.** D22 said
+to drop it because "a dead airless body has no weather to deposit it". That was
+sound when the only route to whiteness was a global aridity figure. But the
+field is **angular** now, and cold-trapped volatile ice in permanently shadowed
+polar craters is real, is visually excellent, and is exactly what an emergent
+snowline produces. So the flag stays and a warm moon's own baseline denies it —
+the same conditional the planet's caps use, with no new mechanism. The snowline
+sits high (0.62 against a planet's 0.42), because a cold trap wants the top of
+the relief *and* the cold end of the field at once.
 
 ### Layer details
 
@@ -640,6 +726,33 @@ surface-city · underground-city · orbital-platforms
 > declare in `archetype.axes`, and caps emerge from the frosting. A moon is
 > *more* likely to be locked than a planet, so it should almost certainly roll
 > the axis high by default when that archetype is built.
+
+> **NO RINGS, AND NO DEBRIS BELT** (D173). The moon carries neither
+> `dusty-rings` nor `orbit-debris`, so both orbital traits are ineligible.
+> No moon in the solar system has a confirmed ring, and the reason is
+> structural rather than accidental: a ring needs a stable band between the
+> body's Roche limit and the distance where the PARENT planet's gravity takes
+> over, and around a moon that band is very narrow — the parent strips it.
+>
+> There is a picture argument too. Rings on a planet, a giant and a moon were
+> the same mark at the same radii, so seeing it on all three made them read as
+> one body type with different fills — D76/D160's vocabulary problem arriving
+> from the direction of sameness. A giant's rings are now `ringlet-system`,
+> a genuinely different object; see [gaseous-bodies.md](gaseous-bodies.md).
+
+> **TIDAL LOCKING WORKS DIFFERENTLY ON THE ICE BRANCH** (D172). The planet's
+> recipe moves SEA LEVEL by bearing, which is the whole feature on a world
+> whose sea is on top. Under an ice shell that is false twice: a subsurface
+> ocean is sealed, with no exposed surface to evaporate from and nowhere to
+> retreat to, and the shell above it is rigid — so a retreating ocean draws a
+> lid spanning a void that would need pillars to hold it up.
+>
+> The ice branch declares `field_when` and simply omits `sea` and `snow`
+> (an omitted key takes its neutral value). What carries the lock instead is
+> the **shell's own thickness**: tidal flexing melts ice from beneath, so the
+> shell is THINNER on the tidal axis and thicker away from it, with the ocean
+> taking up the difference and the body staying round. That is the real
+> mechanism, and it is the opposite sign from a retreating sea.
 
 > `ancient-dead` removed — it's Interior heat at 0, not a trait. A dead moon is
 > the common case here, so the moon archetype should roll Interior heat low by
@@ -670,9 +783,36 @@ surface-city · underground-city · orbital-platforms
 
 | Layer role | Frac range | Optional | Boundary | Notes |
 |---|---|---|---|---|
-| `dust-film` | 0.97–1.00 | 70% | heavy wobble | scratched regolith; the surface when present |
-| `outer-shell` | 0.93–0.96 | — | **heavy wobble** | hardened crust; takes the surface with no dust-film |
-| `interior` | 0.88–0.92 | — | heavy wobble | runs to the centre; Voronoi mosaic — no core |
+| `dust-film` | *(a film, not a band)* | — | follows its host | scratched regolith, deposited ON the shell |
+| `outer-shell` | 0.960–1.000 | — | **heavy ×1.5, faceted** | hardened crust; always the surface |
+| `interior` | 0.862–0.905 | — | **heavy ×1.5, shares the shell's shape** | runs to the centre; Voronoi mosaic — no core |
+
+> **CORRECTED IN SESSION T (D175/D176), against the original table above it.**
+> The figures here are the ones the generator uses; the originals were
+> `dust-film` 0.97–1.00 (70% optional), `outer-shell` 0.93–0.96 and `interior`
+> 0.88–0.92, and they **composed** — so the doccheck passed on them and they
+> were still wrong three ways. See
+> [session-t-asteroid.md](../progress/session-t-asteroid.md).
+>
+> - **`interior` must carry a `frac`.** Omitting it on the strength of "runs
+>   to the centre" resolved it to the shell's *outer* edge, so the shell came
+>   out 0.000 thick and was dropped from the stack entirely — the built body
+>   had one layer on all 200 seeds. 0.88–0.92 is where the mosaic *starts*;
+>   "runs to the centre" describes the other end, which every innermost layer
+>   does for free.
+> - **`dust-film` is a film, not a band.** Authoring the shell below 1.0 left
+>   nothing above it on the 30% of bodies with no dust, and renormalization
+>   then scaled the whole stack by up to 1.075. The dust is a *coating* — the
+>   moon's frosting mechanism, unchanged — so the shell reaches the surface on
+>   both branches and renormalization has nothing to do.
+> - **The shell was a hairline** at 0.0417 of the radius at worst, against
+>   D5's legible-bands rule. The interior's range came down to buy it room;
+>   the worst case over 480 bodies is now 0.0615.
+> - **The boundary is faceted, not merely large.** At `extreme` amplitude the
+>   silhouette swung 12% of the radius and still read as a circle, because fBm
+>   is smooth by construction. What makes it an asteroid is angularity
+>   (`boundaryFacet`) and lobe count (`boundaryFreq`); the interior then
+>   *shares* the shell's curve so the two can never cross.
 
 Read as elsewhere: `frac` is each layer's **outer** radius and the layer runs
 inward until the next begins, so the interior's 0.88–0.92 is where the mosaic

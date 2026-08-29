@@ -197,10 +197,14 @@ CC.Export = (function () {
 
     /* The background spans the whole frame, so the card sits ON the scene
      * rather than beside a differently-coloured panel. */
-    CC.Canvas.drawBackground(ctx, w, h, merged.background || "starfield", {
+    CC.Canvas.drawBackground(ctx, w, h, merged.background || "solid", {
       color: merged.backgroundColor || "#05070e",
+      color2: merged.backgroundColor2,
+      angle: merged.backgroundAngle,
+      stars: merged.stars === undefined ? true : !!merged.stars,
       seed: merged.seed,
-      density: merged.starfieldDensity === undefined ? 0.6 : merged.starfieldDensity
+      density: merged.starfieldDensity === undefined ? 0.6 : merged.starfieldDensity,
+      scale: merged.nebulaScale === undefined ? 0.5 : merged.nebulaScale
     });
 
     var bodyAreaW = w - cardW - margin * 2;

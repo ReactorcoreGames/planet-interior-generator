@@ -89,8 +89,53 @@ CC.ClimateText = (function () {
       " at the equator, " + cold + " at the poles.";
   }
 
+  /* ---- the second temperature ------------------------------------------ */
+
+  /* A BODY WITH TWO TEMPERATURES HAS TO STATE BOTH, and state them so they do
+   * not contradict each other or the picture.
+   *
+   * The surface row above says the shell is frozen. This row says the water
+   * beneath it is not, and — crucially — says WHY, because "frozen surface,
+   * liquid ocean" is a contradiction to any reader who is not given the
+   * mechanism. The lid is the mechanism: it insulates, and the interior heats
+   * from below.
+   *
+   * Returns null when the body has one temperature, which is every body but
+   * an ice-shelled moon. The card drops a null row rather than printing an
+   * empty one.
+   *
+   * READ OFF THE SAME FIELD THE PICTURE IS DRAWN FROM. `climate.subsurface` is
+   * what gen/climate.js computed and what the frosting on the shell's
+   * underside answers to, so the sentence cannot drift from the render — the
+   * standing rule in HAZARDS.md. */
+  function subsurfaceLine(climate) {
+    if (!climate || climate.subsurface === null ||
+        climate.subsurface === undefined) return null;
+
+    var t = CC.Stats.toCelsius(climate.subsurface);
+    var c = Math.round(t);
+
+    /* WHETHER THE SEA IS ACTUALLY LIQUID IS A FACT, NOT AN ASSUMPTION. A moon
+     * with a dead core and a thin lid does freeze through, and the card has to
+     * say that rather than promising an ocean the picture cannot support. */
+    if (climate.subsurface < CC.Climate.COLD) {
+      return "Frozen through at " + c + " C. Whatever ocean was here is now " +
+             "part of the shell.";
+    }
+
+    /* HOW WARM, RELATIVE TO THE SURFACE ABOVE IT — the gap is the interesting
+     * figure, because it is what the insulation bought. */
+    var surf = Math.round(CC.Stats.toCelsius(climate.base));
+    var gap = c - surf;
+
+    return "Liquid water at about " + c + " C, " + gap +
+           " degrees warmer than the surface. The ice sheet holds the heat " +
+           "in; the core supplies it.";
+  }
+
   return {
     temperatureLine: temperatureLine,
+    subsurfaceLine: subsurfaceLine,
     climateLine: climateLine,
     STATE_WORDS: STATE_WORDS
   };

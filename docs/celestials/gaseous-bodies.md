@@ -24,7 +24,7 @@ down can you go before something crushes you, and what's floating at each level.
 | `water-cloud` | 0.72–0.85 | presence: 2.0 (guaranteed at slider 0.5) | slight wobble | convective, lightning-active |
 | `molecular-h` | 0.42–0.70 | — | slight wobble | compressed, warming with depth |
 | `metallic-h` | 0.18–0.40 | — | near-perfect | conductive — the dynamo layer |
-| `core` | 0.08–0.17 | — | near-perfect | small rock-ice, extremely hot |
+| `rock-core` | 0.07–0.16 | — | near-perfect | small rock-ice, extremely hot. **Carries a terrain field**, which is what the frosting deposits crushed sediment onto |
 
 **The outermost boundary is a perfect circle**, but it should be drawn as a
 *soft gradient edge* rather than a hard line — there's no solid surface, and
@@ -45,7 +45,7 @@ enough contrast to read as separate.
 | water-cloud | 0.30–0.60 | 0.35–0.60 |
 | molecular-h | 0.40–0.70 | 0.30–0.55 |
 | metallic-h | 0.30–0.60 | 0.45–0.75 |
-| core | 0.55–0.85 | 0.70–0.95 |
+| rock-core | 0.55–0.85 | 0.62–0.88 |
 
 `secondaryRel: "analogous"` — gas giants read better with a harmonious hue
 family than a hard complement.
@@ -63,7 +63,7 @@ makes a gas giant look like a gas giant.
 | water-cloud | convection cells, lightning glints | 15–35 / 10–30 |
 | molecular-h | flow arrows, pressure gradient | 8–18 / — |
 | metallic-h | swirl bands, conductive glints | 10–25 / 20–50 |
-| core | dense stipple, compression rings | 150–300 / 3–6 |
+| rock-core | dense stipple, compression rings | 150–300 / 3–6 |
 
 The troposphere and water-cloud layers get **strong diagrammatic treatment** —
 counter-rotating flow arrows between bands are exactly the "instructive
@@ -84,8 +84,30 @@ violent-banding · helium-rain · diamond-rain · tidally-locked
 > `axis: "polar"` instead of `"equatorial"`. See
 > [TRAIT-SYSTEM.md](../TRAIT-SYSTEM.md#angular-zones).
 
-**Orbital:** ring-system · shepherd-moons · debris-belt · aurora ·
+**Orbital:** ringlet-system · shepherd-moons · debris-belt · aurora ·
 radiation-belt
+
+> **A GIANT'S RINGS ARE A DIFFERENT OBJECT** (D173), and `ringlet-system` is
+> that object rather than `ring-system` with different numbers. Until it
+> existed, one flat uniform ellipse per band was the mark for a ring around a
+> planet, a giant and a moon alike — so all three read as one body type with
+> different fills. That is D76/D160's vocabulary problem arriving from the
+> direction of sameness: a mark that means the same thing on every body stops
+> distinguishing anything.
+>
+> The physical difference is real and is what the primitive draws. A rocky
+> world's ring is sparse debris, which `ring-system` says well. A giant's is
+> the Saturn case — a dense sheet resolved into hundreds of ringlets with
+> knife-edge divisions — so `ringlet-band` gives each band a bundle of finer
+> strokes at varying alpha, draws a division as a **clean break with bright
+> shoulders** (a resonance empties a band rather than thinning it), and casts
+> the **body's own shadow** across the far side, composited `destination-out`
+> so it removes ring rather than painting dark over a translucent object.
+>
+> Gated on `structured-rings`, which both giants carry and no rocky body does;
+> the planet carries `dusty-rings` and gets the other. Mutually exclusive by
+> TAG rather than by an `excludes`, because `excludes` is a trait-to-trait
+> relation and this is a fact about the body.
 
 **Interior:** *(none — see below)*
 
@@ -147,7 +169,7 @@ Biggest danger        {hazard}
 | `troposphere` | 0.85–0.96 | — | perfect circle | fainter banding than a gas giant |
 | `icy-mantle` | 0.35–0.84 | — | slight wobble | hot dense water/ammonia slush |
 | `superionic` | 0.20–0.34 | 50% | near-perfect | exotic phase, conductive |
-| `core` | 0.10–0.19 | — | near-perfect | rock and iron |
+| `rock-core` | 0.09–0.17 | — | near-perfect | rock and iron. Carries a terrain field, as the gas giant's does |
 
 The `icy-mantle` is proportionally huge — it should dominate the picture the way
 `molecular-h` does on a gas giant.
@@ -162,7 +184,7 @@ Cooler and less contrasty than gas giants. Banding is subtle.
 | troposphere | 0.30–0.60 | 0.45–0.70 |
 | icy-mantle | 0.25–0.55 | 0.30–0.55 |
 | superionic | 0.35–0.65 | 0.50–0.75 |
-| core | 0.40–0.70 | 0.55–0.85 |
+| rock-core | 0.40–0.70 | 0.55–0.85 |
 
 Hue is free, but ice giants read best with a cool bias — worth a soft
 constraint toward `[150, 280]` unless a trait overrides it.
@@ -175,7 +197,7 @@ constraint toward `[150, 280]` unless a trait overrides it.
 | troposphere | faint bands, occasional storm | 8–18 / 2–6 |
 | icy-mantle | slow convection cells, flow arrows, density striations | 15–35 / 8–16 / 20–50 |
 | superionic | conductive glints, ordered lattice hints | 30–70 |
-| core | dense stipple | 150–250 |
+| rock-core | dense stipple | 150–250 |
 
 The `superionic` layer is a chance for a genuinely alien-looking texture — a
 faint regular lattice pattern, unlike anything else in the generator.
@@ -211,7 +233,15 @@ polar-vortex · debris-belt · aurora · gas-miner-platforms · orbital-platform
 
 ## Family notes
 
-**Shared vocabulary:** both use `upper-cloud`, `troposphere`, `core` and the
+> **`rock-core`, NOT `core`, and the distinction is material rather than
+> cosmetic.** A planet's `core` is iron: incandescent, smooth, carrying no
+> terrain, because there is no surface down there in any sense. A giant's heart
+> is rock and ice with a real floor on it, and that floor is what the frosting
+> stage deposits crushed sediment on (PROGRESS.md D22). A role is the
+> generator's word for "what this material is", so two different materials get
+> two names — and the planet's core keeps its own behaviour untouched.
+
+**Shared vocabulary:** both use `upper-cloud`, `troposphere`, `rock-core` and the
 cloud-band / storm-curl / flow-arrow detail family. The difference is what
 fills the middle — compressed hydrogen versus an exotic icy slush.
 

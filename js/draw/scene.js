@@ -24,6 +24,8 @@ var CC = CC || {};
 CC.Scene = (function () {
   "use strict";
 
+  var TAU = CC.Math.TAU;
+
   function clampUnit(v) { return v < 0 ? 0 : (v > 1 ? 1 : v); }
 
   /* Blend mode for outward layers — atmospheres, coronae, halos.
@@ -196,6 +198,7 @@ CC.Scene = (function () {
   }
 
 
+
   function render(ctx, width, height, body, settings, palette, details) {
     settings = settings || {};
 
@@ -230,10 +233,14 @@ CC.Scene = (function () {
      * it needs its own flag rather than a third background MODE — the modes
      * are a user-facing control and this is not a choice a user makes. */
     if (!settings.skipBackground) {
-      CC.Canvas.drawBackground(ctx, width, height, settings.background || "starfield", {
+      CC.Canvas.drawBackground(ctx, width, height, settings.background || "solid", {
         color: settings.backgroundColor || "#05070e",
+        color2: settings.backgroundColor2,
+        angle: settings.backgroundAngle,
+        stars: settings.stars === undefined ? true : !!settings.stars,
         seed: settings.seed,
-        density: settings.starfieldDensity === undefined ? 0.6 : settings.starfieldDensity
+        density: settings.starfieldDensity === undefined ? 0.6 : settings.starfieldDensity,
+        scale: settings.nebulaScale === undefined ? 0.5 : settings.nebulaScale
       });
     }
 
@@ -252,23 +259,75 @@ CC.Scene = (function () {
      * bulge or it would be cropped flat against the edge, which would read as
      * the very circle the feature exists to break. Measured rather than
      * assumed, since the recipe's figures are data. */
-    if (details.zones && details.zones.airAt) {
-      var atmosL = null, al = 0;
-      for (; al < body.layers.length; al++) {
-        if (body.layers[al].outward) { atmosL = body.layers[al]; break; }
-      }
-      if (atmosL) {
-        var innerL = (al + 1 < body.layers.length)
-          ? body.layers[al + 1].outer : body.surface;
+    var atmosL = null, al = 0;
+    for (; al < body.layers.length; al++) {
+      if (body.layers[al].outward) { atmosL = body.layers[al]; break; }
+    }
+    if (atmosL) {
+      /* THE SWEEP MUST SEE THE COMPOSED FUNCTION, NOT ONLY THE ZONE'S HALF.
+       *
+       * It used to sweep `zones.airAt` alone, which was complete while a
+       * bulge was the only thing that could move this edge. It is not any
+       * more: an outward layer may also WOBBLE, and a wobble crest that is
+       * not in this sweep gets cropped flat against the frame — turning the
+       * very feature that exists to break the circle back into one.
+       *
+       * The same function the fill is drawn with is swept here, so the two
+       * cannot disagree. This is deliberately the OPPOSITE call from the
+       * emissive glow (draw/emissive.js), which is excluded: the wobble
+       * moves the body's own silhouette and cropping it destroys the feature,
+       * while a halo reads correctly running off the edge. */
+      var innerL = (al + 1 < body.layers.length)
+        ? body.layers[al + 1].outer : body.surface;
+      var zoneAir = (details.zones && details.zones.airAt)
+        ? details.zones.airAt : null;
+      var extWob = CC.Layers.outwardWobbleFn(atmosL, settings.seed);
+      if (zoneAir || extWob) {
         var peak = 1;
-        for (var ad = 0; ad < 360; ad += 5) {
-          var kA = details.zones.airAt(ad * Math.PI / 180);
+        for (var ad = 0; ad < 360; ad += 3) {
+          var aRad = ad * Math.PI / 180;
+          var kA = (zoneAir ? zoneAir(aRad) : 1) * (extWob ? extWob(aRad) : 1);
           if (kA > peak) peak = kA;
         }
         var reach = innerL + (atmosL.outer - innerL) * peak;
         if (reach > extent) extent = reach;
       }
     }
+    /* A SWOLLEN SKIN IS THE BODY'S OWN SILHOUETTE, SO IT IS IN THE SWEEP.
+     *
+     * D134 is the rule and this is the same call as the coronal wobble, not
+     * the opposite one the emissive glow gets: a measurement of reach should
+     * include anything whose SHAPE is the feature. A photosphere pulled
+     * toward a companion is the body's outline, so a crest cropped flat
+     * against the frame destroys the very thing the feature exists to show.
+     *
+     * IT CANNOT BE ABSORBED BY RENORMALIZATION. gen/structure.js puts the
+     * surface at exactly 1.0 at the END of `build`, while the zones are
+     * constructed later in gen/details.js — so the swell moves the drawn edge
+     * past 1.0 after the fact and nothing upstream can take it back. An
+     * angular sea level already does exactly this; the frosting and the
+     * atmosphere floor both cope by measuring the real per-bearing top rather
+     * than trusting `layer.outer`, and this measures it the same way.
+     *
+     * The outermost BANDED layer only. Deeper layers swell too (weakly, by
+     * design) but they are buried, and an inner layer cannot move a
+     * silhouette it does not own. */
+    if (details.zones && details.zones.swellAt) {
+      for (var sb = 0; sb < body.layers.length; sb++) {
+        var sL = body.layers[sb];
+        if (sL.outward) continue;
+        var sT = sL.thickness || 0;
+        if (sT > 0) {
+          for (var sd2 = 0; sd2 < 360; sd2 += 3) {
+            var sTop = sL.outer
+              + details.zones.swellAt(sd2 * Math.PI / 180, sL.role) * sT;
+            if (sTop > extent) extent = sTop;
+          }
+        }
+        break;
+      }
+    }
+
     if (details.outward && details.outward.length) {
       var reaches = [], oe;
       for (var oi = 0; oi < details.outward.length; oi++) {
@@ -334,6 +393,28 @@ CC.Scene = (function () {
     var elementOpacity = settings.elementOpacity === undefined
       ? 1 : settings.elementOpacity;
 
+    /* THE SKY'S BASE COLOUR, for the one thing that needs to know it: a debris
+     * belt dims the background behind itself, and it does that by washing the
+     * sky's own colour back over it (see drawOrbitalHaze).
+     *
+     * NULL WHENEVER THERE IS NO SKY OF OURS TO REPAINT, which is two distinct
+     * cases and both matter. Transparent is a cutout, and painting a disc of
+     * solid colour into it would destroy the alpha the mode exists to produce
+     * (D103). `skipBackground` means someone else's scene is already on this
+     * canvas — a composed export — and its colour is not ours to assume. The
+     * belt then simply draws its rocks over whatever is there, which is the
+     * correct answer for both. */
+    var sky = (settings.background === "transparent" || settings.skipBackground)
+      ? null : (settings.backgroundColor || "#05070e");
+
+    /* --- 1b. the emissive pass ---
+     *
+     * BEFORE EVERYTHING ELSE THE BODY OWNS, so the star is painted over its
+     * own glow and the halo only ever shows outside the silhouette. See
+     * draw/emissive.js — including why it is excluded from the extent sweep
+     * while the coronal wobble is included in it. */
+    CC.Emissive.drawEmissiveGlow(ctx, view, body, palette, settings);
+
     /* --- 2. outward traits, back half ---
      *
      * Rings and debris pass BEHIND the body as well as in front of it, which
@@ -344,7 +425,7 @@ CC.Scene = (function () {
      *
      * ARCHITECTURE's draw order puts this at step 2 and the front half at
      * step 5, which is exactly what these two calls are. */
-    CC.ZonePaint.drawOutward(ctx, view, details, palette, elementOpacity, "back");
+    CC.ZonePaint.drawOutward(ctx, view, details, palette, elementOpacity, "back", sky);
 
     /* Which layer is the body's visible edge — the outermost that isn't drawn
      * as an outward falloff. */
@@ -401,7 +482,40 @@ CC.Scene = (function () {
        * fluid rests on — the same lookup gen/details.js keys it by. */
       var below = layers[i + 1];
       var sea = (below && details.seaLevel) ? details.seaLevel[below.role] : null;
-      bounds.push(CC.Layers.levelFn(layers[i], bf, sea));
+      var lvl = CC.Layers.levelFn(layers[i], bf, sea);
+
+      /* AND THE TIDAL SWELL, WHICH IS THE SAME KIND OF STATEMENT.
+       *
+       * A companion star pulls the thin outer shells toward it, so the
+       * chromosphere and the photosphere are not circles either. That is a
+       * per-bearing displacement of a banded layer's boundary — which is
+       * exactly what `levelFn` already is, so this needs no new drawing code
+       * and composes with the wobble and the terrain for free.
+       *
+       * THE UNIT CONVERSION IS THE WHOLE TRICK. `swellAt` returns a fraction
+       * of the LAYER'S OWN thickness (D131: a skin and a mantle are not the
+       * same kind of thing and a body-radius figure cannot serve both), while
+       * `levelFn` takes an absolute body-space offset because a sea level is
+       * an absolute height. Multiplying by `layer.thickness` here is what
+       * makes the two agree — and a miss would be invisible on a thick layer
+       * and catastrophic on a thin one.
+       *
+       * Outward layers are excluded: they take the same pull through `airAt`
+       * on the thickness path, and applying both would count it twice. */
+      if (!layers[i].outward && details.zones && details.zones.swellAt) {
+        lvl = (function (base, layer, zf) {
+          var t = layer.thickness || 0;
+          if (t <= 0) return base;
+          var outer = layer.outer;
+          var role = layer.role;
+          return function (a) {
+            var b = base ? base(a) : 1;
+            return b + (zf(a, role) * t) / outer;
+          };
+        })(lvl, layers[i], details.zones.swellAt);
+      }
+
+      bounds.push(lvl);
     }
 
     /* A layer sitting directly on a relief-bearing layer is DEFERRED: it is
@@ -534,12 +648,40 @@ CC.Scene = (function () {
               ? layers[silhouette - 1] : null;
             var span = Math.max(1e-6, outerR - innerR);
 
+            /* The silhouette layer's own tidal swell, resolved once. Null on
+             * every unzoned body and on every zone recipe that declares no
+             * `swell`, which is all of them but the stars and the giants. */
+            var solidSwell = (solid && details.zones && details.zones.swellAt)
+              ? details.zones.swellAt : null;
+            var solidT = solid ? (solid.thickness || 0) : 0;
+            if (solidT <= 0) solidSwell = null;
+
             return function (a) {
               var k = zf(a);
 
               var ground = solid
                 ? solid.outer + (sTerr ? sTerr.at(a) * SILHOUETTE_RELIEF : 0)
                 : innerR;
+
+              /* AND THE SWELL, PER BEARING RATHER THAN AT ITS PEAK.
+               *
+               * The corona's inner edge IS the chromosphere's outer edge, so
+               * if the skin bulges toward the companion and the halo does not
+               * follow AT THAT BEARING, the two separate and a gap of empty
+               * space opens along the limb exactly where the feature is
+               * loudest.
+               *
+               * The frosting above is folded in at its global peak, which is
+               * deliberately conservative and cheap; this one must not be.
+               * A peak figure would lift the whole corona by the facing
+               * side's bulge, which is a uniform inflation — the opposite of
+               * the asymmetry being drawn. Per bearing, the halo rides the
+               * skin and the shape survives. */
+              if (solidSwell) {
+                var swTop = solid.outer + solidSwell(a, solid.role) * solidT;
+                if (swTop > ground) ground = swTop;
+              }
+
               if (fl) {
                 var seaTop = fl.outer + (sSea ? sSea(a) : 0);
                 if (seaTop > ground) ground = seaTop;
@@ -590,9 +732,50 @@ CC.Scene = (function () {
           })(details.zones.airAt, inner, layer.outer);
         }
 
+        /* --- THE COMPOSED PER-BEARING REACH ---------------------------
+         *
+         * `airFn` above is the ZONE's answer to "how far does this layer
+         * reach at this bearing" — a tidal bulge, a collapsed night face.
+         * The layer's own wobble answers the same question for a different
+         * reason, so the two are the same KIND of thing and compose by
+         * multiplication rather than needing a second code path:
+         *
+         *     thicknessAt(a) = wobble(a) * bulge(a)
+         *
+         * `draw/scene.js` already composes `airAt` with a per-bearing ground
+         * floor a few lines above, which is the direct precedent. Building the
+         * composition ONCE here is what makes the coronal wobble and the
+         * binary-companion bulge one feature with two knobs instead of two
+         * features fighting over one function.
+         *
+         * Null when neither exists, which keeps the cheap single-gradient
+         * path for every body that wobbles nothing and zones nothing. */
+        var wobFn = CC.Layers.outwardWobbleFn(layer, settings.seed);
+        var reachFn = airFn;
+        if (wobFn) {
+          reachFn = airFn
+            ? (function (w, z) {
+                return function (a) { return w(a) * z(a); };
+              })(wobFn, airFn)
+            : wobFn;
+        }
+
+        /* HOW DENSE THE LAYER READS BEFORE IT STARTS TO TAPER.
+         *
+         * `hold` is the fraction of the depth carried at near-full opacity;
+         * the taper is a smoothstep after it (draw/layers.js `falloffAlpha`).
+         * A planet's atmosphere wants the default — it is genuinely thin and
+         * should dissolve early. A gas giant's cirrus deck is the opposite: a
+         * DENSE skin that stops being opaque only at its very edge, so it
+         * declares a high hold and the ease-out does its work late.
+         *
+         * Archetype data rather than a role check, so any layer that is
+         * substantial-then-fading can say so. Carried on the layer by
+         * gen/structure.js. */
         CC.Layers.fillOutward(ctx, view, layer, inner,
-          outwardStyle(colour, 0.82 * layer.strength, undefined, ATMOSPHERE_BLEND),
-          airFn);
+          outwardStyle(colour, 0.82 * layer.strength, layer.fadeHold,
+                       ATMOSPHERE_BLEND),
+          reachFn);
 
         /* Haze and sub-bands sit inside the falloff. Clipped to the outward
          * layer's extent rather than to a band, since it has no inner edge of
@@ -606,9 +789,9 @@ CC.Scene = (function () {
         ctx.save();
         ctx.globalCompositeOperation = ATMOSPHERE_BLEND;
         ctx.beginPath();
-        if (airFn) {
+        if (reachFn) {
           CC.Layers.traceBoundary(ctx, view, layer.outer, function (a) {
-            var k = airFn(a);
+            var k = reachFn(a);
             if (k < 0.05) k = 0.05;
             return (inner + (layer.outer - inner) * k) / layer.outer;
           }, false);
@@ -668,6 +851,19 @@ CC.Scene = (function () {
            * do not carry one. */
           band: { inner: Math.max(0, layer.inner), outer: layer.outer }
         });
+        ctx.restore();
+      }
+
+      /* c2. LIMB DARKENING — a luminous layer is dimmer at its edge.
+       *
+       * Its own save/clip rather than riding the detail pass's, because a
+       * layer with no elements at all still curves. It sits AFTER the details
+       * deliberately: see draw/emissive.js for why under them is useless. */
+      if (layer.limbDarkening) {
+        ctx.save();
+        layer.innerFn = (i + 1 < layers.length) ? bounds[i + 1] : null;
+        CC.Layers.clipToLayer(ctx, view, layer, settings.seed, bounds[i]);
+        CC.Emissive.paintLimbDarkening(ctx, view, layer, colour, body.surface);
         ctx.restore();
       }
 
@@ -868,8 +1064,122 @@ CC.Scene = (function () {
       ctx.restore();
     }
 
+    /* --- 4c. spanning traits ---
+     *
+     * Features that CROSS layer boundaries. The great storm is the first: a
+     * storm reaching from the cirrus deck down through the banded layer is one
+     * feature, and drawn inside either layer's clip it was cut in half at the
+     * boundary between them.
+     *
+     * Clipped to the OUTERMOST layer rather than to a band, so the element
+     * spans freely; `fadeEnds` on the element dissolves it at both radial
+     * extremes so it ends by fading rather than by being cut.
+     *
+     * THE CLIP RADIUS IS THE ATMOSPHERE'S, NOT `body.surface`. It used to be
+     * the latter, which is the top of the outermost SOLID layer — on a gas
+     * giant, the troposphere at r=1.0. That cut two different things at once:
+     *
+     *   - A great storm large enough to reach the limb was sliced off flat
+     *     against the body's edge, giving it a straight chord where it should
+     *     have a curved perimeter. Invisible while storms were small; obvious
+     *     as soon as they were enlarged.
+     *   - The cirrus-deck companions were removed ENTIRELY, since they sit
+     *     above r=1.0 by construction — which is why the cloud deck still
+     *     looked undisturbed no matter how the companion was tuned.
+     *
+     * Both are the same bug: the clip was tighter than the pass it guards.
+     * Taking the outermost layer's outer edge covers any outward halo the
+     * archetype declares and keeps the guarantee that matters — a spanning
+     * trait cannot escape the body into open space. */
+    if (details.spanningTraits && details.spanningTraits.length) {
+      /* THE CLIP IS THE FRAME'S REACH, NOT THE OUTERMOST LAYER'S.
+       *
+       * Third time. The comment above records the same bug being fixed twice
+       * — first at `body.surface`, then at the outermost layer — and it fired
+       * again the moment something reached further than a corona:
+       *
+       *   - A prominence is authored `size: [0.20, 0.44]` of the BODY radius
+       *     and anchored near the surface, so a top-tier arch reaches past a
+       *     corona topping out at 1.14-1.32 and was chopped flat against it.
+       *   - Heat plumes are spanning by construction (they cross the
+       *     chromosphere/corona boundary, which is what `spanning` is FOR,
+       *     D91) and would have been chopped by the same edge on the day they
+       *     were built.
+       *
+       * Fixing it against the corona a third time would only set it up to
+       * fire a fourth time against the next thing that reaches further —
+       * which, in this same session, is the emissive glow. So it is fixed
+       * against the thing that is actually true: the guarantee this clip
+       * exists to give is *a spanning trait cannot escape into open space*,
+       * and open space begins where the picture stops. `extent` is that
+       * radius, and it already folds in the wobble, the bulge and the outward
+       * elements.
+       *
+       * `fadeEnds` on the element is the complement, not the alternative: it
+       * makes a trait END by dissolving rather than by being cut. Alone it
+       * only makes the chop soft. */
+      var spanEdge = Math.max(body.surface, extent);
+      ctx.save();
+      ctx.beginPath();
+      CC.Layers.traceBoundary(ctx, view, spanEdge, null, false);
+      ctx.clip();
+
+      for (var st = 0; st < details.spanningTraits.length; st++) {
+        var se = details.spanningTraits[st];
+        /* A TRAIT THAT ESCAPES THE FRAME IS DRAWN OUTSIDE THIS CLIP.
+         *
+         * The clip above gives one guarantee — a spanning trait cannot get out
+         * into open space — and that is right for every mark that is part of
+         * the body: a prominence returns, a flare disperses, a plume falls
+         * back. All of them belong to the star and none should leave it.
+         *
+         * A coronal hole's wind is the one mark whose whole content is that it
+         * DOES leave. Clipped to the picture's own reach it stopped dead at
+         * the halo's edge — a ragged cut across every field line and every
+         * particle, exactly where the mirrors orbit — which turned "material
+         * escaping to interstellar space" into "material stopping at an
+         * invisible wall". The guarantee is still the right default; this is
+         * the documented exception to it, taken in the second pass below. */
+        if (se.escapes) continue;
+        var sAlpha = clampUnit(se.alpha * elementOpacity);
+        if (sAlpha <= 0.004) continue;
+        var sfn = CC.Primitives.KINDS[se.kind];
+        if (!sfn) continue;
+        var sCol = CC.DrawDetails.zoneShift(palette.get(se.role), se);
+        /* `emitted` and `deep` are the two derived palette colours a mark may
+         * need that are not its own layer's: the body's light, and its hot
+         * interior. A field line takes the second — see fieldFill. */
+        var sRich = CC.DrawDetails.styleFor(se.kind, sCol, se, sAlpha,
+                                            palette.emitted, palette.deep);
+        sfn(ctx, view, se, sRich
+          || CC.DrawDetails.toneColour(sCol, se.tone, sAlpha));
+      }
+      ctx.restore();
+
+      /* THE ESCAPING PASS — outside the clip, so it may reach the frame edge.
+       *
+       * Deliberately after the clipped one and outside `ctx.save()`, which is
+       * the whole difference. Nothing here is bounded by the body's extent;
+       * the frame is the only limit, and a mark that runs off it is doing what
+       * it was written to do. See the note above for why this exception
+       * exists and why it is not the default. */
+      for (var xt = 0; xt < details.spanningTraits.length; xt++) {
+        var xe = details.spanningTraits[xt];
+        if (!xe.escapes) continue;
+        var xAlpha = clampUnit(xe.alpha * elementOpacity);
+        if (xAlpha <= 0.004) continue;
+        var xfn = CC.Primitives.KINDS[xe.kind];
+        if (!xfn) continue;
+        var xCol = CC.DrawDetails.zoneShift(palette.get(xe.role), xe);
+        var xRich = CC.DrawDetails.styleFor(xe.kind, xCol, xe, xAlpha,
+                                            palette.emitted, palette.deep);
+        xfn(ctx, view, xe, xRich
+          || CC.DrawDetails.toneColour(xCol, xe.tone, xAlpha));
+      }
+    }
+
     /* --- 5. outward traits, front half --- */
-    CC.ZonePaint.drawOutward(ctx, view, details, palette, elementOpacity, "front");
+    CC.ZonePaint.drawOutward(ctx, view, details, palette, elementOpacity, "front", sky);
 
     ctx.restore();
 

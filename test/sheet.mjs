@@ -4,7 +4,11 @@
  * schemes and nothing looks muddy" — which is a judgement about the *spread*
  * of outputs, not about any single one. That needs them side by side.
  *
- * Usage:  node test/sheet.mjs [count] [cols]
+ * Usage:  node test/sheet.mjs [count] [cols] [archetype]
+ *
+ * The archetype argument defaults to "planet" and accepts any id, or "all"
+ * to interleave every registered family — which is the view for judging
+ * whether a new family sits alongside the existing ones or fights them.
  */
 
 import { createCanvas } from "@napi-rs/canvas";
@@ -20,6 +24,9 @@ const srcs = [...html.matchAll(/<script\s+src=["']([^"']+)["']/gi)]
 
 const sandbox = { console, Math, Date, parseInt, parseFloat, isNaN, isFinite };
 sandbox.self = sandbox; sandbox.globalThis = sandbox;
+// lib/simplex-noise.js publishes itself onto `window`; the nebula background
+// reads it from there, so the sandbox needs one or that background throws.
+sandbox.window = sandbox;
 createContext(sandbox);
 for (const src of srcs) {
   runInContext(readFileSync(resolve(ROOT, src), "utf8"), sandbox, { filename: src });
@@ -28,6 +35,8 @@ const CC = sandbox.CC;
 
 const COUNT = parseInt(process.argv[2] || "24", 10);
 const COLS = parseInt(process.argv[3] || "6", 10);
+const WHICH = process.argv[4] || "planet";
+const IDS = WHICH === "all" ? CC.Archetypes.ids() : [WHICH];
 const CELL = 300;
 const ROWS = Math.ceil(COUNT / COLS);
 
@@ -44,7 +53,7 @@ function rollSettings(i) {
   const r = CC.RNG.stream("sheet-" + i, "roll");
   const rel = ["auto", "complement", "analogous", "triad", "split", "monochrome"];
   return {
-    archetype: "planet",
+    archetype: IDS[i % IDS.length],
     seed: "sheet-" + i,
     thicknessVariation: 0.35 + r() * 0.65,
     optionalLayers: 0.3 + r() * 0.7,
@@ -54,7 +63,12 @@ function rollSettings(i) {
     boundaryIrregularity: 1,
     keepUpright: true,
     rotation: 0,
-    primaryHue: r() * 360,
+    /* LET THE ARCHETYPE'S OWN HUE RANGE DECIDE. Passing a hue here overrode
+     * it, so an ice giant — whose profile constrains hue to the cool
+     * 150..280 band — came out orange and red on the sheet, hiding the very
+     * constraint the sheet exists to judge. undefined means "roll it from the
+     * archetype", which is what Randomize with the hue unlocked does. */
+    primaryHue: undefined,
     hueRelationship: rel[Math.floor(r() * rel.length)],
     secondaryOffset: r() * 60 - 30,
     saturation: 0.85 + r() * 0.35,
@@ -68,8 +82,9 @@ function rollSettings(i) {
 
 for (let i = 0; i < COUNT; i++) {
   const s = rollSettings(i);
-  const body = CC.Structure.build(CC.Archetypes.get("planet"), s, s.seed);
-  const pal = CC.Palette.build(body, CC.Archetypes.get("planet").colorProfile, s, s.seed);
+  const arch = CC.Archetypes.get(s.archetype);
+  const body = CC.Structure.build(arch, s, s.seed);
+  const pal = CC.Palette.build(body, arch.colorProfile, s, s.seed);
 
   const cell = createCanvas(CELL, CELL);
   CC.Scene.render(cell.getContext("2d"), CELL, CELL, body, s, pal);
@@ -80,9 +95,11 @@ for (let i = 0; i < COUNT; i++) {
 
   ctx.fillStyle = "rgba(255,255,255,0.5)";
   ctx.font = "11px sans-serif";
-  ctx.fillText(`${i}  ${pal.relation}  h${Math.round(pal.anchors.primary)}`, x + 8, y + CELL - 8);
+  ctx.fillText(`${i}  ${s.archetype}  ${pal.relation}  h${Math.round(pal.anchors.primary)}`,
+               x + 8, y + CELL - 8);
 }
 
-const out = resolve(ROOT, "shots/_sheet.png");
+const out = resolve(ROOT, WHICH === "planet"
+  ? "shots/_sheet.png" : `shots/_sheet-${WHICH}.png`);
 writeFileSync(out, canvas.toBuffer("image/png"));
-console.log(`Wrote ${COUNT} bodies to shots/_sheet.png (${canvas.width}x${canvas.height})`);
+console.log(`Wrote ${COUNT} ${WHICH} bodies to ${out} (${canvas.width}x${canvas.height})`);

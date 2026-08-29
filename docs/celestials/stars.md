@@ -98,15 +98,27 @@ not dozens. It's the texture that makes a star look like a star.
 ### Eligible traits
 
 prominences (3–30) · flare-storms · starspot-clusters · coronal-holes ·
-accretion-disc · protoplanetary-disc · stellar-jets · binary-companion ·
-t-tauri-variability · dyson-structure · stellar-collector
+accretion-disc · protoplanetary-disc · stellar-jets ·
+t-tauri-variability · orbital-mirrors · stellar-collector
 
-> **`binary-companion` applies zones to the primary.** It isn't just a second
-> disc drawn alongside — the star facing a companion gets a tidal bulge, a
-> brighter and more agitated photosphere on the facing side, and prominences
-> biased toward it (`zoneBias: "facing"`). That makes the trait a structural
-> statement about the star rather than a decoration beside it, and it reuses the
-> tidal-locking machinery with no new drawing code. See
+> **`binary-companion` was built as an AXIS, not a trait** (Session O). It
+> changes values in the stack rather than the stack itself, which is
+> TRAIT-SYSTEM.md's third test, and that is the same reasoning that moved
+> tidal locking off the trait list in D27. Every star declares it; the
+> **Binary companion** slider drives it and **Companion bearing** aims it.
+>
+> **It does not draw a second star.** The user was explicit — *"I do not want
+> to draw another sun"* — so this is a distortion axis: the OUTWARD layers
+> bulge toward the pull and the facing hemisphere runs hotter and more
+> agitated, while the body itself stays perfectly round. A tidal bulge on a
+> star genuinely is a bulge in the tenuous outer envelope rather than a
+> deformation of the fusing interior, so the cutaway stays readable — which
+> matters, because the layer stack is the part that was signed off.
+>
+> It reuses the tidal-locking machinery with **no new drawing code**:
+> `gen/zones.js` already publishes `airAt`, and `draw/scene.js` already
+> composes it into the same per-bearing reach function the coronal wobble
+> multiplies into (D130). See
 > [TRAIT-SYSTEM.md](../TRAIT-SYSTEM.md#angular-zones).
 
 ### Stats
@@ -163,12 +175,11 @@ radiative zones. Small, but it's a nice piece of specificity.
 
 ### Eligible traits
 
-prominences · starspot-clusters · coronal-holes · binary-companion ·
-dyson-structure · stellar-collector · orbital-mirrors
+prominences · starspot-clusters · coronal-holes ·
+orbital-mirrors · stellar-collector
 
-> `binary-companion` zones the primary — tidal bulge and brighter facing
-> photosphere. Same treatment as on a young star; see
-> [TRAIT-SYSTEM.md](../TRAIT-SYSTEM.md#angular-zones).
+> `binary-companion` is an axis on every star, not a trait — see the note
+> under `young-star` above.
 >
 > `solar-cycle-active` removed — it's the **Stellar activity** axis, shared with
 > the dwarf star's `flare-star` / `heavy-starspots`. `planetary-system` removed —
@@ -236,8 +247,8 @@ is a nice bit of visual storytelling.
 
 ### Eligible traits
 
-prominences · shed-shells · dust-formation · pulsating · binary-companion ·
-engulfed-planet · dredge-up · stellar-collector · dyson-structure
+prominences · shed-shells · dust-formation · pulsating ·
+engulfed-planet · dredge-up · stellar-collector · orbital-mirrors
 
 ### Stats
 
@@ -300,7 +311,7 @@ larger here than on a main-sequence star.
 
 ### Eligible traits
 
-starspot-clusters · prominences · binary-companion · dyson-structure
+starspot-clusters · prominences · orbital-mirrors
 
 > **Removed:** `flare-star`, `heavy-starspots`, `tidally-locked-planets`,
 > `long-lived` and `habitable-zone-close`
@@ -330,6 +341,61 @@ starspot-clusters · prominences · binary-companion · dyson-structure
 - "Small, dim, and patient. It will still be burning when the galaxy is dark."
 - "Prone to flares that would strip the atmosphere off anything orbiting close."
 - "Its habitable zone is so tight that anything there is tidally locked."
+
+---
+
+## The limb — how a star reads from outside
+
+*Built in Session O. The interior above is the diagram; this is what makes the
+picture read as a star rather than as a diagram of one. Full reasoning in
+[session-o-star-body.md](../progress/session-o-star-body.md), D129–D139.*
+
+Five mechanisms, each with its own knob, deliberately not folded into one
+"activity" number — the user asked for that separation by name, so that each
+star type gets levers that move independently.
+
+| Mechanism | Declared as | What it does |
+|---|---|---|
+| **Limb darkening** | `limbDarkening` on a layer | A luminous layer is dimmer at its edge. One curve, measured against the BODY's radius and shared between the surface and the layer beneath it, so the disc reads as a sphere rather than as a flat circle |
+| **A wavy limb** | `wobbleRel` on a layer | The boundary is wavy by a proportion **of its own thickness** — 10% at the calmest, up to ~50% at the most violent. Because it is a proportion, a corona's absolute wobble is far larger than a chromosphere's from the same figure |
+| **The plume field** | a `plume` element on the outward layer | Tongues of fire standing off the surface. A separate knob from the wobble |
+| **The emissive halo** | `emissiveGlow` on the archetype | Coloured light in the space around the body, with **heat veins** reaching through it. Reaches 1.34–1.75 body radii |
+| **The binary companion** | `axes` on the archetype | A tidal bulge on the outward layers plus a hotter facing hemisphere. See the note under `young-star` |
+
+### The per-archetype character
+
+The doc's brutality table, as built:
+
+| Archetype | Corona wobble (calm→violent) | Plumes | Halo reach | Reads as |
+|---|---|---|---|---|
+| `young-star` | 0.18 → 0.55 | ×1.55 count, ×1.30 size | 1.62 | The most violent. Newly ignited, unstable, vivid |
+| `main-star` | 0.12 → 0.44 | ×1.0 (the reference) | 1.52 | Active but orderly |
+| `old-giant-star` | 0.34 → 0.62 *(shed envelope)* | its **own** recipe — few, long, very faint | 1.75, dim | Enormous and tired, and genuinely shedding |
+| `dwarf-star` | 0.10 → 0.26 corona, **0.18 → 0.54 chromosphere** | ×1.35 count, ×0.62 size | 1.34 | Small and fierce. **Furious surface, feeble corona** |
+
+Two of these are worth reading twice:
+
+- **The dwarf is not simply "the calmest".** The spec has it biasing activity
+  *high*, so its chromosphere is the most agitated fringe in the family while
+  the thin halo above it barely moves, and its plumes are more numerous and
+  shorter than a main star's. Two numbers pulling opposite ways, which a single
+  activity multiplier could not have said.
+- **The old giant has no corona**, so it inherits none of the corona's plume
+  field. Its shed envelope declares its own instead — a red giant is not
+  flaring, it is *shedding*, so the marks are few, very long, very faint and
+  heavily leaned. Having a separate recipe is what lets the archetype tell its
+  own story rather than be a dimmer copy of someone else's.
+
+### Two things that must not be changed back
+
+**No frosting anywhere (D22).** A photosphere has no hollows for material to
+settle into. Nothing on the limb deposits.
+
+**The silhouette must never stop reading as a circle.** v2's stars wobbled so
+hard they were no longer circles; v2 was more stylized and it worked there, and
+in v3 the job is **waviness**. If a change makes the outline stop reading as a
+disc, it has gone too far — see D131, where the fix for a tame limb turned out
+to be the wobble's *frequency* rather than its amplitude.
 
 ---
 

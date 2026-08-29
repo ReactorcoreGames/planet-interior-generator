@@ -1,65 +1,19 @@
-/* Detail element recipes — pure data.
+/* Solid bodies — detail recipes for the rocky family.
  *
- * Maps a LAYER ROLE to the elements that layer always has. This is the table
- * that keeps `draw/` free of body-type branches: the renderer walks whatever
- * this file says and dispatches on `kind`, never on role or archetype.
+ * `atmosphere`, `ocean`, `crust`, `mantle`, `outer-core` and `core`. The moon,
+ * ice-moon and asteroid roles land at Phase 7.
  *
- * Layer details are STANDARD EQUIPMENT — "this is what this layer is". Optional
- * additions that make one body different from another are TRAITS and live in
- * data/traits.js in Phase 4. If a layer would look wrong without it, it belongs
- * here. See docs/TRAIT-SYSTEM.md for the distinction.
- *
- * RECIPE FIELDS
- *
- *   kind      which primitive draws it (draw/primitives.js)
- *   count     [at density 0, at density 1] — every element interprets the
- *             Detail density slider in its own terms, which is why this is a
- *             range per element rather than one global multiplier
- *   tiers     how many size classes: a few large, more medium, many small.
- *             THIS FIELD IS MOST OF WHAT MAKES OUTPUT LOOK INTRICATE
- *   size      [min, max] in body-space units, at tier 0 (the largest)
- *   depth     [inner, outer] across the layer's own thickness, 0..1. Normalized
- *             to the LAYER, never to a measured radius, so an element rides
- *             with its layer when a neighbour changes thickness (PROGRESS D12)
- *   alpha     [min, max] opacity before the global Element opacity multiplier
- *   texture   true if the Texture strength slider scales it (grain, stipple)
- *   flow      true if the Flow indicators dropdown governs it (arrows, lines)
- *   arc       [min, max] angular extent in degrees, for band-like elements
- *   tone      how the element's colour derives from its layer's band colour:
- *             "lighter" | "darker" | "shift" | "glow"
- *
- * COUNTS ARE A FLOOR, NOT A TARGET. The figures in docs/celestials/*.md were
- * authored against much thinner layers than the stylized proportions gave us
- * (PROGRESS.md D5, and the open question at the end of that file). A count that
- * looked dense in a hairline crust reads as sparse in one seven times thicker,
- * so these run well above the documented ranges. Sparse is the failure mode. */
+ * See js/data/elements/registry.js for what every field means. The registry
+ * must load before this file. */
 
 var CC = CC || {};
 
-CC.Elements = (function () {
+(function () {
   "use strict";
 
-  /* ---- shared recipe fragments ---------------------------------------- */
+  var grain = CC.Elements.grain;
 
-  /* Grain speckle: the base texture of any solid layer. Three tiers of dots,
-   * heavily weighted to the smallest, which is what reads as material rather
-   * than as scattered confetti. Every solid layer gets some. */
-  function grain(lo, hi, size) {
-    return {
-      kind: "speckle",
-      count: [lo, hi],
-      tiers: 3,
-      size: size || [0.010, 0.020],
-      depth: [0.03, 0.97],
-      alpha: [0.27, 0.67],
-      texture: true,
-      tone: "shift"
-    };
-  }
-
-  /* ---- per-role detail tables ----------------------------------------- */
-
-  var ROLES = {
+  CC.Elements.register({
 
     /* ---------------------------------------------------------------- */
     atmosphere: {
@@ -342,28 +296,5 @@ CC.Elements = (function () {
         }
       ]
     }
-  };
-
-  /* Surface terrain draws as its own pass rather than as a listed element: it
-   * is a boundary displacement plus a fill, not a scattered instance, and both
-   * the crust and the ocean consume it. Declared here so the assignment table
-   * stays the one place that says what a role has. */
-  function reliefFor(role) {
-    var r = ROLES[role];
-    return (r && r.relief) || null;
-  }
-
-  function elementsFor(role) {
-    var r = ROLES[role];
-    return (r && r.elements) || [];
-  }
-
-  function roles() { return Object.keys(ROLES); }
-
-  return {
-    ROLES: ROLES,
-    elementsFor: elementsFor,
-    reliefFor: reliefFor,
-    roles: roles
-  };
+  });
 })();

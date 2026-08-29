@@ -373,20 +373,35 @@ CC.Card = (function () {
    * The split runs from "things the picture asserts" out to "things the
    * picture permits", so turning the level down never removes a fact and
    * leaves an inference standing on it. */
-  var LEVELS = {
+  /* THE LINE SETS COME FROM THE STAT TEMPLATE, not from here.
+   *
+   * This used to be a hardcoded table of solid-body keys — "size, gravity,
+   * temp, climate, day, atmosphere, surface" — which made it the one place in
+   * draw/ that knew what a particular family has. A gas giant's card would
+   * have asked for a `surface` row that does not exist on it and quietly
+   * dropped half its own content, because the keys simply would not match.
+   *
+   * Each family declares its own sets in js/gen/stats/<family>.js, for the
+   * same reason it declares its own lines: which facts matter most is part of
+   * the mindset, not a property of the card. A planet's compact card leads
+   * with what the surface is like; a giant's leads with how far down you can
+   * get. The fallback is only for a stats object built before templates
+   * existed. */
+  var FALLBACK_LEVELS = {
     compact: ["size", "gravity", "temp", "day", "atmosphere", "danger"],
     standard: ["size", "gravity", "temp", "climate", "day", "atmosphere",
                "surface", "danger"],
     full: null   /* null means every line, in the template's own order */
   };
 
-  function levelKeys(detail) {
-    return Object.prototype.hasOwnProperty.call(LEVELS, detail)
-      ? LEVELS[detail] : LEVELS.standard;
+  function levelKeys(stats, detail) {
+    var levels = (stats && stats.levels) || FALLBACK_LEVELS;
+    return Object.prototype.hasOwnProperty.call(levels, detail)
+      ? levels[detail] : levels.standard;
   }
 
   function filterLines(stats, detail) {
-    var keep = levelKeys(detail);
+    var keep = levelKeys(stats, detail);
     if (!keep) return stats.lines.slice();
     return stats.lines.filter(function (l) { return keep.indexOf(l.key) >= 0; });
   }
@@ -405,7 +420,7 @@ CC.Card = (function () {
     layoutFor: layoutFor,
     filterLines: filterLines,
     levelKeys: levelKeys,
-    LEVELS: LEVELS,
+    FALLBACK_LEVELS: FALLBACK_LEVELS,
     preferredWidth: preferredWidth,
     roundRect: roundRect,
     wrap: wrap

@@ -266,7 +266,7 @@ check("rotation re-enabled", () => {
   if ($("rotation").disabled) throw new Error("rotation should be enabled");
 });
 
-for (const bg of ["solid", "gradient", "transparent", "starfield"]) {
+for (const bg of ["solid", "gradient", "transparent", "nebula"]) {
   check(`background ${bg}`, () => { $("background").value = bg; fire($("background"), "change"); });
 }
 check("background colour", () => { $("background-color").value = "#224466"; fire($("background-color"), "change"); });
@@ -371,11 +371,11 @@ check("export menu closes", () => {
   // a genuinely transparent PNG, or removing the item removed a feature.
   check("the Output background reaches transparency", () => {
     const E = window.CelestialCutaway.CC.Export;
-    $("background").value = "starfield"; fire($("background"), "change");
+    $("background").value = "nebula"; fire($("background"), "change");
     API.drawNow();
     const withBg = E.renderCanvas({});
-    if (withBg.settings.background !== "starfield") {
-      throw new Error("the starfield setting did not reach the export");
+    if (withBg.settings.background !== "nebula") {
+      throw new Error("the background setting did not reach the export");
     }
 
     $("background").value = "transparent"; fire($("background"), "change");
@@ -393,7 +393,7 @@ check("export menu closes", () => {
     }
     if (sq.width !== sq.height) throw new Error("the 1:1 export is not square");
 
-    $("background").value = "starfield"; fire($("background"), "change");
+    $("background").value = "solid"; fire($("background"), "change");
     API.drawNow();
   });
 
@@ -1024,22 +1024,42 @@ function CCset(id, on) {
 // --- Background randomization: the lock is on the colour, not the type ---
 {
   // One pass of rolls answering both questions, rather than two passes of 12.
-  check("Randomize rolls the background colour, never the type, and stays dark", () => {
+  // THE CEILING IS ON THE AVERAGE, NOT ON EVERY ROLL (D101).
+  //
+  // This used to fail any roll over 0.20 luminance, which was right when the
+  // colour was pinned to a near-black band. It is not right now: one roll in
+  // four deliberately reaches a lit sky, so a per-roll cap made the suite fail
+  // about half the time depending on what came up. A test that encodes the old
+  // rule reports a working feature as broken.
+  //
+  // What must still hold is that DARK IS THE COMMON CASE, which is a statement
+  // about the distribution — so it is measured over enough rolls to be one.
+  check("Randomize rolls the background colour, never the type, and stays mostly dark", () => {
     const type = $("background").value;
     const seen = new Set();
-    for (let i = 0; i < 4; i++) {
+    const lums = [];
+    for (let i = 0; i < 24; i++) {
       $("randomize-btn").click();
       API.drawNow();
-      seen.add($("background-color").value);
+      const hex = $("background-color").value;
+      seen.add(hex);
       if ($("background").value !== type) {
         throw new Error("Randomize changed the background TYPE");
       }
-      const hex = $("background-color").value;
       const n = parseInt(hex.slice(1), 16);
-      const lum = (((n >> 16) & 255) * 0.299 + ((n >> 8) & 255) * 0.587 + (n & 255) * 0.114) / 255;
-      if (lum > 0.20) throw new Error(`background ${hex} has luminance ${lum.toFixed(2)} - too bright`);
+      lums.push((((n >> 16) & 255) * 0.299 + ((n >> 8) & 255) * 0.587 + (n & 255) * 0.114) / 255);
     }
-    if (seen.size < 2) throw new Error(`only ${seen.size} background colours in 4 rolls`);
+    if (seen.size < 2) throw new Error(`only ${seen.size} background colours in 24 rolls`);
+
+    // No roll may reach a backdrop that would fight the body for attention.
+    const worst = Math.max(...lums);
+    if (worst > 0.45) throw new Error(`background luminance reached ${worst.toFixed(2)} - too bright`);
+
+    // And most of them must still be dark, or "mostly dark" is not true.
+    const dark = lums.filter(l => l <= 0.20).length;
+    if (dark < lums.length * 0.5) {
+      throw new Error(`only ${dark}/${lums.length} rolls were dark - the band has drifted bright`);
+    }
   });
 
   check("locking the background colour holds it", () => {

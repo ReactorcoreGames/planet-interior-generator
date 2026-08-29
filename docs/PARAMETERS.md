@@ -105,8 +105,8 @@ Archetype dropdown contents:
 | **Core size bias** | slider | −100…+100 | Push the core smaller or larger within its range. Affects derived stats |
 | **Ocean depth** | slider | 0–100% | 0 = no ocean (desert/airless). Low = seas. High = global ocean. Max = the crust is barely a floor. Solid bodies only |
 | **Interior heat** | slider | 0–100% | 0 = dead (solid core, static mantle, thick crust, grey palette). 100 = molten (liquid core, fully convecting mantle, thin fractured crust, magma reaching the surface). Solid bodies only |
-| **Tidal locking** | slider | 0–100% | 0 = an ordinary rotating world. As it rises one face bakes and the other freezes: the ocean boils off the hot side and pools frozen on the cold side, an ice cap spreads down from the night face, terrain flattens where it is baked, and the atmosphere thins at both extremes. Sits beside Ocean depth because the two are coupled |
-| **Lock facing** | slider | 0–360° | Where the hot face points. Rolled per body; set deliberately to aim the dayside at the viewer |
+| **Tidal locking** *(a star relabels this to* **Binary companion**) | slider | 0–100% | **One slider, two causes — and the label follows the archetype.** On a solid body: 0 = an ordinary rotating world; as it rises one face bakes and the other freezes, the ocean boils off the hot side and pools frozen on the cold side, an ice cap spreads down from the night face, terrain flattens where it is baked, and the atmosphere thins at both extremes. Sits beside Ocean depth because the two are coupled. **On a star it drives a close companion's pull instead:** the outer envelope bulges toward it and the facing hemisphere runs hotter and more agitated, while the body itself stays round — a tidal bulge on a star is a bulge in the thin outer layers, not a deformation of the interior. Both are the same quantity (how hard the asymmetry is driven) aimed at different things, which is why they share one control rather than growing a second (D27). The label and tooltip come from the archetype's own `axes` declaration; see D132. **Inert on the two gaseous archetypes**, which declare no angular axis |
+| **Lock facing** *(a star relabels this to* **Companion bearing**) | slider | 0–360° | Where the interesting face points — the dayside on a planet, the companion on a star. Rolled per body; set deliberately to aim it at the viewer |
 | **Starlight** | slider | 0–100% | **How much light and heat reaches this body.** 100% is seared like Mercury or Venus; around half is temperate like Earth; low values give a frozen outer-system world. **0% means there is no star at all** — a rogue planet drifting unlit, warmed only by its own Interior heat. Feeds the climate baseline, and gently biases how much atmosphere survives (both extremes thin it) |
 | **Star colour** | dropdown | Red dwarf … Blue giant | The spectral character of the light. Tints the palette's outer layers, and changes how much energy arrives per unit of Starlight — a blue giant runs a world ~0.17 hotter than a red dwarf at the same slider position. Never touches self-lit layers |
 | **Star activity** | slider | 0–100% | How violent the star is. **Not temperature** — it scours surface cover, drives the radiation hazard, and (with Exotic oceans on) pushes the sea's colour. A thick atmosphere shields against it, so an airless world suffers most |
@@ -513,12 +513,21 @@ uses.
 
 | Preset | Sets |
 |---|---|
-| **Quiet Sun** | Main star, Stellar activity low — clean, stable, tachocline visible |
-| **Angry Star** | Stellar activity 100 — prominences, flare storms, heavy spotting |
-| **Bloated Giant** | Old giant — extreme core-to-envelope contrast, shed envelope |
-| **Patient Dwarf** | Dwarf star, full-depth convection loops, large starspots |
-| **Binary Pair** | Any star + binary-companion — zoned facing hemisphere |
-| **Dyson Swarm** | Main star + dyson-structure, Enclosure 0 — scattered collectors |
+| **Quiet Sun** | Main star, Star activity 8 — clean, stable, tachocline visible |
+| **Angry Star** | The same star at Star activity 100 — prominences, spotting, flare storms |
+| **Red Giant** | Old giant, Core size bias at its floor — the extreme core-to-envelope contrast |
+| **Dying Giant** | Old giant — dredge-up, pulsation, and a planet it swallowed |
+| **Flare Star** | Dwarf star, Star activity 94 — heavy spotting, frequent flares |
+| **Patient Ember** | Dwarf star, quiet and cool — the trillion-year lifespan |
+| **Newborn Star** | Young star — the inverted interior, still surrounded by its debris |
+| **Harvested Star** | Main star + dyson-structure — deliberately ordinary, so the swarm is the subject |
+
+> Built in Session M. **Starlight is deliberately absent from every stellar
+> preset**: a star declares `starlit: false`, so the control is inert on one by
+> design, and setting it would make it look like a knob that does something.
+> `Binary Pair` is not built — `binary-companion` is a whole axis of work and
+> is recorded as open in
+> [session-m-stars.md](progress/session-m-stars.md#still-open).
 
 **Compact**
 
@@ -637,8 +646,8 @@ first thing anyone sees.
 | Texture strength | 100% | ✅ |
 | Element opacity | 100% | ✅ |
 | Trait count | 2 | ✅ |
-| Tidal locking | 0% — an ordinary rotating world | ✅ |
-| Lock facing | 90° | ✅ |
+| Tidal locking / Binary companion | 0% — an ordinary rotating world; no companion pull | ✅ |
+| Lock facing / Companion bearing | 90° | ✅ |
 | Show info panel | on | ✅ |
 | Info detail level | Standard | ✅ |
 | Artificial traits | allowed | ⬜ P9 |

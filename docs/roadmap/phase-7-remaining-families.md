@@ -57,5 +57,22 @@ of the Voronoi work. Neither should need renderer changes.
   moon is the same arithmetic with a lid on it. Expect this to want a small
   addition to the climate spec — an insulation or sub-surface term — and treat
   that as the archetype declaring a second question, not as a special case.
+
+  **BUILT.** `climate: { subsurface: { layer, insulate, floor } }` is that
+  second question, declared exactly as `latitude`, `starlit` and `selfHeated`
+  are — gen/climate.js never asks what role a layer has. It reads the same
+  `heatTerm` the baseline does and declines the surface losses, so Interior
+  heat stays a real control on the ocean while the surface stays frozen at
+  every setting. Returns null when the archetype declares none or when the
+  layer it names was not built, so "has this body a second temperature" is
+  answered by the stack. The card gains a `Beneath the ice` row that states
+  both without contradiction — and states the *negative* honestly when a dead
+  core lets the sea freeze through.
+
+  Two calibrations worth keeping: the insulation floor has to sit **above
+  freezing** (0.40, since `toCelsius` puts 0 °C near 0.375) — at 0.30 it was
+  promising an ocean that is solid — and the probe measuring the claim has to
+  use the **freezing point**, not `CC.Climate.COLD`, which is 0.18 ≈ −60 °C and
+  reported 18% for something that was mostly true.
 - **Asteroid: probably skip.** A dusting competes with the Voronoi interior on
   a body that small. Revisit only if the mosaic turns out to want a frame.

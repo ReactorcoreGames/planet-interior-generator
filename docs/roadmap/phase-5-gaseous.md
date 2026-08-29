@@ -1,6 +1,15 @@
-# Phase 5 — Second family: gaseous
+# Phase 5 — Second family: gaseous ✅
 
 *Part of [ROADMAP.md](../ROADMAP.md). Goal: prove the architecture generalises.*
+
+> **Built in Session K, and the done-condition was met** — see
+> [session-k-gaseous.md](../progress/session-k-gaseous.md) for what it cost.
+> Nothing in `draw/` needed a gas-giant branch. What the phase did need was six
+> general mechanisms (`alternate`, `bandWidth`, `zonal`, `climateLean`,
+> `boundarySoftens`, `named`), each usable by every family that follows.
+>
+> **Presets landed in Session L**, closing the last open item: four
+> `gas-giant` and three `ice-giant` entries. The phase is complete.
 
 - `gas-giant` and `ice-giant` archetypes
 - Cloud banding, storm curls, counter-rotating flow arrows

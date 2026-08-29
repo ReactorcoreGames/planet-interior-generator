@@ -85,6 +85,9 @@ CC.PresetGallery = (function () {
       CC.Controls.set("archetype", preset.archetype);
       written.push("archetype");
       if (CC.TraitPicker) CC.TraitPicker.setArchetype(preset.archetype);
+      /* The third of D114's three routes. `Controls.set` suppresses the
+       * change event, so nothing else here will relabel the axis slider. */
+      CC.Controls.syncAxisDials();
     }
 
     for (var key in preset.set) {

@@ -28,10 +28,20 @@ CC.TraitPicker = (function () {
 
   /* Category order and labels for the grouped list. Traits declare their group
    * through `tags`; the first tag that matches a known group wins. */
+  /* The picker's sections. A trait lands in the first group whose id appears
+   * in its `tags`, so ORDER IS PRECEDENCE — `atmospheric` sits above
+   * `interior` because a storm belt tagged both belongs under weather.
+   *
+   * A tag with no group here falls through to "Interior" silently, which is
+   * how `atmospheric` and `artificial` would have been swallowed when the
+   * gaseous traits landed: the traits worked and the picker put a Great Storm
+   * under Interior. Adding a family means checking this list. */
   var GROUPS = [
-    { id: "interior", label: "Interior" },
-    { id: "orbital",  label: "Orbital" },
-    { id: "damage",   label: "Damage" }
+    { id: "atmospheric", label: "Weather" },
+    { id: "artificial",  label: "Built" },
+    { id: "interior",    label: "Interior" },
+    { id: "orbital",     label: "Orbital" },
+    { id: "damage",      label: "Damage" }
   ];
 
   function groupOf(trait) {

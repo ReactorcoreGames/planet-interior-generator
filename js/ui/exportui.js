@@ -55,6 +55,21 @@ CC.ExportUI = (function () {
       var result = CC.Export.applySettingsText(text);
       syncRotationEnabled();
       syncBackgroundColour();
+      /* AND THE MODULES THAT HOLD THEIR OWN COPY OF THE ARCHETYPE MUST BE
+       * TOLD, for exactly D79's reason one gesture along. A settings block may
+       * name a different body, and it is written through `CC.Controls.set`,
+       * which deliberately SUPPRESSES the change event (ui/controls.js
+       * `suppress`) so that restoring forty controls fires one redraw rather
+       * than forty. That suppression is also what stops the picker and the
+       * gallery hearing about it: pasting a `gas-giant` block left the select
+       * reading gas-giant while the trait list still offered Cratered and the
+       * gallery still offered Desert World.
+       *
+       * Same defect as the cold-boot one, reached by a different route — the
+       * fix is the same line, and it lives here rather than inside
+       * `applySettingsText` because share.js knows about text and controls,
+       * not about which UI modules cache what. */
+      syncArchetypeConsumers();
       requestDraw();
       flashSeed(result);
 
@@ -66,6 +81,20 @@ CC.ExportUI = (function () {
               " control" + (result.applied.length === 1 ? "" : "s") + " restored" }
         : { ok: false, error: "That did not look like a settings block." });
     });
+  }
+
+  /* Every module that keeps its own copy of the archetype, told what it is
+   * now. Called after any gesture that can change the archetype control
+   * WITHOUT firing its change event — currently a settings paste; a future
+   * one should call this rather than growing a second copy of the list. */
+  function syncArchetypeConsumers() {
+    var id = CC.Controls.get("archetype") || "planet";
+    if (CC.TraitPicker) CC.TraitPicker.setArchetype(id);
+    if (CC.PresetGallery) CC.PresetGallery.setArchetype(id);
+    /* The angular axis's slider is labelled per archetype, and a paste is one
+     * of the three routes that changes the archetype without firing its
+     * change event (D114). */
+    CC.Controls.syncAxisDials();
   }
 
   /* Importing is invisible otherwise — the panel simply changes, and a user
@@ -179,6 +208,12 @@ CC.ExportUI = (function () {
 
   function setupKeyboard() {
     document.addEventListener("keydown", function (e) {
+      /* A MODAL OWNS THE KEYBOARD WHILE IT IS UP. Without this, Space would
+       * randomize behind the backdrop and the number keys would toggle
+       * sections the user cannot see — actions with no visible cause. The
+       * modal handles its own Escape and Tab. */
+      if (CC.Help && CC.Help.isOpen()) return;
+
       var t = e.target;
       var inField = t && (t.tagName === "INPUT" || t.tagName === "SELECT" ||
                           t.tagName === "TEXTAREA");

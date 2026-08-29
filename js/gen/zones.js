@@ -17,7 +17,10 @@
  *   seaAt(angle)                 signed sea-level offset  <- the centre of it
  *   snowAt(angle)                signed snowline offset
  *   airAt(angle)                 atmosphere thickness multiplier
+ *   swellAt(angle, role)         banded-layer boundary offset, in units of
+ *                                that layer's OWN thickness
  *   coverAt(angle)               how much frosting survives
+ *   thinAt(angle)                how many of the layer's own elements survive
  *   tempAt(angle, base)          surface temperature 0..1  <- what it IS
  *   surfaceStateAt(angle, base)  "boiled" | "hot" | ... | "frozen"
  *
@@ -70,10 +73,43 @@ CC.Zones = (function () {
   function build(axis, body, order, params, seed) {
     if (!axis) return null;
     var spec = axis.field || axis;
+
+    /* AN AXIS MAY DECLARE A DIFFERENT FIELD FOR A DIFFERENT STACK.
+     *
+     * `field_when: { "ice-shell": {...} }` — when the named layer was built,
+     * that recipe replaces the default one. The sibling of `frac_when` in the
+     * stack and `film_when` in the colour profile, resolved the same way and
+     * for the same reason: the moon is one archetype with two stacks, and a
+     * recipe written for one of them can be actively wrong on the other.
+     *
+     * The case that forced it: the planet's recipe moves SEA LEVEL by bearing,
+     * which is the centre of the whole feature on a world whose sea is on top
+     * — it boils off the hot face and cold-traps on the night one. Under an
+     * ice shell that is incoherent. A subsurface ocean has no exposed surface
+     * to evaporate from and nowhere to retreat TO, and the shell above it is a
+     * rigid layer at a fixed radius, so moving the sea drew an unsupported lid
+     * spanning a void. Measured before the fix: sea level swung 0.149 of the
+     * body radius across a locked ice moon.
+     *
+     * Resolved here rather than in the archetype because `build` is where the
+     * body is known; the archetype cannot see which branch it rolled. */
+    if (spec && spec.field_when && body && body.has) {
+      for (var fwKey in spec.field_when) {
+        if (!Object.prototype.hasOwnProperty.call(spec.field_when, fwKey)) continue;
+        if (body.has(fwKey)) { spec = spec.field_when[fwKey]; break; }
+      }
+    }
+
     if (!spec || !spec.zones || !spec.zones.length) return null;
     spec = {
       id: spec.id, axis: spec.axis, anchor: spec.anchor,
       residue: spec.residue, blend: spec.blend, zones: spec.zones,
+      /* The swell's own depth list — see gen/zoneswell.js for why it is
+       * separate from `anchor` rather than an extension of it. Carried
+       * explicitly because this rebuild is a whitelist, and a key that is not
+       * named here is silently dropped. */
+      swellAnchor: spec.swellAnchor, swellResidue: spec.swellResidue,
+      swellBlend: spec.swellBlend,
       param: axis.param || spec.param,
       facing: axis.facing || spec.facing
     };
@@ -104,6 +140,27 @@ CC.Zones = (function () {
     var arcs = CC.ZoneGeom.resolveArcs(spec, intensity);
     var placed = CC.ZoneGeom.layout(arcs, offset);
     var blend = spec.blend === undefined ? 0.25 : spec.blend;
+
+    /* THE SWELL GETS ITS OWN CROSS-FADE WIDTH, and it needs a wider one than
+     * the colour does.
+     *
+     * A zone holds its declared figure FLAT across its arc and blends only at
+     * the edges, so the steepness of a transition is set by `blend`. For
+     * `colorShift` and `temp` a narrow terminator is correct and wanted — the
+     * day/night boundary on a locked world should be a band, not a smear.
+     *
+     * Geometry cannot afford it. The same width that reads as a crisp
+     * terminator in COLOUR draws as a faceted KINK in an OUTLINE, because the
+     * eye resolves a discontinuity in a silhouette far more sharply than one
+     * in a tint. Measured on a main star at the calibrated amplitudes, the
+     * shared 0.30 gave 0.056 of the layer's thickness per degree at the
+     * night/twilight edge — a visible crease — where 0.60 gives 0.028.
+     *
+     * So it is a separate number for the same reason `swellAnchor` is a
+     * separate list: light and matter are being asked different questions and
+     * there is no reason their answers should share a figure. Falls back to
+     * `blend` when a recipe declares nothing. */
+    var swellBlend = spec.swellBlend === undefined ? blend : spec.swellBlend;
 
     /* Per-role depth factors, resolved once. Cheaper than recomputing per
      * element, and it keeps the declared-order lookup in one place. */
@@ -247,10 +304,53 @@ CC.Zones = (function () {
      * is where it is thickest. */
     function airAt(angle) { return fieldAt(angle, "air", 1); }
 
+
+
+    /* THE TIDAL SWELL, built in gen/zoneswell.js.
+     *
+     * It is the only field with its own depth list, its own cross-fade width
+     * and a cap of its own, which is what made it a real seam rather than a
+     * byte-count split when this file crossed 500 lines (D128). It is handed
+     * `fieldAt` and `strengthFor` rather than reimplementing them, so there
+     * is still exactly one sampler and one shared depth factor. */
+    var swell = CC.ZoneSwell.build({
+      spec: spec, body: body, order: order, intensity: intensity,
+      swellBlend: swellBlend, fieldAt: fieldAt, strengthFor: strengthFor
+    });
+    var swellAt = swell.swellAt;
+    var swellAnchored = swell.anchored;
+
     /* HOW MUCH FROSTING SURVIVES at an angle, as opposed to which kind. The
      * zone weights decide the material; this decides whether there is any —
      * a scoured dayside is bare rock, which is a statement about quantity. */
     function coverAt(angle) { return fieldAt(angle, "cover", 1); }
+
+    /* HOW MANY OF A LAYER'S OWN ELEMENTS SURVIVE at an angle. 1 is all of
+     * them, 0 is none.
+     *
+     * `coverAt` IS NOT THIS, though the two look alike. Cover is about
+     * FROSTING — a film deposited on a surface — and it is consumed by
+     * gen/frosting.js alone. This is about the layer's DETAIL: the plumes,
+     * cells, streaks and speckles the element stage scatters. A zone that
+     * scours snow off a dayside is not the same statement as a zone where
+     * the layer itself is doing less.
+     *
+     * WHAT IT WAS BUILT FOR, and the reasoning generalises past it. A coronal
+     * hole is a sector where the magnetic field is open and the wind escapes
+     * freely, so there are simply FEWER PLUMES THERE — the feature is an
+     * absence in a field, not a dark shape laid over one.
+     *
+     * IT HAS TO BE AN ABSENCE, because the corona is drawn with a `screen`
+     * blend (ATMOSPHERE_BLEND in draw/scene.js) and under `screen` dark paint
+     * is very nearly a no-op: it can only ever ADD light. That is why the
+     * first implementation had to be a flat, hard-edged, unfaded `darker`
+     * wedge — a soft dark region on a screen-blended layer is invisible, which
+     * is D121s `dust-formation` failure (maxdelta 19) waiting to happen a
+     * second time. Removing elements works WITH the blend instead of against
+     * it, and needs no dark paint at all.
+     *
+     * Neutral 1, because it is a multiplier on a count. */
+    function thinAt(angle) { return fieldAt(angle, "thin", 1); }
 
     /* SURFACE TEMPERATURE at an angle, 0 (frozen) .. 1 (scorching).
      *
@@ -304,8 +404,10 @@ CC.Zones = (function () {
      * eases toward as the dial falls — 1 for a multiplier, 0 for an offset.
      * Zones that omit the key take the neutral value, so a recipe only
      * declares what it actually changes. */
-    function fieldAt(angle, key, neutral) {
-      CC.ZoneGeom.weightsAt(placed, blend, angle, scratch);
+    function fieldAt(angle, key, neutral, blendOverride) {
+      CC.ZoneGeom.weightsAt(placed,
+        blendOverride === undefined ? blend : blendOverride,
+        angle, scratch);
       var m = 0, any = false;
       for (var z = 0; z < zones.length; z++) {
         var w = scratch[z];
@@ -355,7 +457,12 @@ CC.Zones = (function () {
       seaAt: seaAt,
       snowAt: snowAt,
       airAt: airAt,
+      swellAt: swellAt,
+      swellAnchored: swellAnchored,
       coverAt: coverAt,
+      /* How many of a layer's own elements survive at a bearing. See above —
+       * this is the layer's DETAIL, not the frosting `coverAt` governs. */
+      thinAt: thinAt,
       tempAt: tempAt,
       surfaceStateAt: surfaceStateAt,
       at: atAngle,

@@ -1,44 +1,14 @@
-/* Trait definitions — pure data.
+/* Solid bodies — traits for the rocky family.
  *
- * A trait is an OPTIONAL addition that makes one body different from another.
- * If a layer would look wrong without it, it is a layer detail and belongs in
- * data/elements.js instead. See docs/TRAIT-SYSTEM.md for the distinction and
- * for the full field reference.
+ * Everything here requires `solid-surface` or `solid-interior`, which is what
+ * keeps them off a gas giant without any of them naming one. See
+ * js/data/traits/registry.js.
  *
- * THE PLACEMENT GRAMMAR — every trait is described by the same fields, and
- * that is the whole system. A trait that cannot be expressed here means the
- * grammar needs extending, which is a deliberate decision rather than a
- * special case:
- *
- *   anchor    layer role it attaches to. Traits are always layer-RELATIVE, so
- *             they work regardless of how thick that layer happened to roll
- *   reach     on | inward | outward | spanning
- *   depth     [inner, outer] across the anchor's own thickness, 0..1
- *   arc       [min, max] degrees of the body each instance covers
- *   repeat    [min, max] how many separate instances
- *   spacing   even | random | clustered
- *   jitter    0..1 randomness applied to spacing
- *   mirror    duplicate the set reflected across the vertical axis
- *   offset    [min, max] rotation applied to the whole set; [0,0] pins it
- *   element   which drawing primitive (draw/primitives.js)
- *   tiers     size classes — a few large, more medium, many small
- *   density   {min, max} instance count at Detail density 0 .. 1
- *   zoneBias  cluster instances into a named zone, if the body has zones
- *   requires  body tags the archetype must carry
- *   excludes  traits this cannot coexist with
- *   tags      grouping for the picker UI
- *
- * ORIENTATION: bodies are generated pole-up and rotated at the end, so 0 deg
- * is the north pole and 90 deg is the equator. Polar traits pin `offset` to
- * [0,0] and set `mirror` so they land on both poles.
- *
- * ZONE MODIFIERS are a second, smaller shape — `kind: "modifier"`. They draw
- * nothing themselves; they divide the body into angular sectors that perturb
- * whatever the layers already rolled. See gen/zones.js. */
+ * The registry must load before this file. */
 
 var CC = CC || {};
 
-CC.Traits = (function () {
+(function () {
   "use strict";
 
   /* ---- ordinary traits -------------------------------------------------- */
@@ -49,7 +19,13 @@ CC.Traits = (function () {
   var MINERAL_VEINS = {
     id: "mineral-veins",
     label: "Mineral Veins",
-    anchor: "mantle",
+    /* ANCHOR CHAIN, NOT ONE ROLE (D77). The asteroid has neither a crust nor
+     * a mantle — its stack is a shell and a mosaic interior — so a trait
+     * naming only one of those resolves to nothing there and places NOTHING,
+     * silently. `interior` is the fallback, and adding it is what makes this
+     * trait eligible on the asteroid without a duplicate copy of it existing
+     * that could drift from this one. */
+    anchor: ["mantle", "interior"],
     reach: "on",
     depth: [0.05, 0.95],
     arc: [0, 360],
@@ -117,7 +93,13 @@ CC.Traits = (function () {
   var ORE_DEPOSITS = {
     id: "ore-deposits",
     label: "Ore Deposits",
-    anchor: "crust",
+    /* ANCHOR CHAIN, NOT ONE ROLE (D77). The asteroid has neither a crust nor
+     * a mantle — its stack is a shell and a mosaic interior — so a trait
+     * naming only one of those resolves to nothing there and places NOTHING,
+     * silently. `interior` is the fallback, and adding it is what makes this
+     * trait eligible on the asteroid without a duplicate copy of it existing
+     * that could drift from this one. */
+    anchor: ["crust", "outer-shell"],
     reach: "on",
     depth: [0.08, 0.86],
     arc: [0, 360],
@@ -197,7 +179,13 @@ CC.Traits = (function () {
   var METAL_RICH = {
     id: "metal-rich",
     label: "Metal-Rich",
-    anchor: "mantle",
+    /* ANCHOR CHAIN, NOT ONE ROLE (D77). The asteroid has neither a crust nor
+     * a mantle — its stack is a shell and a mosaic interior — so a trait
+     * naming only one of those resolves to nothing there and places NOTHING,
+     * silently. `interior` is the fallback, and adding it is what makes this
+     * trait eligible on the asteroid without a duplicate copy of it existing
+     * that could drift from this one. */
+    anchor: ["mantle", "interior"],
     reach: "on",
     depth: [0.02, 0.98],
     arc: [0, 360],
@@ -215,58 +203,6 @@ CC.Traits = (function () {
     requires: ["solid-interior"],
     excludes: [],
     tags: ["interior", "resource"]
-  };
-
-  /* Ring system — the `reach: "outward"` case. Radii are multiples of the body
-   * radius rather than positions in a layer, and the view leaves room for them
-   * via `body.extent`. */
-  var RING_SYSTEM = {
-    id: "ring-system",
-    label: "Ring System",
-    anchor: "orbit",
-    reach: "outward",
-    depth: [1.35, 2.15],
-    arc: [0, 360],
-    repeat: [3, 8],
-    spacing: "even",
-    jitter: 0.15,
-    mirror: false,
-    offset: [0, 360],
-    element: "ring-band",
-    tiers: 2,
-    alpha: [0.16, 0.52],
-    density: { min: 3, max: 14 },
-    tone: "lighter",
-    requires: [],
-    excludes: ["shattered"],
-    tags: ["orbital"]
-  };
-
-  /* Debris belt — the scattered sibling of the ring system. Same region, but
-   * `spacing: "random"` with high jitter, which is what TRAIT-SYSTEM.md means
-   * by even-and-low-jitter reading as artificial and clustered-and-high-jitter
-   * reading as natural. */
-  var DEBRIS_BELT = {
-    id: "debris-belt",
-    label: "Debris Belt",
-    anchor: "orbit",
-    reach: "outward",
-    depth: [1.28, 1.95],
-    arc: [0, 360],
-    repeat: [1, 1],
-    spacing: "random",
-    jitter: 1,
-    mirror: false,
-    offset: [0, 360],
-    element: "chunk",
-    tiers: 3,
-    size: [0.030, 0.062],
-    alpha: [0.45, 0.92],
-    density: { min: 60, max: 420 },
-    tone: "lighter",
-    requires: [],
-    excludes: [],
-    tags: ["orbital"]
   };
 
   /* Heavy cratering — impact scars across the crust. Distinct from the moon's
@@ -379,47 +315,13 @@ CC.Traits = (function () {
     tags: ["damage"]
   };
 
-  var ALL = [
+  CC.Traits.register([
     MINERAL_VEINS,
     ORE_DEPOSITS,
     VOID_POCKETS,
     MAGMA_CHAMBERS,
     METAL_RICH,
-    RING_SYSTEM,
-    DEBRIS_BELT,
     CRATERED,
     IMPACT_BASIN
-  ];
-
-  var BY_ID = {};
-  for (var i = 0; i < ALL.length; i++) BY_ID[ALL[i].id] = ALL[i];
-
-  /* Which traits an archetype may carry. A trait is eligible when the body
-   * carries every tag it `requires`. Kept as a function rather than a table on
-   * the archetype so adding a trait is one edit here. */
-  function eligible(archetype) {
-    var tags = (archetype && archetype.tags) || [];
-    var out = [];
-    for (var i = 0; i < ALL.length; i++) {
-      var t = ALL[i];
-      var ok = true;
-      for (var r = 0; r < (t.requires || []).length; r++) {
-        if (tags.indexOf(t.requires[r]) < 0) { ok = false; break; }
-      }
-      if (ok) out.push(t);
-    }
-    return out;
-  }
-
-  function get(id) { return BY_ID[id] || null; }
-  function ids() { return ALL.map(function (t) { return t.id; }); }
-  function isModifier(t) { return !!(t && t.kind === "modifier"); }
-
-  return {
-    ALL: ALL,
-    get: get,
-    ids: ids,
-    eligible: eligible,
-    isModifier: isModifier
-  };
+  ]);
 })();

@@ -100,22 +100,80 @@ for (const id of CC.Archetypes.ids()) {
 /* ---- the stack composes at every combination of extremes --------------- */
 
 console.log("\nstack composition (the failure mode in every frac table so far)");
+
+/* A STACK MAY BRANCH, AND EACH BRANCH HAS TO COMPOSE ON ITS OWN.
+ *
+ * `frac_when: { role: [lo, hi] }` says "this layer sits somewhere else when
+ * that layer is present" — a moon's crust is the surface on a bare moon and a
+ * sea floor under an ice shell. Composing the declared `frac` values as one
+ * flat list then compares layers that never coexist, and reports an overlap
+ * that cannot happen.
+ *
+ * So the branches are enumerated and each is checked as a whole stack: layers
+ * that branch take their alternative range, and layers gated on an absent role
+ * drop out. Still generic over every archetype and still mechanically
+ * true-or-false — adding a family adds no code here. */
+function branchesOf(a) {
+  const switches = new Set();
+  for (const l of a.stack) {
+    for (const k of Object.keys(l.frac_when || {})) switches.add(k);
+    if (l.presence && l.presence.requires) switches.add(l.presence.requires);
+  }
+  const keys = [...switches];
+  if (!keys.length) return [a.stack];
+
+  const out = [];
+  for (let m = 0; m < (1 << keys.length); m++) {
+    const on = {};
+    keys.forEach((k, i) => { on[k] = !!((m >> i) & 1); });
+
+    /* A switch role that is always present cannot be off, so that branch is
+     * not a stack the generator can ever build. */
+    let real = true;
+    for (const k of keys) {
+      const layer = a.stack.find(l => l.role === k);
+      if (layer && layer.presence === undefined && !on[k]) real = false;
+    }
+    if (!real) continue;
+
+    const stack = [];
+    for (const l of a.stack) {
+      if (l.role in on && !on[l.role]) continue;
+      if (l.presence && l.presence.requires && !on[l.presence.requires]) continue;
+      let frac = l.frac;
+      for (const [k, alt] of Object.entries(l.frac_when || {})) {
+        if (on[k]) { frac = alt; break; }
+      }
+      stack.push({ role: l.role, frac });
+    }
+    out.push(stack);
+  }
+  return out;
+}
+
 for (const id of CC.Archetypes.ids()) {
   const a = CC.Archetypes.get(id);
-  const rolled = a.stack.filter(l => Array.isArray(l.frac));
+  const branches = branchesOf(a);
   let violations = 0;
+  let combos = 0;
 
-  for (let m = 0; m < (1 << rolled.length); m++) {
-    const at = {};
-    rolled.forEach((l, i) => { at[l.role] = l.frac[(m >> i) & 1]; });
-    for (let i = 1; i < rolled.length; i++) {
-      const above = rolled[i - 1], cur = rolled[i];
-      if (at[cur.role] >= at[above.role]) violations++;
+  for (const stack of branches) {
+    const rolled = stack.filter(l => Array.isArray(l.frac));
+    combos += 1 << rolled.length;
+    for (let m = 0; m < (1 << rolled.length); m++) {
+      const at = {};
+      rolled.forEach((l, i) => { at[l.role] = l.frac[(m >> i) & 1]; });
+      for (let i = 1; i < rolled.length; i++) {
+        const above = rolled[i - 1], cur = rolled[i];
+        if (at[cur.role] >= at[above.role]) violations++;
+      }
     }
   }
-  if (violations) bad(`${id}: frac ranges overlap at ${violations} combinations of extremes`);
-  else ok(`${id}: frac ranges stay ordered at all ${1 << rolled.length} extremes`);
+  const where = branches.length > 1 ? ` across ${branches.length} branches` : "";
+  if (violations) bad(`${id}: frac ranges overlap at ${violations} combinations of extremes${where}`);
+  else ok(`${id}: frac ranges stay ordered at all ${combos} extremes${where}`);
 }
+
 
 /* ---- documented colour values still match the code --------------------- */
 
@@ -147,6 +205,37 @@ console.log("\ndocs/celestials/solid-bodies.md vs js/data/archetypes.js");
     else bad(`${role}: doc row disagrees with the code`);
   }
 }
+
+/* ---- every registered archetype is reachable from the GUI -------------- */
+
+/* THE SUITE AND THE APP READ TWO DIFFERENT LISTS.
+ *
+ * Everything else here drives archetypes through `CC.Archetypes.ids()`, while
+ * the archetype dropdown in index.html is hand-written HTML. So a family can be
+ * registered, stack-checked, rendered, presetted and shipped while being
+ * literally unreachable in the app — which is exactly what happened to the moon
+ * in Session S: every check passed and the option simply was not there.
+ *
+ * Mechanically true-or-false, and generic over `CC.Archetypes.ids()`, so adding
+ * a family still adds no test code — it just has to add its option. */
+console.log("\nthe GUI offers every archetype");
+{
+  const sel = html.match(/<select id="archetype">([\s\S]*?)<\/select>/);
+  if (!sel) {
+    bad("index.html has no archetype <select> to check");
+  } else {
+    const offered = [...sel[1].matchAll(/<option value="([^"]+)"/g)].map(m => m[1]);
+    const registered = CC.Archetypes.ids();
+    const missing = registered.filter(id => !offered.includes(id));
+    const extra = offered.filter(id => !registered.includes(id));
+    for (const id of missing) bad(`${id} is registered but the dropdown does not offer it`);
+    for (const id of extra) bad(`the dropdown offers ${id}, which is not registered`);
+    if (!missing.length && !extra.length) {
+      ok(`all ${registered.length} archetypes are selectable in the GUI`);
+    }
+  }
+}
+
 
 /* ---- index.html is the single source of truth for the file list -------- */
 

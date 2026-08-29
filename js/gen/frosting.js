@@ -50,14 +50,159 @@ CC.Frosting = (function () {
    * clearly lighter and more saturated than the crust it covers. Making the
    * separation relational rather than absolute is what allows the hue to roam
    * free without any world losing its cover to the background. */
+  /* THE ZONE TABLE — the thing D22 said must move out of draw/film.js.
+   *
+   * An archetype's `colorProfile.layers.film` declares its zones as an
+   * ordered map, outermost-down, each carrying BOTH its colour ranges and its
+   * deposition character. Keeping the two together is the point: the four
+   * character knobs and the colour they pair with are one statement about a
+   * material, and having them in two files a thousand lines apart is what
+   * made the planet's numbers look like constants of the renderer rather than
+   * facts about a planet.
+   *
+   *   depth   how thick it lies, as a fraction of the host layer
+   *   smooth  how much flatter than the rock its top surface is. High values
+   *           pool and level out; low values drape and follow the ground
+   *   bleed   how far its underside fingers down into the rock
+   *   patch   how much of the mask's variation reaches the alpha. Low is an
+   *           even coat, high is broken and blotchy
+   *   grain   amplitude of the fine wobble on the top surface — the
+   *           difference between a poured glaze and a crumbly one
+   *
+   * ANY COUNT, NOT FOUR. A planet declares four (peak, land, shallow, deep);
+   * a giant's crushed floor declares two. `zoneWeights` in draw/film.js is
+   * written against the table's length and the `snow` / `aquatic` flags
+   * rather than against four fixed positions, so neither number appears
+   * anywhere in the renderer.
+   *
+   * `line` and `shelf` are the per-archetype thresholds that used to be
+   * SNOWLINE 0.42 and SHELF -0.16 — Earth-ish numbers that had no business
+   * being universal. Both are offsets from the level line, in units of the
+   * terrain's own range, exactly as before.
+   *
+   * Returns null for an archetype with no frosting at all, which is how a
+   * body with no terrain-carrying layer pays nothing. */
+  /* WHICH FROSTING SPEC BELONGS TO WHICH LAYER.
+   *
+   * There used to be exactly one, `colorProfile.layers.film`, resolved once
+   * for the whole body — which was right while every archetype had a single
+   * frosted surface. The ice-shelled moon has TWO, facing each other across a
+   * dark ocean: a rock floor frosted upward with brine pools, and the shell's
+   * underside frosted downward as accreted ice. They are different materials,
+   * different colours and different directions, so one table cannot describe
+   * both.
+   *
+   * A spec is therefore found in one of three places, most specific first:
+   *
+   *   layers[role].film_when[otherRole]   the branch form — this layer frosts
+   *                                       differently when that layer exists.
+   *                                       A moon's crust is a cratered surface
+   *                                       on the dry branch and a sea floor on
+   *                                       the ice one.
+   *   layers[role].film                   this layer's own frosting
+   *   layers.film                         the body's single frosting, which is
+   *                                       what every existing archetype
+   *                                       declares and what it keeps meaning
+   *
+   * The fallback is last, so nothing that worked before this moves: a planet
+   * and a gas giant each declare one `layers.film` and every terrain-carrying
+   * layer resolves to it exactly as it always did.
+   *
+   * `has` answers whether a role was built, so the branch is decided by the
+   * stack that actually exists rather than by what the archetype might roll. */
+  function specFor(profile, role, has) {
+    var layers = profile && profile.layers;
+    if (!layers) return null;
+
+    var own = layers[role];
+    if (own) {
+      if (own.film_when && has) {
+        for (var key in own.film_when) {
+          if (!Object.prototype.hasOwnProperty.call(own.film_when, key)) continue;
+          if (has(key)) return own.film_when[key];
+        }
+      }
+      if (own.film) return own.film;
+    }
+    return layers.film || null;
+  }
+
+  /* Every DISTINCT frosting spec on a body, keyed by the role it frosts.
+   * Callers that resolve colours walk this; callers that only need one table
+   * per layer use `specFor` directly. */
+  function specsByRole(profile, roles, has) {
+    var out = {};
+    for (var i = 0; i < roles.length; i++) {
+      var spec = specFor(profile, roles[i], has);
+      if (spec) out[roles[i]] = spec;
+    }
+    return out;
+  }
+
+  function zoneTable(spec) {
+    if (!spec || !spec.zones) return null;
+
+    var keys = [];
+    var rows = [];
+    for (var k in spec.zones) {
+      if (!Object.prototype.hasOwnProperty.call(spec.zones, k)) continue;
+      var z = spec.zones[k];
+      keys.push(k);
+      rows.push({
+        key: k,
+        /* Defaults are the planet's ordinary ground cover, so a zone that
+         * declares only a colour still deposits something reasonable. */
+        depth: z.depth === undefined ? 0.32 : z.depth,
+        smooth: z.smooth === undefined ? 0.50 : z.smooth,
+        bleed: z.bleed === undefined ? 0.70 : z.bleed,
+        patch: z.patch === undefined ? 0.60 : z.patch,
+        grain: z.grain === undefined ? 0.25 : z.grain,
+        /* Which zone the snowline governs, and which are seen through water.
+         * Read from the same flags the colour stage already keys off, so the
+         * two can never disagree about which zone is which. */
+        snow: !!z.snow,
+        aquatic: !!z.aquatic
+      });
+    }
+    if (!rows.length) return null;
+
+    return {
+      zones: rows,
+      keys: keys,
+      /* The two thresholds. Defaults are the planet's, so an archetype that
+       * declares zones without thresholds behaves exactly as before. */
+      line: spec.line === undefined ? 0.42 : spec.line,
+      shelf: spec.shelf === undefined ? -0.16 : spec.shelf,
+      /* WHICH WAY THE MATERIAL SETTLES. +1 outward from the rock, which is
+       * every deposit in the generator until the ice moon; -1 mirrors it, so
+       * the material builds from a surface DOWNWARD into whatever is below —
+       * accreted ice hanging off the underside of a shell.
+       *
+       * Defaulted rather than required, so every existing table keeps the only
+       * behaviour it has ever had. */
+      direction: spec.direction === -1 ? -1 : 1
+    };
+  }
+
   function resolve(spec, out, layers, params, seed, heat, primary,
-                   satScale, valScale, helpers, thermal) {
+                   satScale, valScale, helpers, thermal, streamKey) {
     wrapHue = helpers.wrapHue;
     makeLighter = helpers.makeLighter;
     makeDarker = helpers.makeDarker;
     makeRgba = helpers.makeRgba;
 
-    var frng = CC.RNG.stream(seed, "colour/film");
+    /* EACH FROSTING GETS ITS OWN STREAM.
+     *
+     * A body may now declare more than one — an ice moon's brine floor and the
+     * accreted ice hanging off its shell are two materials resolved in the
+     * same build. Sharing one stream would hand both the identical aridity
+     * roll, hue spread and per-zone jitter, so the two surfaces facing each
+     * other across the ocean would come out as one material drawn twice. That
+     * would read as a colour-rule bug rather than as the missing seed it is.
+     *
+     * The default key is the one every existing archetype used, so a body with
+     * a single frosting rolls exactly what it always rolled. */
+    var frng = CC.RNG.stream(seed, streamKey || "colour/film");
     var wet = params.oceanDepth === undefined ? 0.4 : params.oceanDepth;
 
     /* Climate still exists — it just no longer dictates the hue.
@@ -104,8 +249,31 @@ CC.Frosting = (function () {
     var arid = clamp(0.42 + (surfaceHeat - 0.45) * 0.85
                      + (1 - wet) * 0.30 - 0.15 + aridRoll, 0, 1);
 
-    /* The family's base hue: anywhere on the wheel. */
+    /* The family's base hue: anywhere on the wheel.
+     *
+     * FREE IS RIGHT FOR A PLANET AND WRONG FOR REGOLITH, and the difference is
+     * what the material IS. A planet's cover is vegetation, reefs and silt —
+     * things with chemistry of their own — so "orange grass or pink forests
+     * are a feature" (D19), and constraining the hue was the failure that made
+     * every world the same ochre.
+     *
+     * Regolith is not that. It is the rock itself, ground to dust by four
+     * billion years of impacts, so its hue is the rock's hue by definition —
+     * and a green moon reads as an error rather than as variety. Measured on a
+     * bare moon before this existed: zones at hue 138 and 97 over rock at 169,
+     * which is moss on stone.
+     *
+     * `hueFrom: "host"` says so. It takes the rock's hue and lets the authored
+     * per-zone offsets work from there, so the mineral tints — faint ochre,
+     * rust, blue-grey — are a small departure from the ground rather than an
+     * unrelated colour. DECLARED, so nothing else changes: every existing
+     * frosting omits it and keeps the free roll it has always had. */
     var base = frng() * 360;
+    if (spec.hueFrom === "host") {
+      /* Resolved below once the host is found; the roll above is still spent
+       * so a body's other frosting rolls do not shift. */
+      base = null;
+    }
 
     /* How far this world's zones spread apart in hue. A low roll gives a world
      * whose cover is all one colour at different depths; a high one gives a
@@ -115,7 +283,16 @@ CC.Frosting = (function () {
     var spread = lerp(0.35, 1.65, frng());
 
     var zones = spec.zones || {};
-    var keys = ["frostPeak", "frostLand", "frostShallow", "frostDeep"];
+    /* THE ZONE NAMES ARE THE ARCHETYPE'S, NOT A FIXED FOUR (D22).
+     *
+     * This was a hardcoded ["frostPeak", "frostLand", "frostShallow",
+     * "frostDeep"], which is a planet's list. Taking the declaration order
+     * instead is what lets a giant's floor declare two zones and a later
+     * family declare three, without a line of this file knowing how many
+     * there are. */
+    var table = zoneTable(spec);
+    var keys = table ? table.keys : [];
+    if (!keys.length) return null;
 
     /* The host: the outermost layer that CARRIES TERRAIN — the rock the
      * frosting actually lies on. Not "the outermost solid layer", which on an
@@ -129,6 +306,13 @@ CC.Frosting = (function () {
         host = out[lr.role];
         break;
       }
+    }
+
+    /* The rock's own hue, for a frosting that declares it is made of the rock.
+     * Falls back to the free roll if there is no host to read, so this can
+     * never leave a body with no frosting hue at all. */
+    if (base === null) {
+      base = host ? host.h : frng() * 360;
     }
 
     /* ROLL ALL FOUR ZONES FIRST, then place the family as a unit.
@@ -300,8 +484,10 @@ CC.Frosting = (function () {
      * single set exactly as before and pays nothing.
      */
     if (thermal && thermal.tempAt) {
-      var frozenKeys = ["frostPeakCold", "frostLandCold",
-                        "frostShallowCold", "frostDeepCold"];
+      /* One frozen counterpart per declared zone, named by suffix rather than
+       * listed — so a two-zone or five-zone archetype gets its thermal sets
+       * for free and this file never counts. */
+      var frozenKeys = suffixed(keys, "Cold");
       for (kk = 0; kk < keys.length; kk++) {
         var src = out[keys[kk]];
 
@@ -340,8 +526,7 @@ CC.Frosting = (function () {
        * desaturated, ashen rather than vegetated. Without this the hot face
        * borrows the temperate family's colours at low coverage and reads as a
        * world that simply has less grass. */
-      var burntKeys = ["frostPeakHot", "frostLandHot",
-                       "frostShallowHot", "frostDeepHot"];
+      var burntKeys = suffixed(keys, "Hot");
       for (kk = 0; kk < keys.length; kk++) {
         var hs = out[keys[kk]];
         /* Toward ash: hue dragged to the warm-neutral end, saturation cut
@@ -363,11 +548,33 @@ CC.Frosting = (function () {
       }
     }
 
-    /* `film` stays as an alias for the land zone. Anything that asks for the
-     * old single colour — stats, future overlays — still gets a sensible
-     * answer rather than the neutral fallback. */
-    out.film = out.frostLand;
+    /* `film` stays as an alias for the ORDINARY GROUND zone. Anything that
+     * asks for the old single colour — stats, future overlays — still gets a
+     * sensible answer rather than the neutral fallback.
+     *
+     * The planet's is `frostLand`, which is its second; an archetype with a
+     * different set gets the first non-aquatic zone that is not the snowline,
+     * which is the same thing said generically. */
+    out.film = out[ordinaryKey(keys, zones)];
     return out.film;
+  }
+
+  /* `["a","b"], "Cold"` -> `["aCold","bCold"]`. */
+  function suffixed(keys, suffix) {
+    var out = [];
+    for (var i = 0; i < keys.length; i++) out.push(keys[i] + suffix);
+    return out;
+  }
+
+  /* Which zone stands for "the ordinary surface of this body" — the one the
+   * `film` alias points at. The first that is neither the snowline nor
+   * underwater; the first of all of them if every zone is one of those. */
+  function ordinaryKey(keys, zones) {
+    for (var i = 0; i < keys.length; i++) {
+      var z = zones[keys[i]] || {};
+      if (!z.snow && !z.aquatic) return keys[i];
+    }
+    return keys[0];
   }
 
   /* Shortest signed hue rotation from `from` to `to`, in degrees. Lets a
@@ -381,5 +588,10 @@ CC.Frosting = (function () {
     return d;
   }
 
-  return { resolve: resolve };
+  return {
+    resolve: resolve,
+    zoneTable: zoneTable,
+    specFor: specFor,
+    specsByRole: specsByRole
+  };
 })();

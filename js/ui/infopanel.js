@@ -38,7 +38,9 @@ CC.InfoPanel = (function () {
     host.innerHTML = "";
     if (!stats) return;
 
-    var keep = CC.Card.levelKeys(level || "standard");
+    /* The line sets belong to the body's own stat template, so the panel
+     * hands the stats in rather than naming a family's keys itself. */
+    var keep = CC.Card.levelKeys(stats, level || "standard");
 
     var head = document.createElement("div");
     head.className = "info-head";

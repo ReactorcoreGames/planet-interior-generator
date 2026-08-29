@@ -13,8 +13,21 @@
  *
  * Pixels enter only through `view`. Every position is view.at(), every length
  * view.px(), every stroke view.lw(). That is what makes the same body the same
- * picture at 240px and at 4320px. */
-
+ * picture at 240px and at 4320px.
+ *
+ * SPLIT ACROSS FILES, following the pattern data/traits/, data/elements/,
+ * data/archetypes/ and gen/stats/ already use — a registry plus one file per
+ * group. The single file reached 1373 lines, well past the 500-line rule, and
+ * the seam it wanted was obvious: the primitives below are what a body is made
+ * of INSIDE its silhouette, and everything in primitives/orbital.js is either
+ * beyond the body or belongs to a specific family.
+ *
+ * THE DISPATCH TABLE IS OWNED HERE AND EXTENDED BY THE OTHERS. `register()`
+ * adds kinds to `KINDS`, so a new group of primitives is a new file plus a
+ * script tag, with nothing to edit here. That is the same promise the trait
+ * registry makes: adding a family should add no code to an existing file.
+ *
+ * Load order: this file first, then anything that registers into it. */
 var CC = CC || {};
 
 CC.Primitives = (function () {
@@ -657,184 +670,11 @@ CC.Primitives = (function () {
     ctx.fill();
   }
 
-  /* ---- ring-band --------------------------------------------------------- */
-
-  /* A concentric band beyond the body — ring systems.
-   *
-   * Drawn as a flat ellipse rather than a circle, because a ring seen from a
-   * cutaway's viewpoint is edge-on-ish: a perfect circle would read as a halo
-   * rather than as a disc of orbiting material. The squash is fixed rather
-   * than rolled so every ring in a system shares one orbital plane, which is
-   * most of what makes them read as a system.
-   *
-   * `el.gap` marks a division — drawn at much lower alpha rather than skipped,
-   * so a gap reads as a thinning rather than as a missing band. */
-  function ringBand(ctx, view, el, style) {
-    var r = view.px(el.radius);
-    var w = Math.max(0.6, view.px(el.size));
-    var squash = 0.26;
-
-    ctx.save();
-    ctx.translate(view.cx, view.cy);
-    ctx.scale(1, squash);
-    ctx.beginPath();
-    ctx.arc(0, 0, r, 0, TAU);
-    ctx.strokeStyle = style;
-    /* Divided by the squash so the stroke stays visually the authored width
-     * rather than being flattened along with the geometry. */
-    ctx.lineWidth = w / squash;
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  /* ---- chunk ------------------------------------------------------------- */
-
-  /* A small angular polygon — debris, rubble, fragments.
-   *
-   * Deliberately angular where `blob` is smooth: broken rock has flat faces
-   * and corners, and that difference is what separates a debris belt from a
-   * field of pockets without needing two colour treatments. */
-  function chunk(ctx, view, el, style) {
-    var c = view.at(el.radius, el.angle);
-    var base = Math.max(0.7, view.px(el.size));
-    var seed = el.seed || 0;
-    /* MORE SIDES THAN BEFORE (3-6 became 5-9). A triangle at debris scale is
-     * two or three pixels of solid colour, which is exactly what a star in the
-     * background plate looks like. More corners give a silhouette that reads
-     * as a broken lump even when small. */
-    var sides = 5 + Math.floor(seed * 5);
-    var spin = seed * TAU;
-
-    /* `style` is a {body, lit, shadow, fleck} set when the caller wants rock
-     * rather than a flat fragment; a plain fill otherwise. */
-    var rich = style && style.body;
-
-    function facePath(scale, dx, dy) {
-      ctx.beginPath();
-      for (var i = 0; i < sides; i++) {
-        var t = (i / sides) * TAU + spin;
-        /* A deterministic per-corner wobble from the element's own seed, so no
-         * two chunks are the same shape and none needs an RNG. Deeper than it
-         * was, so the outline is jagged rather than merely a rounded polygon —
-         * broken rock has facets and notches. */
-        var wob = 0.48 + 0.52 * Math.abs(Math.sin(seed * 40 + i * 2.7));
-        var x = c.x + dx + Math.cos(t) * base * wob * scale;
-        var y = c.y + dy + Math.sin(t) * base * wob * scale;
-        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-    }
-
-    facePath(1, 0, 0);
-    ctx.fillStyle = rich ? style.body : style;
-    ctx.fill();
-
-    if (!rich) return;
-
-    /* A LIT FACE AND A SHADOWED ONE.
-     *
-     * A single flat fill is the whole reason debris was mistaken for
-     * starfield: a star is a small bright uniform dot, and so was a chunk.
-     * Rock is not uniform — it has a face turned toward the light and one
-     * turned away, and that internal contrast is what makes even a 3px mark
-     * read as a solid object rather than as a point of light.
-     *
-     * The offset is a fixed fraction of the chunk's own size, so every
-     * fragment in a belt is lit from the same direction and the belt reads as
-     * one population of rocks under one sun. */
-    var off = base * 0.30;
-    ctx.save();
-    facePath(1, 0, 0);
-    ctx.clip();
-
-    /* The shadowed side: a second copy pushed toward the light, so what
-     * remains uncovered along the far edge is the dark limb of the rock. */
-    ctx.beginPath();
-    facePath(0.96, -off * 0.55, -off * 0.55);
-    ctx.fillStyle = style.shadow;
-    ctx.fill();
-
-    /* The lit crown, smaller and offset the other way. */
-    ctx.beginPath();
-    facePath(0.62, off * 0.42, off * 0.42);
-    ctx.fillStyle = style.lit;
-    ctx.fill();
-
-    /* SURFACE TEXTURE — a few flecks of grain per fragment.
-     *
-     * Pits and mineral speckle. Deterministic from the element's own seed, so
-     * this stays a pure function of the element and costs no RNG. Only drawn
-     * on fragments big enough to show it; below that the flecks would just
-     * dirty the silhouette.
-     *
-     * THE THRESHOLD IS ASKED IN REFERENCE SPACE, NOT IN PIXELS. `base` is
-     * `view.px(...)`, so testing it meant "big enough on this canvas" — and a
-     * fragment that sat below 2.2px in the preview crossed it in a 4K export
-     * and grew flecks that the preview did not have. Measured at 640x360
-     * against 3840x2160: 9629 arcs became 11001, i.e. the export drew 1372
-     * elements that were not in the picture it was exporting.
-     *
-     * That is the resolution-independence rule exactly: counts never scale
-     * with pixels, and the preview is the real render. `view.fs` is the same
-     * authored size the element was placed with, so the answer is the same at
-     * every output size. */
-    if (view.fs(el.size) > 2.2 && style.fleck) {
-      ctx.fillStyle = style.fleck;
-      var flecks = 2 + Math.floor(seed * 4);
-      for (var f = 0; f < flecks; f++) {
-        var fa = seed * 91 + f * 2.399;
-        var fr = base * (0.15 + 0.62 * Math.abs(Math.sin(seed * 53 + f * 1.7)));
-        var fx = c.x + Math.cos(fa) * fr;
-        var fy = c.y + Math.sin(fa) * fr;
-        var fs = Math.max(0.4, base * 0.15 * (0.5 + Math.abs(Math.cos(fa * 3))));
-        ctx.beginPath();
-        ctx.arc(fx, fy, fs, 0, TAU);
-        ctx.fill();
-      }
-    }
-    ctx.restore();
-  }
-
-  /* ---- voronoi ---------------------------------------------------------- */
-
-  /* A cell mosaic, via the vendored d3.Delaunay. Built for the asteroid
-   * interior in Phase 7 and for ice shells; declared here so the vocabulary is
-   * complete and the library is exercised.
-   *
-   * Takes a list of sites rather than one element, because a mosaic is a
-   * single structure rather than a scattered instance. */
-  function voronoi(ctx, view, sites, bounds, styleFor) {
-    if (!sites.length || typeof d3 === "undefined" || !d3.Delaunay) return;
-
-    var pts = [];
-    for (var i = 0; i < sites.length; i++) {
-      var p = view.at(sites[i].radius, sites[i].angle);
-      pts.push(p.x, p.y);
-    }
-
-    var del = d3.Delaunay.from(
-      sites.map(function (s) {
-        var p = view.at(s.radius, s.angle);
-        return [p.x, p.y];
-      }));
-    var vor = del.voronoi(bounds);
-
-    for (i = 0; i < sites.length; i++) {
-      var poly = vor.cellPolygon(i);
-      if (!poly) continue;
-      ctx.beginPath();
-      for (var k = 0; k < poly.length; k++) {
-        if (k === 0) ctx.moveTo(poly[k][0], poly[k][1]);
-        else ctx.lineTo(poly[k][0], poly[k][1]);
-      }
-      ctx.closePath();
-      ctx.fillStyle = styleFor(sites[i], i);
-      ctx.fill();
-    }
-  }
-
   /* Dispatch table. draw/details.js looks a kind up here; nothing anywhere
-   * switches on a layer role. */
+   * switches on a layer role.
+   *
+   * Seeded with the primitives defined above; the files loaded after this one
+   * add theirs through `register`. */
   var KINDS = {
     "speckle": speckle,
     "blob": blob,
@@ -844,13 +684,40 @@ CC.Primitives = (function () {
     "cell": cell,
     "arrow": arrow,
     "flow-line": flowLine,
-    "wedge": wedge,
-    "ring-band": ringBand,
-    "chunk": chunk
+    "wedge": wedge
   };
 
-  return {
+  /* Add drawing kinds to the dispatch table.
+   *
+   * Takes a {kind: fn} map rather than one pair at a time, so a file
+   * registering a group of related primitives does it in one statement and
+   * the kind STRINGS all sit together where they can be read at a glance.
+   *
+   * A duplicate kind THROWS rather than silently winning. Two files claiming
+   * the same name is a mistake in every case — a copied block, a rename that
+   * missed one — and the failure it would otherwise produce is the worst kind:
+   * the body still renders, with one primitive quietly drawn as another,
+   * reported by nothing. The same reasoning as D98. */
+  function register(kinds) {
+    for (var k in kinds) {
+      if (!Object.prototype.hasOwnProperty.call(kinds, k)) continue;
+      if (KINDS[k]) throw new Error("primitive kind already registered: " + k);
+      KINDS[k] = kinds[k];
+      API[camel(k)] = kinds[k];
+    }
+  }
+
+  /* "ring-band" -> "ringBand", so every primitive is reachable by name on the
+   * namespace exactly as the ones defined here are. Tests and tools call these
+   * directly; going through the kind string instead would make a registered
+   * primitive a second-class citizen of the API for no reason. */
+  function camel(k) {
+    return k.replace(/-([a-z])/g, function (m, c) { return c.toUpperCase(); });
+  }
+
+  var API = {
     KINDS: KINDS,
+    register: register,
     speckle: speckle,
     blob: blob,
     vein: vein,
@@ -859,9 +726,8 @@ CC.Primitives = (function () {
     cell: cell,
     arrow: arrow,
     flowLine: flowLine,
-    wedge: wedge,
-    ringBand: ringBand,
-    chunk: chunk,
-    voronoi: voronoi
+    wedge: wedge
   };
+
+  return API;
 })();

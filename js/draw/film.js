@@ -68,6 +68,13 @@ CC.Film = (function () {
    * still gets drawn. */
   var RIBBON_FLOOR = 0.02;
 
+  /* The deepest any zone declares, as a fraction of its host layer — used only
+   * to open the clip far enough for an INVERTED deposit to reach. Generous
+   * rather than exact: it bounds the hanging material's reach without this
+   * file having to know which zone is deepest, which would be learning what a
+   * zone is (D23). */
+  var MAX_ZONE_DEPTH = 1.2;
+
   /* How many DEPTH passes each zone's ribbon is drawn in.
    *
    * ONE FLAT PASS PER ZONE IS NOT ENOUGH, and the first version of the ribbon
@@ -149,27 +156,26 @@ CC.Film = (function () {
    * Authored to contrast with their neighbours: snow lies smooth and even,
    * vegetation is patchy and draped, reefs are lumpy, abyssal ooze is thick
    * and almost featureless. */
-  var ZONES = [
-    { key: "frostPeak",
-      depth: 0.30, smooth: 0.85, bleed: 0.35, patch: 0.35, grain: 0.10 },
-    { key: "frostLand",
-      depth: 0.34, smooth: 0.45, bleed: 0.95, patch: 0.85, grain: 0.30 },
-    { key: "frostShallow",
-      depth: 0.26, smooth: 0.35, bleed: 0.70, patch: 0.95, grain: 0.45 },
-    { key: "frostDeep",
-      depth: 0.40, smooth: 0.92, bleed: 0.30, patch: 0.30, grain: 0.08 }
-  ];
-
-  /* Where the zone boundaries sit, as a fraction of the terrain's own range.
+  /* THE ZONE TABLE IS NO LONGER HERE. It used to be a `var ZONES` at this
+   * spot, with a SNOWLINE of 0.42 and a SHELF of -0.16 beside it, and D22
+   * recorded that all three had to become archetype data when a second family
+   * started depositing. Phase 5 is that family: a gas giant's crushed floor
+   * wants two zones, not four, and thresholds nothing like Earth's.
    *
-   * The snowline and the shelf edge are OFFSETS FROM SEA LEVEL, not absolute
-   * radii, so they follow the sea as Ocean depth moves it — raise the sea and
-   * the shore rises with it, exactly as it should. On a world with no sea at
-   * all the level line falls back to the terrain mean, which puts the two
-   * underwater zones out of reach and leaves peaks and land dividing the
-   * surface between them. */
-  var SNOWLINE = 0.42;      /* above sea level, in units of terrain range */
-  var SHELF = -0.16;        /* below sea level */
+   * The table now lives in `colorProfile.layers.film` beside the colours it
+   * has always paired with, is resolved by `CC.Frosting.zoneTable` in the
+   * generation stage, and arrives here on `details.filmZones` as a plain
+   * array of numbers plus two thresholds.
+   *
+   * NOTHING IN THIS FILE COUNTS ZONES ANY MORE. The weights loop below is
+   * written against the table's own length and the `snow` / `aquatic` flags
+   * on its rows, so an archetype declaring two, three or five zones needs no
+   * change here — which is what D22 asked for and what D23 requires (this
+   * file receives numbers and learns nothing about what a zone is).
+   *
+   * The planet's own numbers moved verbatim into js/data/archetypes/solid.js;
+   * they are unchanged, they are simply now stated as facts about a planet
+   * rather than as constants of the renderer. */
 
   /* Blend width at each boundary. Wide enough that no zone ends on a line —
    * a hard edge between two frostings reads as a drawn contour, which is the
@@ -195,8 +201,8 @@ CC.Film = (function () {
    * world; negative on a locked world's night face, where it drags the snow
    * zone down past the waterline and produces an ice cap out of the ordinary
    * deposition model. */
-  function zoneWeights(h, out, snowShift) {
-    var line = SNOWLINE + (snowShift || 0);
+  function zoneWeights(h, out, snowShift, table) {
+    var line = table.line + (snowShift || 0);
 
     /* THE SNOW BOUNDARY IS WIDER THAN THE OTHER THREE, AND DELIBERATELY SO.
      *
@@ -218,7 +224,7 @@ CC.Film = (function () {
      * number, so assert it and fix it where the steepness is produced. */
     var peak = smoothstep((h - line) / SNOW_BLEND + 0.5);
     var dry = smoothstep(h / (BLEND * 0.8) + 0.5);
-    var shelf = smoothstep((h - SHELF) / BLEND + 0.5);
+    var shelf = smoothstep((h - table.shelf) / BLEND + 0.5);
 
     /* THE SNOW ZONE TAKES PRECEDENCE ALL THE WAY DOWN.
      *
@@ -230,10 +236,76 @@ CC.Film = (function () {
      *
      * Physically that is right: a frozen sea is ice at the surface whatever is
      * underneath, which is exactly what an ice cap over shallow water is. */
-    out[0] = peak;                                  /* peak    */
-    out[1] = dry * (1 - peak);                      /* land    */
-    out[2] = shelf * (1 - dry) * (1 - peak);        /* shallow */
-    out[3] = (1 - shelf) * (1 - peak);              /* deep    */
+    /* THE FOUR RAMPS ARE FOUR ROLES, AND A TABLE MAY DECLARE FEWER.
+     *
+     * The four cases below are the same four they always were — the top zone
+     * (whatever the snowline governs), the ordinary dry ground, the shelf,
+     * and the deep floor — but they are now assigned by walking the table
+     * rather than by writing to fixed indices. A zone's ROLE comes from its
+     * declared flags and its position:
+     *
+     *   the first zone            takes the snowline ramp if it declares
+     *                             `snow`, and is ordinary dry ground if not
+     *   later non-aquatic zones   share the dry ramp
+     *   the first aquatic zone    takes the shelf
+     *   later aquatic zones       take the deep floor
+     *
+     * A two-zone giant therefore gets exactly what its data asks for: one
+     * high-ground zone and one that takes everything below it, with no
+     * underwater ramps reachable because it declares neither `aquatic` zone
+     * and its `shelf` threshold is pushed out of range anyway.
+     *
+     * THE TOP ZONE STILL TAKES PRECEDENCE ALL THE WAY DOWN. Ordinarily the
+     * snowline sits above the waterline and the ramps nest: peak over land
+     * over shallow over deep. A dragged-down snowline breaks that nesting —
+     * snow can now claim ground that is also below sea level — so each lower
+     * zone is masked by what the top has already taken rather than only by
+     * the zone directly above it. Physically that is right: a frozen sea is
+     * ice at the surface whatever is underneath, which is exactly what an ice
+     * cap over shallow water is. */
+    var rows = table.zones;
+    var n = rows.length;
+    var topClaims = rows[0].snow ? peak : 0;
+
+    var dryCount = 0, wetCount = 0, z;
+    for (z = 0; z < n; z++) {
+      if (rows[z].aquatic) wetCount++; else dryCount++;
+    }
+    /* When the top zone is the snowline it is not one of the dry-ramp
+     * sharers, so the ramp is split between the rest. */
+    var drySharers = dryCount - (rows[0].snow ? 1 : 0);
+    if (drySharers < 1) drySharers = 1;
+
+    var seenWet = 0;
+    for (z = 0; z < n; z++) {
+      var row = rows[z];
+      if (z === 0 && row.snow) {
+        out[z] = peak;
+      } else if (!row.aquatic) {
+        out[z] = dry * (1 - topClaims) / drySharers;
+      } else {
+        seenWet++;
+        /* The first wet zone is the shelf; anything below it is the deep
+         * floor, sharing what the shelf did not take. */
+        out[z] = seenWet === 1
+          ? shelf * (1 - dry) * (1 - topClaims)
+          : (1 - shelf) * (1 - topClaims) / Math.max(1, wetCount - 1);
+      }
+    }
+
+    /* A TABLE WITH NO WET ZONES MUST STILL ACCOUNT FOR ALL ITS GROUND.
+     *
+     * On a planet the shelf and deep ramps carry everything below the
+     * waterline. A giant's floor declares neither, so without this the weights
+     * sum to well under 1 wherever the ground is low and the deposit thins to
+     * nothing there — the opposite of "thick sediment pooled in every hollow".
+     * Renormalizing is the honest fix: the zones the archetype declared divide
+     * the whole surface between them, however many there are. */
+    var sum = 0;
+    for (z = 0; z < n; z++) sum += out[z];
+    if (sum > 1e-6 && Math.abs(sum - 1) > 1e-6) {
+      for (z = 0; z < n; z++) out[z] /= sum;
+    }
     return out;
   }
 
@@ -294,6 +366,17 @@ CC.Film = (function () {
                            silhouette, silhouetteRelief) {
     if (!details.film) return;
 
+    /* THE ZONE TABLE, RESOLVED BY THE GENERATION STAGE (D22/D23).
+     *
+     * A plain array of numbers plus two thresholds. If the archetype declares
+     * no frosting there is nothing to deposit and this stage is skipped
+     * entirely, which is how a body with no terrain-carrying layer pays
+     * nothing for the feature existing. */
+    var fallbackTable = details.filmZones;
+    var byRole = details.filmZoneByRole || {};
+    if ((!fallbackTable || !fallbackTable.zones.length) &&
+        !Object.keys(byRole).length) return;
+
     for (var i = 0; i < layers.length; i++) {
       var layer = layers[i];
       if (layer.outward) continue;
@@ -301,6 +384,20 @@ CC.Film = (function () {
       var terrain = details.terrain[layer.role];
       var mask = details.film[layer.role];
       if (!terrain || !mask) continue;
+
+      /* THE TABLE IS PER FROSTED SURFACE.
+       *
+       * A body with one frosting resolves every layer to the same table, which
+       * is what `fallbackTable` is and what every archetype before the moon
+       * declared. An ice-shelled moon frosts TWO surfaces facing each other
+       * across its ocean, and they are different materials in different
+       * directions, so each layer asks for its own.
+       *
+       * This file still learns nothing about what a zone is (D23) — it looks a
+       * table up by the role it is already iterating and receives plain
+       * numbers, exactly as before. */
+      var table = byRole[layer.role] || fallbackTable;
+      if (!table || !table.zones.length) continue;
 
       /* The outermost solid layer draws its relief DAMPED (scene.js's
        * SILHOUETTE_RELIEF), because the silhouette is the one boundary read
@@ -345,12 +442,37 @@ CC.Film = (function () {
        * the layer's envelope without cutting into the deposit. The inner edge
        * still uses the real displaced boundary of the layer below, since
        * frosting must not leak into the mantle. */
+      /* AN INVERTED DEPOSIT LIVES OUTSIDE THIS LAYER'S BAND, and clipping it
+       * to the band would erase it completely.
+       *
+       * The clip above exists to keep an outward deposit from leaking into the
+       * mantle. Material hanging off the layer's INNER edge is doing exactly
+       * the thing that clip forbids — it belongs in the space below, which on
+       * an ice moon is the ocean the ice is accreting into. So the inner limit
+       * is opened up by the depth the deposit can actually reach, and no
+       * further, which keeps the guarantee (nothing leaks past the deposit's
+       * own reach) while letting the one legitimate case through.
+       *
+       * This is the same trap the outward clip already cost a round on: the
+       * deposit maths was computing a correct band that was being clipped to
+       * nothing. Worth stating rather than rediscovering. */
+      var invert = table.direction === -1;
       var reach = layer.outer + Math.max(0, terrain.range().hi) * relief;
       ctx.beginPath();
       CC.Layers.traceBoundary(ctx, view, reach, null, false);
-      if (layer.inner > 0) {
-        CC.Layers.traceBoundary(ctx, view, layer.inner,
-                                (i + 1 < layers.length) ? bounds[i + 1] : null, true);
+      var floor = layer.inner;
+      if (invert) {
+        /* How far the hanging material may reach: its own maximum depth plus
+         * the amplitude of the underside it grew on. */
+        var lo = terrain.range().lo;
+        floor = layer.inner - layer.thickness * MAX_ZONE_DEPTH
+                            - Math.max(0, -lo) * relief;
+        if (floor < 0) floor = 0;
+      }
+      if (floor > 0) {
+        CC.Layers.traceBoundary(ctx, view, floor,
+                                (invert || i + 1 >= layers.length)
+                                  ? null : bounds[i + 1], true);
       }
       ctx.clip("evenodd");
 
@@ -379,7 +501,7 @@ CC.Film = (function () {
        * be kept in step. */
       drawFrosting(ctx, view, layer, terrain, mask, palette, level,
                    elementOpacity, relief, details.climateField, seaFn,
-                   details.coverAt, bounds[i]);
+                   details.coverAt, bounds[i], table);
 
       ctx.restore();
     }
@@ -389,7 +511,9 @@ CC.Film = (function () {
    * few whole ribbons. The measuring is unchanged; only the painting is new.
    * See `paintFrosting` for why the two are separate. */
   function drawFrosting(ctx, view, layer, terrain, mask, palette, level,
-                        opacity, relief, climate, seaFn, coverFn, boundFn) {
+                        opacity, relief, climate, seaFn, coverFn, boundFn,
+                        table) {
+    var ZONES = table.zones;
     var range = terrain.range();
     /* THE SPAN MUST BE MEASURED IN THE SAME UNITS AS THE ELEVATION.
      *
@@ -418,10 +542,40 @@ CC.Film = (function () {
      * locked world grows an ice cap without any ice-cap code. */
     function levelAt(a) { return level + (seaFn ? seaFn(a) : 0); }
 
-    /* Elevation as the LAYER draws it. Everything below works in this space,
-     * so the deposit lands on the rock the viewer can actually see rather
-     * than on the undamped field behind it. */
-    function ground(a) { return terrain.at(a) * relief; }
+    /* WHICH WAY IS UP FOR THIS DEPOSIT, and it is the only thing that differs
+     * between a rock floor and the underside of an ice shell.
+     *
+     * +1 is every deposit in the generator until the ice moon: material
+     * settles OUTWARD from the rock, its top surface is at a larger radius
+     * than the ground, and gravity is toward the centre.
+     *
+     * -1 mirrors the whole thing. The accreted ice on the underside of a shell
+     * grows DOWNWARD into the water: it hangs from the layer's inner edge, its
+     * "top" (the free surface, the end away from the wall it grew on) is at a
+     * SMALLER radius than the ice it is attached to, and it pools where the
+     * underside dips down rather than where the ground dips in.
+     *
+     * Everything below is written in the deposit's own frame — "up" means away
+     * from the surface it grew on — and `dir` is the only place the two cases
+     * differ. That is what makes this a few sign changes rather than a second
+     * deposition model: the pooling, the shedding, the zone weights and the
+     * feathering are all the same arithmetic seen in a mirror.
+     *
+     * `anchor` is the surface the material grows on: the layer's outer radius
+     * when it settles outward, its inner radius when it hangs inward. */
+    var dir = table.direction === -1 ? -1 : 1;
+    var anchor = dir > 0 ? layer.outer : layer.inner;
+
+    /* Elevation as the LAYER draws it, in the deposit's own frame — positive
+     * is always AWAY from the surface the material grew on, so a hollow is a
+     * hollow whichever way the deposit hangs.
+     *
+     * On an inverted deposit the terrain field is the shell's UNDERSIDE, and
+     * flipping its sign here is what turns a bump on that underside into a
+     * dip the accreted ice can gather in. Without the flip the ice would build
+     * up on the ridges and shed from the troughs, which is upside down in the
+     * literal sense. */
+    function ground(a) { return terrain.at(a) * relief * dir; }
 
     /* How far the levelling looks along the surface, in radians. Tied to the
      * terrain's own band structure rather than to a pixel size, so it is
@@ -453,16 +607,22 @@ CC.Film = (function () {
      * structurally a cap, chromatically not ice. That is the exact failure
      * D35 fixed for locked worlds, and it would have returned here in a new
      * form. */
+    /* Named by suffix off the table's own keys rather than listed, so a
+     * two-zone or five-zone archetype gets its thermal sets for free —
+     * gen/frosting.js writes them under exactly these names. */
     var coldSet = null, hotSet = null;
     if (climate && climate.tempAt && palette.layers &&
-        palette.layers.frostPeakCold) {
-      coldSet = [palette.get("frostPeakCold"), palette.get("frostLandCold"),
-                 palette.get("frostShallowCold"), palette.get("frostDeepCold")];
-      hotSet = [palette.get("frostPeakHot"), palette.get("frostLandHot"),
-                palette.get("frostShallowHot"), palette.get("frostDeepHot")];
+        palette.layers[ZONES[0].key + "Cold"]) {
+      coldSet = [];
+      hotSet = [];
+      for (z = 0; z < ZONES.length; z++) {
+        coldSet.push(palette.get(ZONES[z].key + "Cold"));
+        hotSet.push(palette.get(ZONES[z].key + "Hot"));
+      }
     }
 
-    var w = [0, 0, 0, 0];
+    var w = new Array(ZONES.length);
+    for (z = 0; z < ZONES.length; z++) w[z] = 0;
 
     /* THE MEASUREMENTS, one entry per sampled bearing. Collected first and
      * painted afterwards, because a ribbon has to know its whole outline
@@ -504,7 +664,8 @@ CC.Film = (function () {
        * `ice-caps` trait and why this must stay a threshold rather than a
        * shape. */
       zoneWeights((h - levelAt(a)) / span, w,
-                  climate && climate.snowShiftAt ? climate.snowShiftAt(a) : 0);
+                  climate && climate.snowShiftAt ? climate.snowShiftAt(a) : 0,
+                  table);
 
       /* How much material survives here, as opposed to which kind. A scoured
        * dayside is bare rock, which is a statement about quantity — the zone
@@ -674,8 +835,16 @@ CC.Film = (function () {
        * Only ever lowers the top, and only where the ground is genuinely below
        * the water — a coastline where the rock breaches the surface keeps its
        * full deposit, because there `h` is already above `sea`. */
+      /* BOTH SEA CLAMPS ARE ABOUT A DEPOSIT THAT SETTLED OUT OF WATER ONTO A
+       * FLOOR, and neither means anything for one hanging INTO the water from
+       * above. Accreted ice on the underside of a shell is submerged along its
+       * whole length by construction — there is no "standing above the sea"
+       * case to prevent, and clamping against a sea level measured in the
+       * layer's outward frame would cut the deposit off at an arbitrary
+       * radius. So the inverted case skips them rather than being given a
+       * mirrored rule it does not need. */
       var sea = levelAt(a);
-      if (h < sea && top > sea) top = sea;
+      if (dir > 0 && h < sea && top > sea) top = sea;
 
       /* AND IT STAYS CLEAR OF THE ICE FLOATING ABOVE IT.
        *
@@ -690,7 +859,7 @@ CC.Film = (function () {
        * fraction rather than the ice's true underside because that underside is
        * `paintSeaIce`'s own business and asking for it here would couple two
        * files that currently share only the climate field. */
-      if (climate && climate.isFrozen && h < sea && climate.isFrozen(a)) {
+      if (dir > 0 && climate && climate.isFrozen && h < sea && climate.isFrozen(a)) {
         var floorRoom = sea - h;
         var ceiling = h + floorRoom * 0.45;
         if (top > ceiling) top = ceiling;
@@ -708,9 +877,47 @@ CC.Film = (function () {
        * bites INTO the rock — so the frosting overlaps the stone rather than
        * balancing on it, which is what makes the two read as one ground
        * instead of as a decal. `bleed` sets how deep that bite goes. */
-      var rOuter = layer.outer + top;
-      var rInner = layer.outer + h - maxDepth * 0.55 * bleed * roots;
+      /* BACK INTO REAL RADII, and this is where the deposit's own frame meets
+       * the body's. `dir` un-mirrors both terms together: on an inverted
+       * deposit the free surface is at a SMALLER radius than the wall it grew
+       * on, and the bleed bites OUTWARD into that wall rather than inward.
+       *
+       * `rOuter`/`rInner` keep their names — they are the band's outer and
+       * inner radii, which is what every consumer below wants — so the swap
+       * happens here once rather than being threaded through the paint pass. */
+      var rFree = anchor + top * dir;
+      var rBite = anchor + (h - maxDepth * 0.55 * bleed * roots) * dir;
+
+      var rOuter = dir > 0 ? rFree : rBite;
+      var rInner = dir > 0 ? rBite : rFree;
       if (rInner > rOuter) rInner = rOuter;
+
+      /* AN INVERTED DEPOSIT MAY NOT PROTRUDE PAST THE WALL IT GREW ON.
+       *
+       * `h` is the terrain mirrored into the deposit's frame, so wherever the
+       * raw field is NEGATIVE the mirrored value is positive — and `top`,
+       * built from it, then places the free surface at a LARGER radius than
+       * the anchor. For an outward deposit that is correct and is the whole
+       * point: the rock surface itself moves, and the deposit rides it.
+       *
+       * For an underside hanging into a fluid it is wrong. The wall is the
+       * layer's own inner edge, which is flat; the underside's relief carves
+       * INTO the shell and can never stand proud of it into the water. Left
+       * unclamped, the band crossed its own anchor on roughly a fifth of
+       * bearings — measured on seed `tancalsel-4497`, the accreted tip reached
+       * 0.8866 against a shell inner edge of 0.8403, so the deposit was drawn
+       * inside the shell and the ocean appeared to have retreated. That is
+       * what read as "the ocean is still retreating": not the tidal field at
+       * all (which is flat — D172 fixed that), but this band inverting.
+       *
+       * So the whole band is held at or inside the anchor. It is a clamp
+       * rather than a reshape: a bearing that was already correct is
+       * untouched, which is why it cannot flatten the accretion it is
+       * protecting. */
+      if (dir < 0) {
+        if (rOuter > anchor) rOuter = anchor;
+        if (rInner > rOuter) rInner = rOuter;
+      }
 
       /* WHERE THERE IS NO MATERIAL THE BAND CLOSES, rather than being painted
        * at a low alpha. `amount` is the quantity of deposit at this bearing;
@@ -725,7 +932,12 @@ CC.Film = (function () {
       /* The rock as DRAWN — boundary wobble and all. Falls back to the
        * terrain-only surface when no boundary function was supplied, which is
        * what a caller without one always got. */
-      rockR[i] = boundFn ? layer.outer * boundFn(a) : (layer.outer + h);
+      /* An inverted deposit grew on the layer's INNER edge, so that is the
+       * surface its ribbons must be floored against. `boundFn` describes the
+       * layer's own outer boundary and means nothing for an underside, so the
+       * anchor plus the field is the honest answer there. */
+      rockR[i] = (dir > 0 && boundFn) ? layer.outer * boundFn(a)
+                                      : (anchor + h * dir);
       zoneW[i] = [w[0], w[1], w[2], w[3]];
       /* Brighter where the deposit is deepest, so a thick drift reads as
        * catching the light rather than as a flat fill. Carried per bearing and
@@ -755,7 +967,8 @@ CC.Film = (function () {
      * a bearing far from any edge is left exactly as measured. */
     featherEnds(outerR, innerR, rockR, tone);
 
-    paintFrosting(ctx, view, outerR, innerR, rockR, zoneW, tone, opacity);
+    paintFrosting(ctx, view, outerR, innerR, rockR, zoneW, tone, opacity,
+                  ZONES);
   }
 
   /* Thin the deposit toward wherever it ends.
@@ -856,7 +1069,8 @@ CC.Film = (function () {
    * translucent. Quantity is now entirely a matter of THICKNESS, decided in the
    * measuring pass, so where there is little material the band is thin and
    * where there is none it is closed. */
-  function paintFrosting(ctx, view, outerR, innerR, rockR, zoneW, tone, opacity) {
+  function paintFrosting(ctx, view, outerR, innerR, rockR, zoneW, tone,
+                         opacity, ZONES) {
     var n = outerR.length - 1;
     var z, i, a, p;
 
@@ -1239,7 +1453,6 @@ CC.Film = (function () {
 
   return {
     draw: drawSurfaceFilm,
-    ZONES: ZONES,
     /* Exported so a harness can ask "which zone wins at this bearing" against
      * the real function rather than reimplementing it. A probe that
      * duplicates the logic it is testing agrees with itself and not with the
@@ -1250,8 +1463,6 @@ CC.Film = (function () {
      * segment period rather than a hardcoded copy of it. SEGMENTS is now purely
      * a SAMPLING rate — the band is painted as whole ribbons, so there is no
      * per-segment fill and no overlap constant to go with it. */
-    SEGMENTS: SEGMENTS,
-    SNOWLINE: SNOWLINE,
-    SHELF: SHELF
+    SEGMENTS: SEGMENTS
   };
 })();

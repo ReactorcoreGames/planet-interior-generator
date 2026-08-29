@@ -564,7 +564,22 @@ var CC = CC || {};
     });
 
     if (typeof window !== "undefined" && window.addEventListener) {
+      /* THE PREVIEW'S OWN BOX IS WHAT THE CANVAS IS MEASURED INTO, so that is
+       * what is watched. `resize` fires when the WINDOW changes, which is a
+       * different question and one that can be answered before layout has
+       * caught up; a `ResizeObserver` reports a box that has actually changed,
+       * after layout, which is exactly the signal `fitToDisplay` needs.
+       *
+       * Both are kept: the observer is the accurate one, and the window event
+       * still covers a change that moves the viewport without altering the
+       * preview's box. `requestDraw` coalesces them into one render per frame,
+       * so listening twice costs nothing. */
       window.addEventListener("resize", requestDraw);
+
+      if (typeof ResizeObserver === "function") {
+        var previewEl = document.getElementById("preview");
+        if (previewEl) new ResizeObserver(requestDraw).observe(previewEl);
+      }
     }
 
     draw();

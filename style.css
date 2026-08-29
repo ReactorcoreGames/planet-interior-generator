@@ -61,10 +61,42 @@ html, body {
   font: var(--font);
 }
 
+/* HEIGHT IS `100%` OF THE FIXED BODY, NEVER `100vh`, and the difference is a
+ * real defect rather than a style preference.
+ *
+ * `html, body` above are `position: fixed; inset: 0`, so they are already
+ * pinned to exactly the visible viewport and they resize the instant it
+ * changes. `100vh` is a different measurement: it is the LARGE viewport, and
+ * on exiting fullscreen (F11) it kept the fullscreen height while the fixed
+ * body correctly shrank back.
+ *
+ * `#app` was then TALLER THAN ITS PARENT, and body's `overflow: hidden` simply
+ * clipped the excess — so the bottom of the layout hung below the window with
+ * no way to reach it. Two symptoms, one cause: the panel's scroll container
+ * ran off the bottom of the screen, so its scrollbar could not travel all the
+ * way down; and `#preview` reported the fullscreen height, so the canvas was
+ * sized for a viewport that no longer existed and the body was cut off at the
+ * bottom of the frame.
+ *
+ * Inheriting the parent's height removes the second opinion entirely. There is
+ * one measurement of how tall the window is — the fixed body — and everything
+ * below follows it, so there is nothing left to disagree on a viewport change.
+ * `100%` resolves because the parent has a definite height. */
+/* `100%` is the measurement; `100dvh` and the `max-height` are belt and
+ * braces. `dvh` is the DYNAMIC viewport height — the one unit that is defined
+ * to track the visible area as browser chrome appears and disappears, which is
+ * exactly the F11 transition — and the cap guarantees that even if a height
+ * came from somewhere unexpected, this element can never be taller than the
+ * window and so can never hang below it where `overflow: hidden` would strip
+ * the bottom off. Cheap, and it removes the whole failure mode rather than one
+ * route into it. */
 #app {
   display: grid;
   grid-template-columns: 1fr 392px;
-  height: 100vh;
+  height: 100%;
+  height: 100dvh;
+  max-height: 100%;
+  overflow: hidden;
 }
 
 /* ============ PREVIEW ============ */
@@ -75,6 +107,18 @@ html, body {
   align-items: center;
   justify-content: center;
   min-width: 0;
+  /* THE MISSING AXIS. `min-width: 0` was here and its vertical twin was not,
+   * which is the asymmetry that let the F11 ratchet climb: a grid item's
+   * automatic minimum size is its CONTENT, so `#preview` would refuse to
+   * shrink below whatever the canvas claimed and instead pass the growth up to
+   * `#app`. Pinned to zero so the preview is sized purely by the grid row and
+   * never by what is inside it — see #stage below for the loop this closes.
+   *
+   * `overflow: hidden` is the backstop: even if something in here did report
+   * an oversized box, it is clipped at the preview's own edge rather than
+   * stretching the page past the bottom of the window. */
+  min-height: 0;
+  overflow: hidden;
   padding: 16px;
   background:
     radial-gradient(circle at 50% 45%, #171029 0%, var(--bg) 70%);
@@ -102,7 +146,36 @@ html, body {
   background-position: 0 0, 10px 10px;
 }
 
+/* THE CANVAS MUST NEVER BE ABLE TO SIZE ITS OWN PARENT.
+ *
+ * This is the F11 defect, and it is a FEEDBACK LOOP rather than a stale
+ * measurement — which is what the symptom "it expands as gradually as it can
+ * go, a bit at a time over a second or two" was saying all along. A one-shot
+ * bad measurement snaps wrong once and stays; a loop ratchets.
+ *
+ * `canvas.width`/`height` set the element's INTRINSIC size, and draw/canvas.js
+ * writes them every render from the measured box. A block-level canvas in a
+ * flex/grid chain whose height is even momentarily indefinite is sized from
+ * that intrinsic height — so the canvas grew `#preview`, which grew `#app`,
+ * which was measured on the next frame and grew the canvas again. One step per
+ * render, only ever upward, because `fitToDisplay`'s aspect-skew guard then
+ * substitutes the parent box the canvas had just inflated. F11 supplies the
+ * initial kick; nothing in the loop can ever shrink it back, which is exactly
+ * why waiting made it worse rather than better and why it never recovered.
+ *
+ * `position: absolute; inset: 0` takes the canvas OUT OF FLOW entirely, so its
+ * intrinsic size becomes incapable of contributing to any ancestor's height —
+ * the loop cannot start. `#preview` is already `position: relative`, so this
+ * resolves against it and the canvas still fills the preview exactly as
+ * `width/height: 100%` did. `min-height: 0` on the flex parent is the
+ * companion guard: it stops a flex item refusing to shrink below its content.
+ *
+ * The rendered result is identical. What changes is that the measurement is
+ * now strictly one-directional — layout sizes the canvas, and the canvas can
+ * never size layout back. */
 #stage {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   display: block;

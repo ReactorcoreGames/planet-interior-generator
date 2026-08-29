@@ -156,32 +156,35 @@ var CC = CC || {};
       ctx.stroke();
     }
 
-    /* THE BODY'S SHADOW FALLS ACROSS THE FAR SIDE.
+    /* THERE IS NO RING SHADOW, AND THAT IS THE CONSIDERED ANSWER.
      *
-     * Drawn as a `destination-out` wedge, so it REMOVES ring rather than
-     * painting dark over it — dark paint would sit on top of the background
-     * as much as on the ring, and the ring is translucent. Removing is also
-     * what a shadow physically is here: that material is not lit.
+     * One was drawn here: a `destination-out` wedge for the body occluding
+     * its own rings, on the reasoning that Saturn's shadow is a real and
+     * striking feature and that it makes a ring read as a lit SHEET rather
+     * than as a drawn circle. It was removed, for a reason that outlives the
+     * bug it also caused.
      *
-     * Deliberately soft-edged and partial. A hard black wedge would read as a
-     * missing chunk, and the penumbra of a body that size is genuinely wide.
-     * `el.shadow` is the bearing the star is in; a trait that omits it gets no
-     * shadow rather than an arbitrary one. */
-    if (el.shadow !== undefined && el.shadow !== null) {
-      var sr = view.px(el.radius) + w;
-      var grad = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.max(1, sr));
-      grad.addColorStop(0, "rgba(0,0,0,1)");
-      grad.addColorStop(1, "rgba(0,0,0,1)");
-      ctx.globalCompositeOperation = "destination-out";
-      ctx.globalAlpha = 0.85;
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      /* A wedge opposite the star, about a fifth of the turn wide. */
-      ctx.arc(0, 0, sr * 1.25, el.shadow - 0.32, el.shadow + 0.32);
-      ctx.closePath();
-      ctx.fill();
-    }
+     * THIS PICTURE HAS NO LIGHT SOURCE. It is a CROSS-SECTION: the body is
+     * cut open and its interior is drawn directly, and nothing else in the
+     * generator casts a shadow or agrees on where a star is. A shadow answers
+     * a question the image never asks, and its direction was necessarily
+     * arbitrary — the same error the great storm's note records from the
+     * other direction, where a top-down cyclone was drawn into a side-on cut.
+     * A mark has to be in the projection the picture is actually in.
+     *
+     * It caused a defect too, which is worth recording because it is the kind
+     * that hides: the wedge was a pie slice with its apex at (0,0), the
+     * body's CENTRE, and `destination-out` erases whatever is already on the
+     * canvas rather than only the ring. So it cut a triangular hole through
+     * every layer of the planet down to the background, once per band,
+     * compositing to opaque — a BLACK RAY out of the middle of a gas giant.
+     * That was fixable (clip to the band's annulus, start at the limb), and
+     * it was fixed before this decision was taken; the mark is gone on the
+     * projection argument, not because it was hard to draw.
+     *
+     * WHAT SEPARATES THE TWO RING FAMILIES IS MATERIAL, NOT LIGHTING — see
+     * the trait declarations in data/traits/orbital.js. `el.shadow` may still
+     * be present on an element; nothing reads it. */
 
     ctx.restore();
   }

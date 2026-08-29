@@ -489,7 +489,38 @@ CC.ZonePaint = (function () {
     var els = details.outward;
     if (!els || !els.length) return;
 
-    var colour = palette.get(details.outwardRole || "atmosphere");
+    /* THE ORBITAL BAND'S OWN COLOUR, NOT THE ATMOSPHERE'S.
+     *
+     * This read `palette.get(details.outwardRole || "atmosphere")`, and
+     * `outwardRole` IS NEVER SET — nothing in the generator assigns it, so the
+     * fallback was not a fallback, it was the only path. Every ring on every
+     * body was therefore painted in the ATMOSPHERE's colour, which is pale and
+     * washed by design because it is a haze seen edge-on.
+     *
+     * That is why ringed giants all looked alike no matter what colour the
+     * world was: the mark was not merely desaturated by its tone, it was
+     * reading a role that had nothing to do with it. `orbit` is the role these
+     * elements actually carry (gen/traitroll.js gives them a synthetic layer
+     * of that name) and gen/palette.js now builds a real entry for it, derived
+     * from the body's outermost solid layer — ring debris is made of the world
+     * it orbits, so it keeps that tint.
+     *
+     * Taken per element rather than once for the whole pass, because these
+     * elements do not all belong to one layer: a debris belt and a ring system
+     * can be in orbit together, and each should answer for its own role. The
+     * lookup is a table read, so per-element costs nothing measurable.
+     *
+     * `outwardRole` is still honoured as an override if anything ever sets it,
+     * and `atmosphere` remains the last resort so a body whose palette lacks
+     * an orbit entry degrades exactly as before rather than to grey. */
+    function outwardColour(el) {
+      return palette.get(details.outwardRole || (el && el.role) || "orbit"
+        ) || palette.get("atmosphere");
+    }
+
+    /* The haze is one band across the whole system, so it takes the system's
+     * colour rather than any single element's. */
+    var colour = outwardColour(els[0]);
 
     ctx.save();
 
@@ -531,7 +562,7 @@ CC.ZonePaint = (function () {
       /* A gap band is a thinning, not an absence. */
       if (e.gap) alpha *= 0.28;
 
-      var oc = CC.DrawDetails.zoneShift(colour, e);
+      var oc = CC.DrawDetails.zoneShift(outwardColour(e), e);
       /* ONE SHARED RESOLVER, because this used to be a second `if (chunk)`
        * chain and it drifted: the first orbital trait wanting a richer style
        * than a colour string crashed here. See CC.DrawDetails.styleFor. */

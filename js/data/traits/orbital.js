@@ -88,9 +88,26 @@ var CC = CC || {};
     offset: [0, 360],
     element: "ring-band",
     tiers: 2,
-    alpha: [0.16, 0.52],
+    /* DARKER AND DENSER THAN A GIANT'S, WHICH IS A MATERIAL FACT.
+     *
+     * The two ring families are separated by what they are MADE OF rather
+     * than by how they are lit — there is no light source in a cross-section,
+     * which is why the shadow that used to do this job was removed (see
+     * draw/primitives/orbital.js).
+     *
+     * A rocky world's ring is pulverised rock and dust: dark, and warm-toned
+     * the way regolith is. `darker` is the tone that says that — it steps
+     * value DOWN and saturation slightly up, which is the difference between
+     * rubble and ice. Alpha runs lower to match, because sparse debris
+     * scatters little of what falls on it.
+     *
+     * The saturation step is deliberately SMALL. Rock and dust are greys and
+     * browns, and pushing chroma to separate the families would make debris
+     * read as coloured glass rather than as stone — the material has to stay
+     * believable while the contrast does the work. */
+    alpha: [0.14, 0.42],
     density: { min: 3, max: 14 },
-    tone: "lighter",
+    tone: "darker",
     /* Cold enough for solid material to survive in orbit — see the header.
      *
      * `dusty-rings` rather than `orbit-safe`, because the tag now has to say
@@ -147,9 +164,27 @@ var CC = CC || {};
     offset: [0, 360],
     element: "ringlet-band",
     tiers: 2,
-    alpha: [0.20, 0.60],
+    /* BRIGHT AND TINTED, BECAUSE IT IS ICE — BUT NOT BLEACHED.
+     *
+     * A dense ice sheet is highly reflective, so it reads much brighter than
+     * a rocky world's debris; that much `lighter` had right, and the higher
+     * alpha here says the same thing (a dense sheet returns far more light
+     * than scattered rubble).
+     *
+     * What `lighter` got WRONG is saturation. It multiplies chroma by 0.72,
+     * so every giant's rings converged on the same pale near-white whatever
+     * colour the body was — the mark stopped saying anything about the world
+     * it belonged to, which is the sameness problem this trait pair exists to
+     * solve, arriving one level down. Saturn's rings are not white; they are
+     * warm buff and ochre, and the tint varies with composition.
+     *
+     * `bright` is the tone that says bright-and-still-coloured — see
+     * draw/details.js for why it had to be a new one rather than a tweak to
+     * an existing one. This is the other half of the pair; see RING_SYSTEM
+     * above for why the families separate on material rather than lighting. */
+    alpha: [0.24, 0.66],
     density: { min: 7, max: 22 },
-    tone: "lighter",
+    tone: "bright",
     requires: ["structured-rings"],
     excludes: ["shattered"],
     tags: ["orbital"]

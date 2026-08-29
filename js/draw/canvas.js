@@ -246,6 +246,19 @@ CC.Canvas = (function () {
       }
     }
 
+    /* NO VIEWPORT CLAMP HERE, AND THAT IS DELIBERATE.
+     *
+     * One was tried as a second line of defence against the F11 ratchet (see
+     * `#stage` in style.css) and it broke the oval guard above: clamping to
+     * `window.innerHeight` truncates the parent-box substitution that guard
+     * depends on, so a canvas whose box has not resolved got the clamped
+     * height instead of the parent's ratio and came out squished — trading a
+     * layout bug this file does not own for a rendering bug it does.
+     *
+     * The loop is closed in CSS, where it actually lives: the canvas is taken
+     * out of flow so its intrinsic size cannot reach any ancestor. This
+     * function's job is to MEASURE, and a measurement that second-guesses the
+     * box it was given is how the oval defect arrived in the first place. */
     var ratio = dpr || (typeof window !== "undefined" && window.devicePixelRatio) || 1;
 
     canvas.width = Math.round(cssW * ratio);

@@ -184,6 +184,30 @@ CC.DrawDetails = (function () {
                              clamp(s * 0.80, 0, 1),
                              clamp(v + LIFT * 0.85, 0, 1), alpha);
 
+      /* BRIGHT WITHOUT BEING BLEACHED — the one thing no other tone here can
+       * say, and the gap is why it exists.
+       *
+       * Every other lightening tone couples value and saturation: `lighter`
+       * multiplies saturation by 0.72, `glow` by 0.62. That coupling is right
+       * for detail sitting INSIDE a layer, where a mark that lightens without
+       * losing chroma reads as paint rather than as material catching light.
+       *
+       * It is wrong for a gas giant's rings, and the symptom was that every
+       * giant's ring system came out the same pale near-white whatever colour
+       * the body was — the mark stopped carrying any information about the
+       * world it belonged to. Real ring systems are bright AND tinted:
+       * Saturn's are warm buff and ochre, and the tint varies with what the
+       * ringlets are made of.
+       *
+       * So this steps value up like `lighter` and leaves saturation very
+       * nearly alone. The tiny pull-back stops a fully saturated layer
+       * producing a ring more vivid than the planet it orbits, which would
+       * invert the emphasis — the body is still the subject. */
+      case "bright":
+        return CC.Color.hsva(colour.h + 3,
+                             clamp(s * 0.94, 0, 1),
+                             clamp(v + LIFT, 0, 1), alpha);
+
       case "glow":
         /* Self-lit layers: push brightness hard and pull saturation, so the
          * detail reads as hotter material rather than paler material. */

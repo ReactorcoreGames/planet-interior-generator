@@ -1067,6 +1067,70 @@ CC.Palette = (function () {
       if (out[DEEP_ROLES[di]]) { deep = out[DEEP_ROLES[di]]; break; }
     }
 
+    /* ---- THE ORBITAL BAND NEEDS A COLOUR OF ITS OWN --------------------
+     *
+     * `anchor: "orbit"` gets a SYNTHETIC layer (gen/traitroll.js) so rings and
+     * debris can be placed outside the body without a separate code path. It
+     * is not a real layer, so nothing here ever built a palette entry for it,
+     * and `get("orbit")` fell all the way through to the neutral fallback
+     * below — h:0, s:0, v:0.45. Flat grey.
+     *
+     * THAT IS WHY EVERY RINGED GIANT LOOKED THE SAME. The rings were not pale
+     * because of their tone; they were pale because they had no colour at all,
+     * and no tone can put chroma back into a colour whose saturation is zero.
+     * Four giants with completely different palettes drew four identical grey
+     * ring systems. A mark that cannot vary with the body is a mark that has
+     * stopped carrying information, which is the same sameness problem the
+     * two ring traits were split apart to solve — one level further down, and
+     * invisible from the trait declarations because it lived here.
+     *
+     * DERIVED FROM THE BODY, NOT INVENTED. Ring material is debris from the
+     * world it orbits — shattered moons, captured dust, the same rock and ice
+     * the body is made of — so borrowing the outermost real layer's hue is
+     * the physically honest choice as well as the one that keeps the system
+     * in family. This is zones.js rule 1 again: perturb the rolled colour,
+     * never replace it.
+     *
+     * Desaturated and lightened FROM that hue rather than set to a fixed
+     * value. Rings are dust and ice, so they are never as chromatic as a
+     * cloud deck — but they keep the body's tint, which is exactly the
+     * variety that was missing. The per-family split (dark warm rubble vs
+     * bright ice) is then the TONE's job, applied on top of this in
+     * draw/details.js — so this stays one colour and the two ring traits
+     * stay distinguishable. */
+    if (!out.orbit) {
+      /* `order` is the adjacency pass's list: the non-outward layer colours,
+       * outermost first. The outermost solid layer is the body's visible
+       * material, which is what ring debris would be made of. */
+      var host = null;
+      for (var oi = 0; oi < order.length; oi++) {
+        if (order[oi] && !order[oi].emissive) { host = order[oi]; break; }
+      }
+      if (!host) host = order[0] || null;
+
+      if (host) {
+        var oh = host.h;
+        /* Toward neutral but never all the way: enough chroma to say which
+         * world this belongs to, not enough to compete with the body. */
+        var os = clamp(host.s * 0.55, 0, 1);
+        /* Lifted clear of the background so a ring reads against space
+         * whatever the host layer's value happens to be. */
+        var ov = clamp(0.52 + host.v * 0.34, 0, 1);
+        out.orbit = {
+          h: oh, s: os, v: ov,
+          hex: CC.Color.hsvToHex(oh, os, ov),
+          depth: 1,
+          bandContrast: 1,
+          hotEdge: null,
+          heatSpec: null,
+          emissive: false,
+          lighter: makeLighter(oh, os, ov),
+          darker: makeDarker(oh, os, ov),
+          rgba: makeRgba(oh, os, ov)
+        };
+      }
+    }
+
     return {
       layers: out,
       anchors: { primary: primary, secondary: secondary, tertiary: tertiary },

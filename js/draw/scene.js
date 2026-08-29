@@ -328,6 +328,20 @@ CC.Scene = (function () {
       }
     }
 
+    /* THE BODY'S OWN REACH, TAKEN BEFORE THE ORBITAL ELEMENTS GO IN.
+     *
+     * Everything measured above — the atmosphere's bulge, the outward wobble,
+     * the swollen skin — is the BODY'S SILHOUETTE: features whose shape is the
+     * body's own outline. Everything measured below is in ORBIT around it, and
+     * the two must not be the same number even though both are "how far out
+     * does this picture go".
+     *
+     * `extent` from here on is the FRAME's reach and is used to size the view.
+     * `bodyReach` is where the body stops, and it is what bounds a spanning
+     * trait — see the clip further down for why that distinction is the fix to
+     * a real defect rather than a tidying-up. */
+    var bodyReach = extent;
+
     if (details.outward && details.outward.length) {
       var reaches = [], oe;
       for (var oi = 0; oi < details.outward.length; oi++) {
@@ -1092,11 +1106,12 @@ CC.Scene = (function () {
      * archetype declares and keeps the guarantee that matters — a spanning
      * trait cannot escape the body into open space. */
     if (details.spanningTraits && details.spanningTraits.length) {
-      /* THE CLIP IS THE FRAME'S REACH, NOT THE OUTERMOST LAYER'S.
+      /* THE CLIP IS THE BODY'S REACH, WHICH IS NOT THE FRAME'S.
        *
-       * Third time. The comment above records the same bug being fixed twice
-       * — first at `body.surface`, then at the outermost layer — and it fired
-       * again the moment something reached further than a corona:
+       * Third time, and then a fourth. The comment above records the same bug
+       * being fixed twice — first at `body.surface`, then at the outermost
+       * layer — and it fired again the moment something reached further than
+       * a corona:
        *
        *   - A prominence is authored `size: [0.20, 0.44]` of the BODY radius
        *     and anchored near the surface, so a top-tier arch reaches past a
@@ -1106,19 +1121,34 @@ CC.Scene = (function () {
        *     D91) and would have been chopped by the same edge on the day they
        *     were built.
        *
-       * Fixing it against the corona a third time would only set it up to
-       * fire a fourth time against the next thing that reaches further —
-       * which, in this same session, is the emissive glow. So it is fixed
-       * against the thing that is actually true: the guarantee this clip
-       * exists to give is *a spanning trait cannot escape into open space*,
-       * and open space begins where the picture stops. `extent` is that
-       * radius, and it already folds in the wobble, the bulge and the outward
-       * elements.
+       * That third fix reached for `extent` on the reasoning that open space
+       * begins where the picture stops. It cured the chopping and introduced
+       * the OPPOSITE defect, which is the fourth entry in this list:
+       *
+       *   - Ticking RING SYSTEM made the great storm bulge out past the upper
+       *     cloud, and unticking it pulled the storm back in. Nothing about
+       *     the storm changed; the ring did. `extent` folds in
+       *     `details.outward`, so a ring at r=2.35 pushed this clip out to
+       *     2.35 and the storm simply expanded into the room it was given.
+       *
+       * The error was treating the frame's reach and the body's reach as one
+       * number. They answer different questions: `extent` sizes the VIEW and
+       * must include anything drawn, ring included; this clip bounds a mark
+       * that belongs to the BODY and must include only the body's own
+       * silhouette. Sharing one number let anything in orbit resize the
+       * weather, which is a coupling no trait declaration asked for.
+       *
+       * So it is fixed against the thing that is actually true: the guarantee
+       * is *a spanning trait cannot escape the body*, and `bodyReach` is that
+       * radius — the wobble, the bulge and the swell, taken before the
+       * orbital elements are folded in. That is stable under every trait that
+       * draws beyond the body, so a fifth entry cannot arrive from a ring, a
+       * debris belt, or an orbital structure that has not been written yet.
        *
        * `fadeEnds` on the element is the complement, not the alternative: it
        * makes a trait END by dissolving rather than by being cut. Alone it
        * only makes the chop soft. */
-      var spanEdge = Math.max(body.surface, extent);
+      var spanEdge = Math.max(body.surface, bodyReach);
       ctx.save();
       ctx.beginPath();
       CC.Layers.traceBoundary(ctx, view, spanEdge, null, false);

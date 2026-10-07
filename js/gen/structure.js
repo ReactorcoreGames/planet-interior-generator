@@ -312,6 +312,9 @@ CC.Structure = (function () {
         boundaryShare: spec.boundaryShare || null,
         /* How many lobes the wobble puts round the body. See `boundaryFn`. */
         boundaryFreq: spec.boundaryFreq || 0,
+        /* Where this layer's edge breaks up through the one above, driven by
+         * a parameter. See `breachFn` in js/gen/form.js. */
+        breach: spec.breach || null,
         outward: !!spec.outward,
         /* How much of an outward layer's depth is carried at near-full
          * opacity before the taper starts. Undefined leaves draw/layers.js's
@@ -346,6 +349,12 @@ CC.Structure = (function () {
          * amplitudes — see gen/details.js. Undefined on every layer that
          * existed before the moon. */
         reliefSpec: spec.reliefSpec,
+        /* Traits this layer answers with its OWN marks rather than hosting
+         * the trait's. See `absorbedScale` in gen/details.js. */
+        absorbs: spec.absorbs,
+        /* Per-trait depth overrides within this layer. See `placeOne` in
+         * gen/traitroll.js. */
+        traitDepth: spec.traitDepth,
         opacity: spec.opacity === undefined ? 1 : spec.opacity,
         shell: !!spec.shell,
         relative: !!relative,
@@ -672,6 +681,11 @@ CC.Structure = (function () {
        * Undefined on every existing archetype, so nothing that does not ask
        * for it renders differently. */
       emissiveGlow: archetype.emissiveGlow,
+      /* THE SHAPE THE WHOLE BODY IS WARPED INTO — elongation, taper and an
+       * eccentric centre. Plain data; draw/scene.js turns it into the warp
+       * `view.at` applies. Null on every archetype that does not declare one.
+       * See js/gen/form.js. */
+      form: CC.Form ? CC.Form.roll(archetype.form, irregularity, seed) : null,
       layers: layers,
       surface: surface,
       extent: extent,

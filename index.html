@@ -175,6 +175,20 @@
             <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-cohesion"><span class="lock-icon">&#128274;</span></label>
           </div>
 
+          <!-- CAVERNS. Cohesion's sibling: what has been cut THROUGH the rock,
+               where Cohesion is what the rock is made of. Low and middle
+               values are natural caves - thick squiggly tunnels and clusters of
+               chambers, some breaking the surface; the top of the range adds
+               bored tunnels and mined halls on top, and at 100% the body is
+               hollowed out. Cohesion caps it, because a rubble pile cannot hold
+               a cavern open. See js/gen/caves.js. -->
+          <div class="control-row" title="Caves and tunnels cut through the interior. 0% is untouched rock; low and middle values are natural caves - winding tunnels and chambers, some opening to space; high values add straight bored tunnels and mined halls, and 100% is a hollowed-out body. Low Cohesion holds less of it open. Asteroids only.">
+            <label for="caverns">Caverns</label>
+            <input type="range" id="caverns" min="0" max="100" value="30">
+            <output data-readout="caverns"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-caverns"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
           <div class="control-row" title="0% is a desert or airless world with no ocean at all. High values drown the crust in a global sea.">
             <label for="ocean-depth">Ocean depth</label>
             <input type="range" id="ocean-depth" min="0" max="100" value="40">
@@ -736,6 +750,8 @@
 <script src="js/data/flavour/stellar.js"></script>
 
 <!-- generation -->
+<script src="js/gen/form.js"></script>
+<script src="js/gen/caves.js"></script>
 <script src="js/gen/structure.js"></script>
 <script src="js/gen/frosting.js"></script>
 <script src="js/gen/palette.js"></script>
@@ -760,9 +776,13 @@
 <!-- drawing -->
 <script src="js/draw/canvas.js"></script>
 <script src="js/draw/layers.js"></script>
+<script src="js/draw/formfill.js"></script>
 <script src="js/draw/primitives.js"></script>
 <script src="js/draw/primitives/orbital.js"></script>
+<script src="js/draw/rocktexture.js"></script>
 <script src="js/draw/primitives/mosaic.js"></script>
+<script src="js/draw/primitives/machines.js"></script>
+<script src="js/draw/caves.js"></script>
 <script src="js/draw/primitives/stellar.js"></script>
 <script src="js/draw/primitives/stellar-foreign.js"></script>
 <script src="js/draw/primitives/stellar-limb.js"></script>

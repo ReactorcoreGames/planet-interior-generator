@@ -35,8 +35,6 @@ var CC = CC || {};
         "The body itself. Anchor to the wrong fragment and it comes away with you.");
       add(facts.voidFraction > 0.14,
         "Voids you cannot see from outside. A drill finds them the hard way.");
-      add(facts.rubble && facts.traits.indexOf("hollowed-out") >= 0,
-        "Somebody excavated a rubble pile. Whatever held when they left may not still.");
       add(facts.escapeVelocity < 3,
         "Losing your grip. Escape velocity is under walking pace - a slip is a departure.");
       add(facts.traits.indexOf("shattered") >= 0,
@@ -47,7 +45,17 @@ var CC = CC || {};
         "It bakes on the sunward face. Nothing you leave outside survives a pass.");
       add(facts.starlight > 0.85,
         "Too close in. There is no atmosphere and no magnetic field between you and the star.");
-      add(!facts.rubble,
+      /* THE ROCK'S OWN RADIATION (ASTEROID-OVERHAUL §8) — read off the
+       * fragments that were drawn hot, so it appears exactly when the picture
+       * shows them. */
+      add(facts.radioactive > 0.03,
+        "The rock itself. Some of the fragments are hot, and you cannot tell which until your dosimeter does.");
+      add(facts.radioactive > 0.05,
+        "Radiation from inside, not from the sky. Shielding the hull does nothing about what you dig up.");
+      /* THE CAVES — passages that open to vacuum at both ends. */
+      add(facts.caveArea > 0.03,
+        "The tunnels. Some of them come out somewhere else, and some of them just stop.");
+      add(!facts.rubble && !(facts.radioactive > 0.03),
         "Very little, honestly. It is a rock, and it will go on being a rock.");
     },
 
@@ -60,14 +68,16 @@ var CC = CC || {};
         "Four different rocks in the same body - this used to be several bodies.");
       add(facts.materials <= 2 && facts.cells > 0,
         "Uniform all the way through. Whatever it broke off was uniform too.");
-      add(facts.traits.indexOf("hollowed-out") >= 0,
-        "There is a chamber inside it that nothing natural cut.");
-      add(facts.traits.indexOf("ice-rich") >= 0,
+      add(facts.iceFraction > 0.05,
         "Ice packed into the gaps between the fragments, and it has been there a long time.");
       add(facts.traits.indexOf("mining-station") >= 0,
         "The workings are still bolted to the surface. Nobody has been back for them.");
       add(facts.voidFraction > 0.20,
         "More than a fifth of it is empty space. You could hide a great deal in here.");
+      add(facts.excavated && facts.caveArea > 0.10,
+        "Hollowed out. Whoever mined it took most of the middle and left the shell.");
+      add(facts.traits.indexOf("tunnel-borer") >= 0,
+        "The borers are still running. Nobody remembers telling them to stop.");
       add(true, "It tumbles rather than spins. There is no fixed horizon anywhere on it.");
       add(true, "It has no name, only a catalogue number, and that number has been reused.");
     },
@@ -78,14 +88,10 @@ var CC = CC || {};
        * makes it true of this body. */
       add(facts.metallic,
         "Nickel-iron, in quantity, with no overburden to move. This is why anyone comes out here.");
-      add(facts.traits.indexOf("ice-rich") >= 0,
+      add(facts.iceFraction > 0.05,
         "Water ice in the voids - fuel, air and shielding from one hole in the ground.");
-      add(facts.traits.indexOf("metal-rich") >= 0,
-        "The whole body is metal under a skin of rubble. Somebody will want it.");
       add(facts.traits.indexOf("ore-deposits") >= 0,
         "Platinum-group metals near the surface, and no gravity well to lift them out of.");
-      add(facts.traits.indexOf("mineral-veins") >= 0,
-        "Seams running through the fragments, concentrated by whatever broke the parent body.");
       add(facts.voidFraction > 0.15,
         "Somewhere to hide, which out here is worth more than metal.");
       add(facts.escapeVelocity < 5,
@@ -106,6 +112,8 @@ var CC = CC || {};
         "Thrusting against it pushes it away. Every manoeuvre here moves the target.");
       add(facts.traits.indexOf("mining-station") >= 0,
         "There is already a berth on it, if the moorings have held.");
+      add(facts.caveArea > 0.05,
+        "Go in through a tunnel mouth. The inside is easier to hold station in than the outside.");
       add(facts.traits.indexOf("shattered") >= 0,
         "It is cracked through. Pick a face and stay off the fracture lines.");
       add(facts.hazardScore < 4,

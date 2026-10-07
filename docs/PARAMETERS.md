@@ -121,6 +121,8 @@ as Ocean depth and Interior heat: an axis, not two checkboxes.
 | Control | Archetypes | Range | Replaces | Drives |
 |---|---|---|---|---|
 | **Cohesion** | asteroid | 0–100% | `rubble-pile` / `void-riddled` | Voronoi cell count and size, void frequency, outer-shell integrity |
+| **Caverns** | asteroid | 0–100% (default 30) | `hollowed-out` | Caves cut through the interior: natural winding tunnels and clustered chambers through the low and middle range, bored tunnels and mined halls added at the top, some opening to space. Capped by Cohesion: nothing below ~6%, the full amount from ~62%. Measured into the card's Inside row and the density. See `js/gen/caves.js` |
+| *Interior heat → **Radioactivity*** | asteroid | 0–100% | — | The same control, relabelled by the archetype's `dials`. Above about a third, a share of the mosaic's fragments (up to a tenth) turn hot material, sickly green or cold blue-white, and glow near the top. Composition only; moves no structure |
 | **Luminosity source** | nebula | 0–100% | `dark` / `reflection` / `emission` | Layer opacity, lightness, hue bias, whether protostars light their surroundings |
 | ~~**Stellar activity**~~ | all stars | — | — | **SUPERSEDED by the universal Star activity axis — do not build this.** See the note below |
 | **Field strength** | neutron star, pulsar | 0–100% | `magnetar` | Magnetosphere extent, field-line count and twist, particle glints |
@@ -561,7 +563,7 @@ uses.
 | **Planet-Cracker** | Machine world wrapped around a captured natural core |
 | **Half-Built Dyson** | Main star + dyson-structure, Enclosure ~50 |
 | **Coruscant World** | Planet + surface-city at max density + orbital-ring |
-| **Hollowed Asteroid** | Asteroid, Cohesion 0, hollowed-out + docked-ships |
+| **Hollowed Asteroid** | Built as **Hollowed Rock**: Asteroid, Caverns 96, Cohesion 62, mining-station + tunnel-borer (`hollowed-out` retired in U1; it is a position on the Caverns axis since U2) |
 
 **Presets are not a body type.** A desert world is a planet whose ocean depth is
 zero — which is why "frozen desert with a dying core" or "tidally locked ocean

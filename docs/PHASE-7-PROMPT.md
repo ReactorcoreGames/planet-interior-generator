@@ -34,7 +34,8 @@ STATUS
    still a circle at every amplitude (the missing statements were angularity
    and frequency, not size — D179), and the fragments read as polished
    because every mark describing them was a continuous field (D181).
-⬜ **compact group** — neutron-star, pulsar, black-hole. A later session.
+   **Overhauled in Sessions U1 and U2 (D184–D204)** after the user's review — see docs/ASTEROID-OVERHAUL.md and docs/progress/session-u1-asteroid-body.md / session-u2-asteroid-interior.md. A blob silhouette applied inside `view.at`, flat textured cells, the Caverns axis (caves, bores, exits), the tunnel borer, `plate`, and Interior heat relabelled Radioactivity through a general `dials` declaration. Signed off by the user.
+⬜ **compact group (NEXT)** — neutron-star, pulsar, black-hole.
 ⬜ **diffuse** — nebula. A later session.
 
 Do ONE group per session. Phase 6 needed four sessions for one family, and
@@ -54,11 +55,12 @@ READ FIRST, in this order:
   has been CORRECTED and the correction is recorded; the asteroid's has NOT)
 - docs/progress/session-m-stars.md (D115–D128 — a whole new family added
   from scratch; still the closest precedent for the compact group)
+- docs/progress/session-u2-asteroid-interior.md (D193–D204 — the most recent
+  session; its general mechanisms — `absorbs`, `traitDepth`, `seat`, `dials`,
+  the cave system's warped-space layout — are the newest tools available)
+- docs/celestials/compact-objects.md (the compact group's own spec)
 
 WHAT'S LEFT TO BUILD
-
-**Asteroid (next).** Voronoi interiors via the vendored d3-delaunay. The
-biggest test of the Voronoi work.
 
 **Compact:** `neutron-star`, `pulsar`, `black-hole` — exotic textures, and
 the void. Rides the stellar machinery from Sessions M–R while it is still

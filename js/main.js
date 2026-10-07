@@ -42,6 +42,11 @@ var CC = CC || {};
        * where the layer's boundaries are, so it must stay out of
        * `structureKey` or dragging it would re-roll the whole stack. */
       cohesion: (c.get("cohesion") === undefined ? 45 : c.get("cohesion")) / 100,
+      /* WHAT HAS BEEN CUT THROUGH THE ROCK — caves at the low end, bores and
+       * halls at the top, capped by Cohesion (js/gen/caves.js). Detail stage
+       * for the same reason as Cohesion: it fills a layer, it does not move
+       * a boundary. */
+      caverns: (c.get("caverns") === undefined ? 30 : c.get("caverns")) / 100,
       oceanDepth: (c.get("ocean-depth") || 0) / 100,
       interiorHeat: (c.get("interior-heat") || 0) / 100,
       boundaryIrregularity: (c.get("boundary-irregularity") || 0) / 100,
@@ -191,7 +196,7 @@ var CC = CC || {};
     return [structureKey(s), s.detailDensity, s.sizeTiers, s.flowIndicators,
             s.textureStrength,
             (s.traits || []).join(","), (s.traitExcluded || []).join(","),
-            s.traitCount, s.tidalLock, s.tidalFacing, s.cohesion,
+            s.traitCount, s.tidalLock, s.tidalFacing, s.cohesion, s.caverns,
             /* The climate field lives in this stage: it modulates the
              * snowline and the frosting rather than a layer radius, exactly as
              * tidal locking does. */
@@ -380,6 +385,7 @@ var CC = CC || {};
      * and for the same reason. Cohesion decides what a layer is made of, not
      * where its boundaries are. */
     { id: "cohesion", stage: "detail", format: pct },
+    { id: "caverns", stage: "detail", format: pct },
     { id: "ocean-depth", stage: "structure", format: pct },
     { id: "interior-heat", stage: "structure", format: pct },
     { id: "boundary-irregularity", stage: "structure", format: pct },

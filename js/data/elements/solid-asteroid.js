@@ -136,6 +136,15 @@ var CC = CC || {};
            * broken rock or as a pattern, and it wants to be high — rubble is
            * irregular — without reaching the sliver regime. */
           jitter: 0.58,
+          /* ICE IN THE VOIDS on a body far enough out to keep it — the
+           * mechanism that replaced the `ice-rich` trait. Every void is icy
+           * at Starlight 0.08 and below; none is above 0.30. See buildMosaic. */
+          voidIce: { param: "starlight", full: 0.08, none: 0.30 },
+          /* SOME FRAGMENTS ARE HOT — Interior heat, relabelled Radioactivity
+           * on this body (ASTEROID-OVERHAUL §8). A share of the solid cells
+           * leans sickly yellow-green or cold blue-white and, near the top,
+           * glows. See buildMosaic and mosaicFill. */
+          mosaicRadio: "interiorHeat",
           depth: [0.0, 1.0],
           alpha: [1.0, 1.0],
           tone: "shift"

@@ -254,7 +254,35 @@ CC.Controls = (function () {
     setLabel("tidal-facing",
       (axis && axis.facingDial) || d.facingDial,
       (axis && axis.facingTitle) || d.facingTitle);
+
+    /* ANY CONTROL AN ARCHETYPE RENAMES, by the same rule: one quantity, a
+     * different name and different consumers on this body. `dials: { <control
+     * id>: { label, title } }` on the archetype — the asteroid calls Interior
+     * heat "Radioactivity" (ASTEROID-OVERHAUL §8). Every id ANY archetype
+     * renames is walked, so switching away restores the default. */
+    var ids = CC.Archetypes.ids();
+    for (var ai = 0; ai < ids.length; ai++) {
+      var dl = CC.Archetypes.get(ids[ai]).dials || {};
+      for (var cid in dl) {
+        if (!Object.prototype.hasOwnProperty.call(dl, cid)) continue;
+        if (!dialDefaults[cid]) {
+          var lab = document.querySelector(".control-row label[for='" + cid + "']");
+          dialDefaults[cid] = {
+            label: lab ? lab.textContent : cid,
+            title: (lab && lab.closest(".control-row").title) || ""
+          };
+        }
+      }
+    }
+    var mine = (arch && arch.dials) || {};
+    for (var did in dialDefaults) {
+      if (!Object.prototype.hasOwnProperty.call(dialDefaults, did)) continue;
+      var spec = mine[did];
+      setLabel(did, (spec && spec.label) || dialDefaults[did].label,
+               (spec && spec.title) || dialDefaults[did].title);
+    }
   }
+  var dialDefaults = {};
 
 
   function setChangeHandler(fn) { onChange = fn; }

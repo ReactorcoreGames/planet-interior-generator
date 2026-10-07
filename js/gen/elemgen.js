@@ -784,6 +784,24 @@ CC.ElemGen = (function () {
     var placed = 0;
     var jitter = recipe.jitter === undefined ? 0.52 : recipe.jitter;
 
+    /* ON A WARPED BODY, laid out where the cells will be seen — see
+     * `mosaicSites` in js/gen/form.js for why the polar lattice below crowds
+     * the narrow side once the form is applied. */
+    var form = opts && opts.form;
+    if (form) {
+      var at = CC.Form.mosaicSites(form, layer.outer, cells, jitter, rng, coh);
+      for (var fi = 0; fi < at.length; fi++) {
+        sites.push({
+          angle: at[fi].angle,
+          radius: at[fi].radius,
+          material: Math.floor(rng() * materials),
+          hollow: rng() < voidChance,
+          shine: rng()
+        });
+      }
+      placed = cells;
+    }
+
     for (var ring = 0; ring < rings && placed < cells; ring++) {
       var want = Math.max(1, Math.round(cells * radii[ring].r / total));
       if (ring === rings - 1) want = Math.max(1, cells - placed);
@@ -818,6 +836,51 @@ CC.ElemGen = (function () {
       }
     }
 
+    /* ICE IN THE VOIDS, ON A BODY COLD ENOUGH TO KEEP IT.
+     *
+     * The replacement for the retired `ice-rich` trait (ASTEROID-OVERHAUL §3):
+     * what a body is made of belongs to the mosaic, so ice is a property of
+     * its voids rather than a scatter of blobs over them. Driven by the named
+     * parameter — Starlight, on the asteroid, which is the frost line stated
+     * as a dial: far enough out and the voids hold ice, close in and they are
+     * empty. `voidIce: { param, full, none }` — the parameter value at which
+     * every void is icy, and the one above which none is.
+     *
+     * Rolled after every site exists, so it never shifts the geometry. */
+    var iceFrac = 0;
+    var vi = recipe.voidIce;
+    if (vi && params && params[vi.param] !== undefined) {
+      var iv = (vi.none - params[vi.param]) / Math.max(1e-6, vi.none - vi.full);
+      iv = clamp(iv, 0, 1);
+      iceFrac = iv * iv * (3 - 2 * iv);
+    }
+    if (iceFrac > 0) {
+      for (var ic = 0; ic < sites.length; ic++) {
+        if (sites[ic].hollow) sites[ic].icy = rng() < iceFrac;
+      }
+    }
+
+    /* RADIOACTIVE FRAGMENTS (ASTEROID-OVERHAUL §8). Not the whole interior:
+     * the point is that SOME pieces are hot, so a share of the solid cells —
+     * none below about a third of the range, a tenth at the top — is
+     * marked. Composition, never structure: it moves no cell, no void and no
+     * count. Chosen by a hash of each site's own roll rather than a new draw,
+     * so the rest of the mosaic is the same rock with or without it.
+     * `mosaicRadio` names the parameter, as `mosaicCohesion` does. */
+    var radio = 0;
+    if (recipe.mosaicRadio && params && params[recipe.mosaicRadio] !== undefined) {
+      radio = clamp(params[recipe.mosaicRadio], 0, 1);
+    }
+    var hotShare = CC.Math.smoothstep(0.35, 1.0, radio) * 0.11;
+    var hotCount = 0;
+    if (hotShare > 0) {
+      for (var hc = 0; hc < sites.length; hc++) {
+        if (sites[hc].hollow) continue;
+        var hh = Math.sin(sites[hc].shine * 7919.31 + 4.17) * 43758.5453;
+        if (hh - Math.floor(hh) < hotShare) { sites[hc].hot = true; hotCount++; }
+      }
+    }
+
     /* THE SEAM OPENS AS THE BODY LOOSENS. Authored in body-space units so it
      * is resolution-independent, like every other size in this file. */
     var sm = recipe.seam || [0.010, 0.0022];
@@ -840,7 +903,10 @@ CC.ElemGen = (function () {
       sites: sites,
       seam: seam,
       materialCount: materials,
+      iceFraction: iceFrac,
       cohesion: coh,
+      radioactivity: radio,
+      hotCount: hotCount,
       /* What the primitive clips its Voronoi rectangle to. The layer's outer
        * edge rather than 1.0, so a mosaic in a thin band does not build a
        * diagram across the whole body. */
@@ -899,7 +965,10 @@ CC.ElemGen = (function () {
                          recipe.aspect ? recipe.aspect[1] : 0.42, r());
       }
     }, function (o) {
-      return buildScattered("capsule", recipe, layer, plan, rng, o);
+      /* `plate` shares the hull's placement and proportions — a built
+       * object lying along the surface — and differs in what is drawn. */
+      return buildScattered(recipe.kind === "plate" ? "plate" : "capsule",
+                            recipe, layer, plan, rng, o);
     });
   }
 
@@ -1046,7 +1115,8 @@ CC.ElemGen = (function () {
       case "vein":          return buildVeins(recipe, layer, plan, rng, opts);
       case "blob":          return buildBlobs(recipe, layer, plan, rng, opts);
       case "storm":         return buildStorms(recipe, layer, plan, rng, opts);
-      case "capsule":       return buildHulls(recipe, layer, plan, rng, opts);
+      case "capsule":
+      case "plate":         return buildHulls(recipe, layer, plan, rng, opts);
       case "shard":         return buildShards(recipe, layer, plan, rng, opts);
       case "prominence":    return buildProminences(recipe, layer, plan, rng, opts);
       case "plume":         return buildPlumes(recipe, layer, plan, rng, opts);

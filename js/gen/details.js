@@ -38,6 +38,33 @@ CC.Details = (function () {
   var clamp = M.clamp;
   var TAU = M.TAU;
 
+  /* A TRAIT A LAYER ANSWERS WITH ITS OWN MARKS (ASTEROID-OVERHAUL §6).
+   *
+   * `absorbs: { <traitId>: { craters, elements: { <kind>: mul } } }` on a
+   * layer says: when this trait lands here, do not draw the trait's marks —
+   * turn up mine. The asteroid's shell already has a crater field and a field
+   * of impact pits, and a "Heavily Cratered" trait laid over them as a second
+   * set would be two crater mechanisms in one band. One mechanism, one place.
+   *
+   * Layer-side rather than trait-side, so `cratered` on a planet or a moon is
+   * untouched. Returns the identity for a layer that declares nothing.
+   * gen/traitroll.js `place` skips an absorbed trait so it draws nothing of
+   * its own. */
+  function absorbedScale(layer, traits, body) {
+    var out = { craters: 1, elements: {} };
+    var abs = layer && layer.absorbs;
+    if (!abs) return out;
+    for (var i = 0; i < traits.length; i++) {
+      var a = abs[traits[i].id];
+      if (!a || CC.TraitRoll.anchorLayer(traits[i], body) !== layer) continue;
+      if (a.craters) out.craters *= a.craters;
+      for (var k in (a.elements || {})) {
+        out.elements[k] = (out.elements[k] || 1) * a.elements[k];
+      }
+    }
+    return out;
+  }
+
   /* ---- the stage -------------------------------------------------------- */
 
   /* Build every detail element for a body.
@@ -97,6 +124,7 @@ CC.Details = (function () {
      * amplitude, which changes the field every later stage samples, and trait
      * instances are placed against the same angles. */
     var archetype = CC.Archetypes.get(body.archetype);
+    var formFn = body.form ? CC.Form.fn(body.form) : null;
     var traits = CC.TraitRoll.select(archetype, params, seed);
 
     /* THE ANGULAR AXIS IS ARCHETYPE DATA, NOT A TRAIT.
@@ -230,6 +258,7 @@ CC.Details = (function () {
           ? clamp((atmos.outer - body.surface) / 0.13, 0, 1) * 0.8
           : 0;
 
+        var absorbed = absorbedScale(layer, traits, body);
         var spec = {
           bands: relief.bands,
           /* The AMPLITUDE COMES FROM THE LAYER, not from the recipe.
@@ -242,7 +271,10 @@ CC.Details = (function () {
            * happened to be. */
           amplitude: layer.relief || relief.amplitude,
           sharpen: relief.sharpen,
-          craters: relief.craters,
+          craters: (relief.craters && absorbed.craters !== 1)
+            ? { count: Math.round(relief.craters.count * absorbed.craters),
+                size: relief.craters.size, depth: relief.craters.depth }
+            : relief.craters,
           erosion: erosion,
 
           /* THE ZONE HOOK, AND IT IS A GENERAL ONE (PROGRESS.md D22).
@@ -375,12 +407,27 @@ CC.Details = (function () {
        * is DATA and it is per layer rather than per family. Absent on every
        * existing archetype, so no current render moves. */
       var eScale = (layer && layer.elementScale) || null;
+      var eAbsorbed = absorbedScale(layer, traits, body).elements;
 
       var list = [];
 
       for (var e = 0; e < recipes.length; e++) {
         var recipe = recipes[e];
         var scale = eScale ? eScale[recipe.kind] : null;
+        /* A SCALE MAY BE DRIVEN BY A PARAMETER: `{ by, count: [at0, at1],
+         * size: [at0, at1] }` reads the two ends of the named control. The
+         * asteroid's shell fractures use it, so Cohesion — the brittleness
+         * axis — multiplies and lengthens the cracks in the crust as it falls
+         * (ASTEROID-OVERHAUL §8). Resolved here to plain numbers, so nothing
+         * below knows the difference. */
+        if (scale && scale.by) {
+          var sv = params[scale.by];
+          sv = clamp(sv === undefined ? 0.5 : sv, 0, 1);
+          var lerpEnds = function (v) {
+            return Array.isArray(v) ? v[0] + (v[1] - v[0]) * sv : v;
+          };
+          scale = { count: lerpEnds(scale.count), size: lerpEnds(scale.size) };
+        }
 
         /* ONE STREAM PER (ROLE, ELEMENT KIND, INDEX).
          *
@@ -395,6 +442,9 @@ CC.Details = (function () {
          * texture and flow multipliers so those still mean what they mean. */
         if (scale && scale.count !== undefined) {
           count = Math.round(count * scale.count);
+        }
+        if (eAbsorbed[recipe.kind]) {
+          count = Math.round(count * eAbsorbed[recipe.kind]);
         }
 
         /* The two global multipliers from the Detail panel. Applied to COUNT
@@ -436,7 +486,10 @@ CC.Details = (function () {
          * gen/traitroll.js — which calls the same dispatch — needs no change
          * and no builder that ignores it can be broken by it. */
         var made = CC.ElemGen.build(recipe, layer, plan, count, rng,
-                                    { phase: phase, params: params });
+                                    { phase: phase, params: params,
+                                      /* The body's form, so a mosaic can lay its
+                                       * cells where they will be seen (gen/form.js). */
+                                      form: formFn });
 
         /* SIZE IS SCALED AFTER THE BUILD, NOT BY REWRITING THE RECIPE.
          *
@@ -726,7 +779,15 @@ CC.Details = (function () {
      * locked, which is most of them. */
     var climate = climateField.summarise();
 
+    /* CAVES — tunnels and chambers cut through the interior, one structural
+     * system driven by a slider and capped by Cohesion (gen/caves.js). Built
+     * after the traits because a tunnel borer's bore is part of it. Null on
+     * every archetype that declares no `caves`. */
+    var caves = CC.Caves.build(archetype, body, params, seed, formFn,
+                               placed.spanning);
+
     return {
+      caves: caves,
       byRole: byRole,
       terrain: terrain,
       /* Per-role surface-film masks, keyed the same way as `terrain`. */

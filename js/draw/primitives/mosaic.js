@@ -21,10 +21,11 @@
  *      background instead would be D156's trap in reverse: a void has to
  *      genuinely be absent, not merely dim.
  *
- *   2. SHADING WITHIN EACH CELL. A fragment is a lump with a lit side and a
- *      shaded side, so every cell carries a gradient along one shared light
- *      direction. This is the single biggest difference from `voronoi`'s flat
- *      fill: flat cells read as areas, shaded cells read as solids.
+ *   2. TEXTURE WITHIN EACH CELL. Flat material colour with a coarse mottle
+ *      and a fine grain laid into it (draw/rocktexture.js). This used to be
+ *      a gradient along a shared light direction plus a sheen, and it read
+ *      as polished stone (ASTEROID-OVERHAUL §2): a cutaway is a cut face,
+ *      lit by nothing, and rock is rough, not shaded.
  *
  *   3. INSET AND SEAM. Each cell is drawn slightly SMALLER than its polygon,
  *      leaving a dark line between neighbours. A Voronoi diagram's cells share
@@ -33,11 +34,8 @@
  *      pieces". It is also what stops the field reading as one continuous
  *      surface with colour variation on it.
  *
- *   4. A HIGHLIGHT ON THE LIT EDGE. Stone has a sheen (the spec asks for
- *      "muted and desaturated but with a slight sheen"), and a bright arc on
- *      the light-facing edge of a fragment is what carries it at two pixels of
- *      width without lifting the fragment's overall value — the same argument
- *      `rockFill`'s `rim` makes in draw/details.js, and for the same reason.
+ *   4. GRIT. Dark pitting and pale inclusions in two size tiers — the
+ *      coarse, discrete mark the texture tiles are too fine to make.
  *
  * ---- WHY IT IS ONE ELEMENT AND NOT N -------------------------------------
  *
@@ -152,11 +150,13 @@ var CC = CC || {};
 
   /* `style` is the rich object built by draw/details.js `mosaicFill`:
    *
-   *   materials  [{ body, lit, shadow, seam }]  one entry per material index
-   *   seam       the colour of the joint between fragments
-   *   voidFill   what a void is filled with, or null to leave it empty
-   *   glint      the sheen colour, or null
-   *   light      { x, y } unit vector the shading runs along
+   *   materials    [{ body }]  one flat colour per material index
+   *   seam         the colour of the joint between fragments
+   *   voidFill     what a void is filled with, or null to leave it empty
+   *   iceFill      what an icy void is filled with (see `voidIce`)
+   *   grainAlpha   strength of the fine gaussian grain (draw/rocktexture.js)
+   *   mottleAlpha  strength of the coarse mottle
+   *   grit, gritLight  the two polarities of inclusion
    */
   function mosaic(ctx, view, el, style) {
     var polys = cellsOf(view, el);
@@ -164,8 +164,11 @@ var CC = CC || {};
 
     var sites = el.sites;
     var mats = style.materials;
-    var lx = style.light ? style.light.x : -0.55;
-    var ly = style.light ? style.light.y : -0.83;
+    /* The cut-face texture, or null on a canvas that cannot build one — the
+     * fragments are then simply flat. Scaled with the body (texels per pixel
+     * follow view.scale), so it is the same rock at every resolution. */
+    var tex = CC.RockTexture ? CC.RockTexture.build(ctx) : null;
+    var texScale = view.scale * 0.55;
 
     /* ONE SEAM PASS UNDER EVERYTHING, rather than a stroke per cell.
      *
@@ -192,6 +195,7 @@ var CC = CC || {};
     ctx.fill();
 
     var inset = Math.max(0.6, view.px(el.seam || 0.004));
+    var hotCells = [];
 
     for (i = 0; i < polys.length; i++) {
       var poly = polys[i];
@@ -209,7 +213,49 @@ var CC = CC || {};
        * exists for the case where the layer wants the void tinted (an icy
        * body's pockets are not black), and null means "leave the hole". */
       if (s.hollow) {
-        if (style.voidFill) {
+        /* AN ICY VOID IS FILLED, NOT EMPTY — the ice mechanism that replaced
+         * the `ice-rich` trait (ASTEROID-OVERHAUL §3). Ice is a material, so
+         * it is a property of the void rather than a scatter of blobs over it.
+         * Drawn flat and pale, with the grain only: ice is smoother than rock,
+         * and that difference is most of what says it is not another stone. */
+        if (s.icy && style.iceFill) {
+          traceInset(ctx, poly, c, inset * 0.7);
+          ctx.fillStyle = style.iceFill;
+          ctx.fill();
+          if (tex) {
+            ctx.save();
+            ctx.clip();
+            CC.RockTexture.lay(ctx, tex, c, s.shine, texScale,
+                               style.grainAlpha * 0.8, 0);
+            ctx.restore();
+          }
+          continue;
+        }
+        /* A RECESS, NOT A CUTOUT (the user, after Session U1).
+         *
+         * Left as bare seam ground, a void read as a pitch-black missing piece
+         * — a hole in the picture rather than a hole in the rock. It is drawn
+         * instead as a deep, dark, desaturated pocket: lifted a little at the
+         * floor and falling away to near-black at the walls, with the cut-face
+         * texture still in it. The depth gradient is the one gradient a cell
+         * keeps, and it is not the retired shine: it describes how far down
+         * the light reaches, not a light source on a surface. */
+        if (style.voidFloor) {
+          traceInset(ctx, poly, c, inset);
+          var vg = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.r);
+          vg.addColorStop(0, style.voidFloor);
+          vg.addColorStop(0.55, style.voidMid);
+          vg.addColorStop(1, style.voidWall);
+          ctx.fillStyle = vg;
+          ctx.fill();
+          if (tex) {
+            ctx.save();
+            ctx.clip();
+            CC.RockTexture.lay(ctx, tex, c, s.shine, texScale,
+                               style.grainAlpha * 0.6, style.mottleAlpha * 0.5);
+            ctx.restore();
+          }
+        } else if (style.voidFill) {
           traceInset(ctx, poly, c, inset * 0.5);
           ctx.fillStyle = style.voidFill;
           ctx.fill();
@@ -218,71 +264,43 @@ var CC = CC || {};
       }
 
       var m = mats[s.material % mats.length];
+      /* A radioactive fragment is a different MATERIAL, so it takes the
+       * flat fill and keeps every other mark — texture, grit — a stone. */
+      if (s.hot && style.hot) {
+        m = { body: style.hot };
+        if (style.hotGlow) hotCells.push(c);
+      }
 
       traceInset(ctx, poly, c, inset);
 
-      /* THE FRAGMENT'S OWN SHADING, along the field's one light direction.
+      /* FLAT, AND TEXTURED — NOT SHADED (ASTEROID-OVERHAUL §2).
        *
-       * A linear gradient across the cell rather than a radial one, because a
-       * broken lump of rock is a FACET catching light from one side, not a
-       * sphere. All the cells share `light`, so the field reads as one mass
-       * lit from one direction instead of two hundred independently shaded
-       * pebbles — which is the difference between "broken rock" and "gravel
-       * texture".
+       * The fragments used to carry a gradient along a shared light direction
+       * plus a sheen over the top, and the review called them "too shiny".
+       * Both were continuous fields across the cell, and a surface described
+       * only by continuous fields is a polished one. They also claimed a light
+       * source a cutaway does not have: this is a CUT FACE, and nothing in a
+       * cross-section is catching the sun. Both are gone and must not come
+       * back as a light direction under another name.
        *
-       * The gradient runs the full width of the cell, so the contrast within a
-       * fragment is the same regardless of how big it is. */
-      var g = ctx.createLinearGradient(
-        c.x + lx * c.r, c.y + ly * c.r,
-        c.x - lx * c.r, c.y - ly * c.r);
-      /* THE MID STOP SITS EARLY, at a third rather than at the middle.
-       *
-       * `body` is the material's own colour and `lit`/`shadow` are excursions
-       * either side of it, but the excursions are not symmetric — `shadow` is
-       * a multiplier and `lit` is an addition, so `body` is much closer to
-       * `lit` in value than to `shadow`. Placing it at the geometric centre
-       * therefore spent most of the cell's width on the dark half, and the
-       * fragment read as a dark shape with a bright edge instead of as a lump
-       * with two sides. Moving the stop to where the material's own colour
-       * actually falls between its two extremes puts the body colour across
-       * the middle of the cell, which is what it is for. */
-      g.addColorStop(0, m.lit);
-      g.addColorStop(0.34, m.body);
-      g.addColorStop(1, m.shadow);
-      ctx.fillStyle = g;
+       * What makes the fragment stone instead is texture: the material's own
+       * flat colour, then a coarse mottle and a fine gaussian grain laid into
+       * the cell from draw/rocktexture.js, each fragment showing a different
+       * part of the tile so neighbours do not read as one painted surface. The
+       * fan still separates neighbouring fragments by value; the seams still
+       * separate them by line. */
+      ctx.fillStyle = m.body;
       ctx.fill();
 
-      /* THE SHEEN, on the lit edge only.
-       *
-       * A SOFT GRADIENT, NOT A STROKED ARC, and the first version was the arc.
-       * It clipped a circle to the cell and stroked it at a sixth of the
-       * cell's radius, which produced a hard-edged CRESCENT in every fragment
-       * — rendered, they read as painted-on swooshes or as fingernail
-       * clippings stuck to the rock, and at a high Cohesion where the cells are
-       * large they dominated the whole interior. The mark was competing with
-       * the fragments instead of describing them.
-       *
-       * The fault was that a stroke has two hard edges and a sheen has none.
-       * A reflection off stone is a bright region that fades in and out, and
-       * fading TOWARDS nothing is the only way it seats into the material
-       * (D156). So it is a gradient along the same light direction the cell is
-       * already shaded with, opaque at the lit edge and gone by the middle —
-       * which adds brightness exactly where the `lit` stop already is, rather
-       * than laying a second shape over it.
-       *
-       * Only a fraction of the cells get one, so the field has a few faces
-       * catching the light rather than every one of them — a uniform sheen is
-       * a filter, not a material.
-       *
-       * `glint` is null on a dull material, and then nothing is drawn. */
-      if (style.glint && s.shine > 0.62) {
-        var gg = ctx.createLinearGradient(
-          c.x + lx * c.r, c.y + ly * c.r,
-          c.x - lx * c.r * 0.15, c.y - ly * c.r * 0.15);
-        gg.addColorStop(0, style.glint);
-        gg.addColorStop(1, style.glintOut);
-        ctx.fillStyle = gg;
-        ctx.fill();
+      if (tex) {
+        ctx.save();
+        ctx.clip();
+        CC.RockTexture.lay(ctx, tex, c, s.shine, texScale,
+                           style.grainAlpha, style.mottleAlpha);
+        ctx.restore();
+        /* Re-traced so the grit below clips to this cell under the restored
+         * transform rather than relying on the path surviving the texture. */
+        traceInset(ctx, poly, c, inset);
       }
 
       /* ---- THE GRIT ----------------------------------------------------
@@ -358,6 +376,24 @@ var CC = CC || {};
           }
           ctx.restore();
         }
+      }
+    }
+
+    /* THE GLOW, over the whole field so a halo can spill onto neighbours —
+     * `screen`, so it can only add light, the family's one honest emissive
+     * mark. Only near the top of the Radioactivity range. */
+    if (hotCells.length) {
+      ctx.globalCompositeOperation = "screen";
+      for (i = 0; i < hotCells.length; i++) {
+        var hcl = hotCells[i];
+        var hg = ctx.createRadialGradient(hcl.x, hcl.y, hcl.r * 0.2,
+                                          hcl.x, hcl.y, hcl.r * 1.35);
+        hg.addColorStop(0, style.hotGlow);
+        hg.addColorStop(1, style.hotGlowEdge);
+        ctx.fillStyle = hg;
+        ctx.beginPath();
+        ctx.arc(hcl.x, hcl.y, hcl.r * 1.35, 0, TAU);
+        ctx.fill();
       }
     }
 

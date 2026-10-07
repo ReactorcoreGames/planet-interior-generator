@@ -13,14 +13,10 @@ Checklist at the end of every session; add new narrative to
 **Phase 6 polish, the tidal bulge ✅ (Session P)** ·
 **Phase 6 polish, the traits ✅ (Session Q)** ·
 **Phase 6 limb, calibrated against the app ✅ (Session R)** ·
-**Phase 7 moon ✅ (Session S)**
-**Next:** Phase 7 continues — the **asteroid** (the Voronoi interior; the
-primitive exists but has never been called and currently fills cells flat, so
-it will produce exactly the "mosaic laid over a circle" the phase doc's
-done-condition forbids), then the **compact** group (neutron star, pulsar,
-black hole) and the **diffuse** group (nebula). Open question 1 is discharged
-for the moon; **the asteroid half of it is still open** — see below.
-**Last updated:** 2026-08-28 (Session S — Phase 7's moon: a frac table whose
+**Phase 7 moon ✅ (Session S)** · **Phase 7 asteroid ✅ (Session T)** · **Asteroid overhaul, the body ✅ (Session U1)** · **Asteroid overhaul, on and in the rock ✅ (Session U2)**
+**Next (Session V):** the **compact group** — neutron star, pulsar, black hole. The asteroid is signed off by the user after U2 (D204 seated the stations); its minor open items stay listed in [session-u2-asteroid-interior.md](progress/session-u2-asteroid-interior.md), and support pillars remain optional.
+**Then:** Phase 7's last two groups, one per session: the **compact** group (neutron star, pulsar, black hole — [PHASE-7-PROMPT.md](PHASE-7-PROMPT.md)), then the **diffuse** group (nebula). After Phase 7: Phase 8 (overlay, scale, polish), Phase 9 (machine worlds), Phase 10 (release) — see [ROADMAP.md](ROADMAP.md).
+**Last updated:** 2026-10-08 (Session U2 — the asteroid's interior: caves, the borer, `plate`, Radioactivity; D193–D203). Earlier: 2026-08-28 (Session S — Phase 7's moon: a frac table whose
 authored radii were not its drawn radii for three separate reasons, an optional
 layer that contradicted the body's own temperature on 89% of seeds, a second
 temperature declared rather than detected, a frosting spec that had to become
@@ -230,6 +226,36 @@ assumed.
       did nothing on a star; it drives the companion now and `axes.dial`
       relabels the slider per archetype. Wired on all three routes into the
       archetype control, D114's audit applied rather than rediscovered
+
+### Asteroid overhaul, on and in the rock ✅ (Session U2)
+
+[session-u2-asteroid-interior.md](progress/session-u2-asteroid-interior.md) — D193–D204. The second half of [ASTEROID-OVERHAUL.md](ASTEROID-OVERHAUL.md). **The body U1 built was not touched, and no other body changed**: non-asteroid renders hash identically to HEAD.
+
+- [x] **a layer may answer a trait with its own marks** (D193) — `absorbs` on a layer: "Heavily Cratered" on the asteroid's shell raises the shell's own craters and pits instead of laying a second crater mechanism over them. `cratered` and `impact-basin` anchor to `outer-shell` too; `void-pockets` and `magma-chambers` stay ineligible on purpose
+- [x] **a basin on an unfrosted surface is shaped by its band** (D194) — damage clips to the real band where there is no frosting to reach for, and `traitDepth` lets a layer restate where a trait sits in it
+- [x] **`plate`** (D195) — block, truss frame or landing pad from one primitive; the mining station is a cluster of rectangular modules, not capsules
+- [x] **the tunnel borer** (D196) — a machine pointing the way it digs; its bore is part of the cave system, so it merges with any cavern it meets
+- [x] **caves are one system, drawn in tone passes so it merges** (D197) — natural tunnels and clustered chambers, bored tunnels and mined halls at the top, exits through the crust, laid out in warped space; the colour is the rubble void's own ramp
+- [x] **thin caves read as roots, round halls as a molecule** (D198) — thicker natural tunnels, stadium-shaped halls
+- [x] **Caverns** (D199) — one asteroid slider; Cohesion caps the amount, the slider alone sets natural vs bored. Wired like Cohesion; Hollowed Rock has its chamber back
+- [x] **the card measures the caves** (D200) — rasterized from the drawn geometry; an Inside row; caves are hole for density and gravity
+- [x] **a clip of 900 circles cost 70 ms** (D201) — one outline per tunnel instead, wound the same way as the arcs or overlaps become holes
+- [x] **Radioactivity** (D202) — Interior heat relabelled on the asteroid through a general `dials` declaration; hot fragments chosen by hash, a glow near the top, a card row, and a hazard that blames the rock rather than the sky
+- [x] the ore-deposits trait is labelled **Mineralised Crust** (D203); numbers untouched
+- [x] **a station sits ON the surface** (D204, the user's review) — `seat` re-seats a mark on the drawn outline at draw time, a quarter sunk in and tilted to the facet; no longer buried in the crust or clipped at the outline
+
+### Asteroid overhaul, the body ✅ (Session U1)
+
+[session-u1-asteroid-body.md](progress/session-u1-asteroid-body.md) — D184–D192. The first half of [ASTEROID-OVERHAUL.md](ASTEROID-OVERHAUL.md). **No other body changed**, checked by hashing renders against the previous commit.
+
+- [x] **a body FORM, applied inside `view.at`** (D184) — elongation, taper, a lobe harmonic and an eccentric centre: the low-order statements noise round a circle cannot make. One warp every boundary, cell and element passes through, so nothing can slide off anything else. Recentred on the shape's own bounding box. Relief halved
+- [x] **a warp must not decide the cell size** (D185) — mosaic sites laid out in warped space on a fine hex lattice thinned by noise, because the polar lattice crowded the narrow side and a plain hex lattice was a honeycomb
+- [x] **a radial gradient cannot bend** (D186) — band gradients filled in slices on a warped body, scaled to the edge; this also removed the pale "fur" ring the asteroid had since Session T
+- [x] **flat cells, textured, lit by nothing** (D187) — both shine sources deleted; a grain and a mottle tile laid per fragment. Judged at sheet scale as well as large
+- [x] **Cohesion finishes its job** (D188) — the crust breaks open in sectors at the loose end, the shell's fractures multiply and lengthen, the cut face gets grainier. `elementScale` may be parameter-driven
+- [x] **what an aggregate is made of belongs to the mosaic** (D189) — dust film, `ice-rich` deleted; `hollowed-out` retired; `metal-rich`/`mineral-veins` off the asteroid. Ice is `voidIce`, driven by Starlight, and the card counts it separately from empty void. **Traits describe what happened to a body, not what it is**
+- [x] **a void is a recess, not a cutout** (D192) — the user's review: dark, desaturated, textured pockets with a depth gradient, in the fan's stone-leaned hue, instead of pitch-black seam ground
+- [x] **an anchor that cannot resolve makes a trait ineligible** (D190) — §6's general fix, pulled forward so §3 could not create new dead traits
 
 ### Phase 7 — asteroid ✅ (Session T)
 
@@ -649,6 +675,8 @@ part needs to be pulled in:
 | [session-r-limb.md](progress/session-r-limb.md) | D155–D162 — Phase 6 limb, calibrated against the running app: a frame convention asserted in prose and wrong in both primitives that used it, a fade that reached a tenth and stopped rather than reaching zero, two marks each calibrated alone and wrong as a pair, a flag silently dropped between the trait and the renderer, a separation failsafe that guaranteed hue and not value, and a coronal hole that finally worked by changing REGISTER rather than shape (Session R) |
 | [session-q-traits.md](progress/session-q-traits.md) | D146–D154 — Phase 6 polish doc 3, the stellar traits: an unexamined `requires: []` that let rings orbit a star, a flare storm that was two independent bugs neither of which shows a result alone, a ribbon widened along the one axis that is correct at its apex and meaningless at its feet, an absence built because dark paint under `screen` cannot work, and a test harness whose framing was tighter than the app's (Session Q) |
 | [session-p-tidal.md](progress/session-p-tidal.md) | D140–D145 — Phase 6 polish doc 2, the tidal bulge reaching the skin: a signed displacement that is `airAt`'s sibling, its own anchor list, and elements that had to be told to ride the swell (Session P) |
+| [session-u2-asteroid-interior.md](progress/session-u2-asteroid-interior.md) | D193–D203 — the asteroid overhaul's second half: a layer that answers a trait with its own craters, a basin shaped by its band, `plate` and a rectangular station, a tunnel borer whose bore belongs to the caves, one cave system drawn in tone passes so it merges, Cohesion capping it, a card that measures it, a clip that cost 70 ms until it stopped being 900 circles, and Interior heat relabelled Radioactivity (Session U2) |
+| [session-u1-asteroid-body.md](progress/session-u1-asteroid-body.md) | D184–D192 — the asteroid overhaul's first half: a body form applied as one warp inside `view.at`, mosaic sites laid out where they will be seen, concentric gradients that cannot bend, flat textured cells lit by nothing, Cohesion finally driving the shell, and composition moved out of the trait pool into the mosaic (Session U1) |
 | [session-t-asteroid.md](progress/session-t-asteroid.md) | D175–D183 — Phase 7, the asteroid: an omitted `frac` that deleted a layer on every seed, a gravity clamp whose floor sat above the whole family's range, a body too small to keep its own heat, a silhouette that stayed round at every amplitude because the missing statements were angularity and frequency, two large boundaries that had to stop being independent, and a Voronoi interior that could not read as rough while every mark describing it was a continuous field (Session T) |
 | [session-s-moon.md](progress/session-s-moon.md) | D163–D174 — Phase 7, the moon: authored radii that were not the drawn radii for three separate reasons, an optional layer contradicting the body's own temperature on 89% of seeds, a second temperature declared rather than detected, a frosting spec that had to become per-surface with its own RNG stream, an upward deposit whose sign changes were mostly not in the radii, and an accreted ice that never drew because two sites asked "does this layer carry terrain" two different ways (Session S) |
 | [session-o-star-body.md](progress/session-o-star-body.md) | D129–D139 — Phase 6 polish doc 1, the star's own body: a limb-darkening curve that belongs to the sphere and not the layer, a wobble and a tidal bulge that turned out to be one mechanism, an amplitude that was right while the frequency was wrong, a clip fixed against the frame after being too tight three times, and an authored alpha that is not the drawn alpha either (Session O) |

@@ -141,6 +141,36 @@ CC.Canvas = (function () {
 
     var scale = R / REFERENCE_RADIUS;
 
+    /* THE BODY'S FORM, a per-bearing radius multiplier (js/gen/form.js).
+     *
+     * Applied here because `at` is the one funnel every boundary, site and
+     * element passes through, so all of them wear the same shape and none can
+     * slide off another. Full strength inside the body; beyond the surface it
+     * eases back to the identity, so orbital marks keep their clearance from
+     * the rock without being squashed into its outline. Null is the identity
+     * and costs nothing. */
+    var form = opts.form || null;
+
+    /* CENTRE THE SHAPE, NOT THE POINT IT RADIATES FROM. A form with an offset
+     * sits off its warp origin (js/gen/form.js reports by how much), so the
+     * origin is moved the other way. The body is rotated about the origin
+     * afterwards (draw/scene.js), so the shift is rotated with it first —
+     * otherwise rotation would swing the shape back off-centre. */
+    if (form && form.centre) {
+      var rot = (opts.formRotation || 0) * Math.PI / 180;
+      var fx = form.centre.x, fy = form.centre.y;
+      cx -= (fx * Math.cos(rot) - fy * Math.sin(rot)) * R;
+      cy -= (fx * Math.sin(rot) + fy * Math.cos(rot)) * R;
+    }
+
+    function formAt(f, ang) {
+      if (!form) return 1;
+      var k = form(ang);
+      if (f <= 1) return k;
+      var u = Math.min(1, (f - 1) / 0.6);
+      return k + (1 - k) * u * u * (3 - 2 * u);
+    }
+
     var view = {
       width: widthPx,
       height: heightPx,
@@ -158,9 +188,15 @@ CC.Canvas = (function () {
        * Angle 0 points up (the pole), increasing clockwise, because bodies are
        * generated pole-up and rotated at the end. */
       at: function (f, ang) {
-        var r = f * R;
+        var r = f * R * formAt(f, ang);
         return { x: cx + Math.sin(ang) * r, y: cy - Math.cos(ang) * r };
       },
+
+      /* Whether the body is warped at all, and by how much at a bearing.
+       * Read by the few marks that draw concentric geometry directly (a
+       * radial gradient cannot bend), so they can match the warp locally. */
+      form: form,
+      formAt: formAt,
 
       /* A line width authored at reference scale -> pixels, floored so it
        * never vanishes entirely. */

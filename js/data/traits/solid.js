@@ -19,13 +19,12 @@ var CC = CC || {};
   var MINERAL_VEINS = {
     id: "mineral-veins",
     label: "Mineral Veins",
-    /* ANCHOR CHAIN, NOT ONE ROLE (D77). The asteroid has neither a crust nor
-     * a mantle — its stack is a shell and a mosaic interior — so a trait
-     * naming only one of those resolves to nothing there and places NOTHING,
-     * silently. `interior` is the fallback, and adding it is what makes this
-     * trait eligible on the asteroid without a duplicate copy of it existing
-     * that could drift from this one. */
-    anchor: ["mantle", "interior"],
+    /* MANTLE ONLY. It once carried `interior` as a fallback so it could land
+     * on the asteroid; that was retired (ASTEROID-OVERHAUL §3). On an aggregate
+     * body WHAT IT IS MADE OF belongs to the mosaic's material fan, not to the
+     * trait pool — the ore is in particular fragments, not flowing between
+     * them. Traits describe what HAPPENED to a body, not what it IS. */
+    anchor: "mantle",
     reach: "on",
     depth: [0.05, 0.95],
     arc: [0, 360],
@@ -89,16 +88,22 @@ var CC = CC || {};
 
   /* Ore deposits — clustered blobs in the crust. The shallow sibling of the
    * veins, and the reason `sizeRel` exists: the crust's thickness varies most,
-   * so absolute sizes read correctly at only one setting. */
+   * so absolute sizes read correctly at only one setting.
+   *
+   * LABELLED "MINERALISED CRUST" (ASTEROID-OVERHAUL §5). The user liked the
+   * mark and not the name: in a crust or an asteroid's shell these are
+   * mineralisation in the rock rather than a deposit someone has found. The
+   * id stays `ore-deposits` so saved settings still load, and the NUMBERS
+   * ARE NOT TO BE TOUCHED — it is the one mark the review called good. */
   var ORE_DEPOSITS = {
     id: "ore-deposits",
-    label: "Ore Deposits",
+    label: "Mineralised Crust",
     /* ANCHOR CHAIN, NOT ONE ROLE (D77). The asteroid has neither a crust nor
      * a mantle — its stack is a shell and a mosaic interior — so a trait
      * naming only one of those resolves to nothing there and places NOTHING,
-     * silently. `interior` is the fallback, and adding it is what makes this
-     * trait eligible on the asteroid without a duplicate copy of it existing
-     * that could drift from this one. */
+     * silently. `outer-shell` is the fallback, and adding it is what makes
+     * this trait eligible on the asteroid without a duplicate copy of it
+     * existing that could drift from this one. */
     anchor: ["crust", "outer-shell"],
     reach: "on",
     depth: [0.08, 0.86],
@@ -122,7 +127,13 @@ var CC = CC || {};
 
   /* Void pockets — the same shape as ore, read as absence rather than
    * presence. `tone: "darker"` is the whole difference, which is a good sign
-   * the primitive list is the right size. */
+   * the primitive list is the right size.
+   *
+   * CRUST ONLY, AND DELIBERATELY NOT ON THE ASTEROID (ASTEROID-OVERHAUL §6).
+   * An asteroid's voids are the mosaic's, owned by Cohesion, and its cavities
+   * are the Caverns axis; a third route to holes would fight both. With no
+   * `crust` in that stack the anchor cannot resolve, so the trait is not
+   * offered there (D190). */
   var VOID_POCKETS = {
     id: "void-pockets",
     label: "Void Pockets",
@@ -149,7 +160,12 @@ var CC = CC || {};
 
   /* Magma chambers — glowing pockets high in the mantle, reaching up into the
    * crust. `reach: "outward"` from the mantle is what puts them at the top of
-   * their layer where they read as feeding something. */
+   * their layer where they read as feeding something.
+   *
+   * MANTLE ONLY, AND DELIBERATELY NOT ON THE ASTEROID (ASTEROID-OVERHAUL §6).
+   * Magma in an asteroid means a body big enough to have differentiated,
+   * which is exactly what that archetype argues it is not. Its anchor cannot
+   * resolve there, so it is not offered (D190) — on purpose, not by accident. */
   var MAGMA_CHAMBERS = {
     id: "magma-chambers",
     label: "Magma Chambers",
@@ -179,13 +195,12 @@ var CC = CC || {};
   var METAL_RICH = {
     id: "metal-rich",
     label: "Metal-Rich",
-    /* ANCHOR CHAIN, NOT ONE ROLE (D77). The asteroid has neither a crust nor
-     * a mantle — its stack is a shell and a mosaic interior — so a trait
-     * naming only one of those resolves to nothing there and places NOTHING,
-     * silently. `interior` is the fallback, and adding it is what makes this
-     * trait eligible on the asteroid without a duplicate copy of it existing
-     * that could drift from this one. */
-    anchor: ["mantle", "interior"],
+    /* MANTLE ONLY. It once carried `interior` as a fallback so it could land
+     * on the asteroid; that was retired (ASTEROID-OVERHAUL §3). On an aggregate
+     * body WHAT IT IS MADE OF belongs to the mosaic's material fan, not to the
+     * trait pool — the ore is in particular fragments, not flowing between
+     * them. Traits describe what HAPPENED to a body, not what it IS. */
+    anchor: "mantle",
     reach: "on",
     depth: [0.02, 0.98],
     arc: [0, 360],
@@ -218,7 +233,11 @@ var CC = CC || {};
   var CRATERED = {
     id: "cratered",
     label: "Heavily Cratered",
-    anchor: "crust",
+    /* `outer-shell` is the asteroid's surface (ASTEROID-OVERHAUL §6). There
+     * the shell ABSORBS this trait — it raises its own crater field and its
+     * own impact pits instead of taking a second set of marks over them. See
+     * `absorbs` in js/data/archetypes/solid-asteroid.js. */
+    anchor: ["crust", "outer-shell"],
     reach: "on",
     cutsFrosting: true,
     /* DRY LAND ONLY, AND SEATED ON THE REAL GROUND. Impacts scar exposed
@@ -286,7 +305,11 @@ var CC = CC || {};
   var IMPACT_BASIN = {
     id: "impact-basin",
     label: "Impact Basin",
-    anchor: "crust",
+    /* `outer-shell` for the asteroid (ASTEROID-OVERHAUL §6). A sector of a
+     * thin band IS a basin, so the wedge is right there too — and on a rock
+     * this small, "one hit that nearly finished it" reads stronger than on a
+     * moon. */
+    anchor: ["crust", "outer-shell"],
     reach: "on",
     /* `cutsFrosting` because a basin is an EXCAVATION exactly like the smaller
      * craters in CRATERED — it must punch through whatever frosting lies on

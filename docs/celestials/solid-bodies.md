@@ -783,9 +783,14 @@ surface-city · underground-city · orbital-platforms
 
 | Layer role | Frac range | Optional | Boundary | Notes |
 |---|---|---|---|---|
-| `dust-film` | *(a film, not a band)* | — | follows its host | scratched regolith, deposited ON the shell |
 | `outer-shell` | 0.960–1.000 | — | **heavy ×1.5, faceted** | hardened crust; always the surface |
 | `interior` | 0.862–0.905 | — | **heavy ×1.5, shares the shell's shape** | runs to the centre; Voronoi mosaic — no core |
+
+> **REVISED IN SESSION U1 (ASTEROID-OVERHAUL §1–§3, §8).** See [session-u1-asteroid-body.md](../progress/session-u1-asteroid-body.md).
+>
+> - **The dust film is gone.** It read badly on the render, and it was what threw detached lobes whenever the outline grew. The shell is the surface.
+> - **The body has a FORM** — elongation, taper, a 2–3-lobe harmonic and an eccentric centre, rolled per body and scaled by Boundary irregularity (`js/gen/form.js`). It is applied as a per-bearing warp inside `view.at`, so every boundary, cell and element wears it together. This, not amplitude, is what stops the silhouette reading as a circle. Relief is halved to 0.06: terrain is cosmetic surface marking on the faces, not the outline.
+> - **Cohesion finishes its job as the brittleness axis.** Below about half, the mosaic's edge breaks up through the shell in sectors (`breach`), so a loose body's crust is discontinuous and at 0 is missing outright in places; the shell's fractures multiply and lengthen; and the cut face gets grainier.
 
 > **CORRECTED IN SESSION T (D175/D176), against the original table above it.**
 > The figures here are the ones the generator uses; the originals were
@@ -824,11 +829,9 @@ The shells are thickened from the original spec so the regolith and hardened
 crust read as legible bands rather than hairlines, per
 [PROGRESS.md](../PROGRESS.md) D5.
 
-**The asteroid still uses the standard layered model** — three layers, same as
+**The asteroid still uses the standard layered model** — two layers, the same model as
 everything else. What differs is that its innermost layer's *detail* is a
-Voronoi mosaic rather than speckle and cells: 40–200 cells in 2–4 muted,
-slightly shiny colours representing different materials, with void pockets
-between.
+Voronoi mosaic rather than speckle and cells: 40–200 cells in 2–4 muted, flat colours representing different materials, textured as a cut face (a coarse mottle and a fine grain, no shading — a cutaway is lit by nothing), with void pockets between. On a cold body the voids hold ice.
 
 That distinction matters for the build: `voronoi` is an ordinary entry in the
 [element primitive list](../TRAIT-SYSTEM.md#element-primitives), and the
@@ -837,11 +840,10 @@ frequency all ride the **Cohesion** parameter.
 
 ### Colour profile
 
-2–4 material colours, all muted and desaturated but with a slight sheen.
+2–4 material colours, all muted and desaturated. **No sheen** (Session U1): the first iteration had a per-cell gradient and a sheen pass, and both read as polish. The cells are flat and textured.
 
 | Layer | Saturation | Lightness |
 |---|---|---|
-| dust-film | 0.02–0.15 | 0.25–0.45 |
 | outer-shell | 0.05–0.25 | 0.20–0.45 |
 | interior cells | 0.10–0.40 | 0.20–0.60 |
 
@@ -852,7 +854,6 @@ variation to read as different materials, not enough to look like confetti.
 
 | Layer | Elements | Count |
 |---|---|---|
-| dust-film | fine speckle, scratches | 400–900 / 20–50 |
 | outer-shell | grain, impact pits | 300–600 / 15–40 |
 | interior | **Voronoi mosaic** | 40–200 cells |
 | interior | void pockets between cells | 5–25 |
@@ -860,9 +861,11 @@ variation to read as different materials, not enough to look like confetti.
 
 ### Eligible traits
 
-metal-rich · ice-rich · shattered ·
-mineral-veins · ore-deposits · hollowed-out (artificial) · mining-station ·
-docked-ships · derelict-hulk
+shattered · ore-deposits (labelled Mineralised Crust) · cratered (absorbed by the shell's own craters) · impact-basin · mining-station · tunnel-borer · docked-ships · derelict-hulk
+
+> **Interior structure is an axis, Caverns** (Session U2, ASTEROID-OVERHAUL §7). Natural caves through the low and middle range, bored tunnels and mined halls at the top, capped by Cohesion; the tunnel borer's bore is part of the same system. Interior heat is relabelled **Radioactivity** on this body and turns a share of the fragments hot.
+
+> **What an aggregate is made of belongs to the mosaic, not to the trait pool** (Session U1). The ore is in particular fragments, so composition is the material fan, the palette and the card that reads them back. `metal-rich` and `mineral-veins` no longer anchor to the asteroid; `ice-rich` is deleted — an icy asteroid is a cold one, whose voids hold ice (`voidIce`, driven by Starlight); `hollowed-out` is retired, replaced by interior structure as an axis — Caverns (ASTEROID-OVERHAUL §7, Session U2). **Traits describe what happened to a body, not what it is.**
 
 > **`rubble-pile` and `void-riddled` fold into one axis: Cohesion** (0–100%).
 > At 0 the body is a loose gravitational aggregate — many small Voronoi cells,

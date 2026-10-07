@@ -156,6 +156,10 @@ CC.Hazard = (function () {
      * shielding half of it. */
     var rad = facts.radiation;
     if (facts.interiorHeat < 0.12) rad = clamp(rad + 0.22, 0, 1);
+    /* A RADIOACTIVE ROCK IS ITS OWN SOURCE (ASTEROID-OVERHAUL §8): the share
+     * of fragments drawn hot. Absent on every family but the asteroid. */
+    var outside = rad;
+    if (facts.radioactive) rad = clamp(rad + facts.radioactive * 4, 0, 1);
     if (rad > 0.72) score += 2;
     else if (rad > 0.42) score += 1;
 
@@ -189,7 +193,10 @@ CC.Hazard = (function () {
     if (cold < -215 || hot > 900) floor = 4;              /* at least Lethal */
     if (floor > idx) idx = floor;
 
-    return { rating: RATINGS[idx], score: score, radiation: rad };
+    /* The radiation REPORTED is the external figure — what the sky and the
+     * star do. The flavour pool's "stellar flares" line reads it, and a
+     * radioactive rock is not a flare; its own line reads `radioactive`. */
+    return { rating: RATINGS[idx], score: score, radiation: outside };
   }
 
   return {

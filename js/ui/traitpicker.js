@@ -83,14 +83,16 @@ CC.TraitPicker = (function () {
    * data/traits.js because it is UI copy, not generation data. */
   var BLURB = {
     "mineral-veins": "Branching bright veins threading through the mantle.",
-    "ore-deposits": "Clustered pockets of valuable rock in the crust.",
+    "ore-deposits": "Bright mineralised patches through the crust, or an asteroid's shell.",
     "void-pockets": "Dark cavities and empty space inside the crust.",
     "magma-chambers": "Glowing pockets of melt high in the mantle, pushing toward the surface.",
     "metal-rich": "Bright metallic flecks scattered through the whole interior.",
     "ring-system": "Bands of orbiting material passing behind and in front of the body.",
     "debris-belt": "A scattered field of rubble and fragments in orbit.",
     "cratered": "Impact scars across the surface, in every size.",
-    "impact-basin": "One to five enormous craters, deep enough to show in the crust."
+    "impact-basin": "One to five enormous craters, deep enough to show in the crust.",
+    "mining-station": "Boxy surface installations bolted into an asteroid's shell.",
+    "tunnel-borer": "Boring machines driving into an asteroid, each trailing the tunnel it cut."
   };
 
   function build() {

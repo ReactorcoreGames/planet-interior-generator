@@ -773,30 +773,37 @@ CC.DrawDetails = (function () {
       var val = clamp(base * (1.0 + k * 0.46), 0.13, 0.86);
 
       mats.push({
-        body: CC.Color.hsva(hue, sat, val, alpha),
-        /* The lit face and the shaded one. A narrower spread than a debris
-         * chunk's, because these fragments are packed against each other
-         * rather than tumbling in sunlight — the light in here is bounced. */
-        /* THE LIT FACE AND THE SHADED ONE, AND THE SPREAD IS WIDE.
-         *
-         * The first version ran +0.13 / x0.52 around the body value, which is
-         * the spread a debris chunk uses — and a debris chunk is thirty pixels
-         * across where these are two hundred. Rendered, the cells came out
-         * FLAT: the gradient existed and was invisible, so the interior read
-         * as a field of tiles in slightly different colours, which is the
-         * "mosaic pattern laid over a circle" the done-condition forbids.
-         *
-         * The amount of shading a shape needs is a function of how large it is
-         * — a big surface shows its curvature and a small one cannot — so a
-         * mark this size wants roughly three times a chunk's spread. What
-         * makes a polygon read as a solid lump rather than as an area of
-         * colour is that its two ends are clearly different. */
-        lit: CC.Color.hsva(hue + 5, clamp(sat * 0.70, 0, 1),
-                           clamp(val + 0.30, 0, 0.95), alpha),
-        shadow: CC.Color.hsva(hue - 8, clamp(sat * 1.25, 0, 1),
-                              clamp(val * 0.34, 0.04, 1), alpha)
+        /* ONE FLAT COLOUR PER MATERIAL. The lit and shaded variants this
+         * used to carry drove a per-cell gradient that read as polish, and
+         * they went with it (ASTEROID-OVERHAUL §2). */
+        body: CC.Color.hsva(hue, sat, val, alpha)
       });
     }
+
+    /* HOW ROUGH THE CUT FACE IS, AND COHESION DECIDES IT (§8, brittleness).
+     *
+     * A loose aggregate's fragments are crumbly and granular; a monolith's
+     * slabs are dense stone whose interest is in larger-scale mottling. So
+     * the fine grain rises and the mottle falls as Cohesion drops — brittle
+     * rock looks different up close as well as in the large. The grain's
+     * figure is the review's own "monochrome gaussian, 30%", centred on it. */
+    var coh = el.cohesion === undefined ? 0.5 : clamp(el.cohesion, 0, 1);
+
+    /* The fan's own stone-leaned hue, so a void is the same rock in shadow
+     * rather than a fourth, differently coloured stone. */
+    var stoneHue = colour.h + (((34 - colour.h + 540) % 360) - 180) * 0.70;
+
+    /* RADIOACTIVE FRAGMENTS (ASTEROID-OVERHAUL §8) — the cells buildMosaic
+     * marked `hot`. A sickly yellow-green or a cold blue-white, one per body
+     * so a rock's hot material is one material, and stronger up the range.
+     * The glow is the mark that says RADIOACTIVE rather than merely
+     * differently coloured, so it only arrives near the top. */
+    var rad = el.radioactivity || 0;
+    var hotK = clamp((rad - 0.35) / 0.65, 0, 1);
+    var hotHue = ((el.seed || 0) * 7.7 % 1) < 0.6 ? 82 : 192;
+    var hot = CC.Color.hsva(hotHue, 0.24 + hotK * 0.28,
+                            clamp(0.38 + colour.v * 0.25 + hotK * 0.16, 0, 0.88), alpha);
+    var hotGlow = clamp((rad - 0.62) / 0.38, 0, 1);
 
     return {
       materials: mats,
@@ -806,57 +813,53 @@ CC.DrawDetails = (function () {
        * the boundary stroke in draw/scene.js makes. */
       seam: CC.Color.hsva(colour.h - 4, clamp(colour.s * 1.1, 0, 1),
                           clamp(colour.v * 0.20, 0.02, 0.16), alpha),
-      /* A VOID IS LEFT AS THE SEAM GROUND. Filling it with anything else would
-       * make it a fourth material; leaving it is what makes it a hole. */
       voidFill: null,
-      /* THE SHEEN the spec asks for — "slightly shiny". Pale and
-       * low-saturation, because a reflection carries the light's colour rather
-       * than the rock's, but kept in the family rather than pushed to white so
-       * it reads as mineral catching the light instead of as a highlight pass
-       * laid over the top.
+      /* A VOID IS A DEEP RECESS, NOT A CUTOUT. Dark and desaturated, in the
+       * rock's own hue, and anchored to the same lifted base the materials
+       * fan around — so a pale stony body has dark-grey pockets and a dark
+       * carbonaceous one has near-black ones, but neither has pitch-black
+       * holes. Floor lighter than walls; the walls sit just above the seam,
+       * so the joint around a pocket still reads as its rim. In the fan's
+       * stone-leaned hue: in the palette's raw hue the pockets read as a
+       * fourth, bluish stone instead of as the same rock in shadow. */
+      voidFloor: CC.Color.hsva(stoneHue, clamp(colour.s * 0.55, 0, 0.24),
+                               (0.24 + clamp(colour.v, 0, 1) * 0.42) * 0.30, alpha),
+      voidMid: CC.Color.hsva(stoneHue, clamp(colour.s * 0.55, 0, 0.24),
+                             (0.24 + clamp(colour.v, 0, 1) * 0.42) * 0.19, alpha),
+      voidWall: CC.Color.hsva(stoneHue - 4, clamp(colour.s * 0.60, 0, 0.26),
+                              (0.24 + clamp(colour.v, 0, 1) * 0.42) * 0.09, alpha),
+      /* THE SAME RECESS AS A CONTINUOUS RAMP, wall (0) to floor (1), for the
+       * caves (draw/caves.js): a cave and a rubble void are the same kind of
+       * darkness at two scales, so they come from one formula. */
+      voidRamp: function (t) {
+        t = clamp(t, 0, 1);
+        return CC.Color.hsva(stoneHue - 4 * (1 - t),
+                             clamp(colour.s * (0.60 - 0.05 * t), 0, 0.26 - 0.02 * t),
+                             (0.24 + clamp(colour.v, 0, 1) * 0.42) * (0.09 + 0.21 * t),
+                             alpha);
+      },
+      /* ICE IN A VOID — pale, cold and faintly blue whatever the rock's hue,
+       * because what makes it read as ice is that it is NOT another stone.
+       * Only voids the builder marked `icy` take it (see `voidIce`). */
+      iceFill: CC.Color.hsva(205, 0.11, 0.70, alpha * 0.90),
+      hot: hot,
+      hotGlow: hotGlow > 0
+        ? CC.Color.hsva(hotHue, 0.55, 0.92, alpha * hotGlow * 0.42) : null,
+      hotGlowEdge: CC.Color.hsva(hotHue, 0.55, 0.92, 0),
+      grainAlpha: (0.32 - coh * 0.12) * alpha,
+      mottleAlpha: (0.11 + coh * 0.09) * alpha,
+      /* ---- THE GRIT ----------------------------------------------------
        *
-       * FAINT. The first version ran at alpha 0.55 as a stroked crescent and
-       * was the loudest thing in the picture; as a gradient it covers far more
-       * of each cell, so it has to be much weaker to add up to the same
-       * amount of light. A sheen that is legible as a shape is not a sheen. */
-      glint: CC.Color.hsva(colour.h + 10, clamp(colour.s * 0.26, 0, 0.24),
-                           clamp(colour.v * 0.55 + 0.42, 0.55, 0.94),
-                           alpha * 0.11),
-      /* WHERE THE SHEEN GOES, which is to nothing. Fading towards nothing is
-       * not ending at nothing (D156): the stop has to be the same colour at
-       * zero alpha, or the gradient interpolates through grey and leaves a
-       * dirty smear across the middle of every fragment. */
-      glintOut: CC.Color.hsva(colour.h + 10, clamp(colour.s * 0.26, 0, 0.24),
-                              clamp(colour.v * 0.55 + 0.42, 0.55, 0.94), 0),
-      /* HALVED AGAIN AFTER THE GRIT LANDED. The sheen was tuned when the
-       * fragments were smooth, and against a smooth surface it read as
-       * subtle; against a gritty one it was the second thing making the rock
-       * look polished. D158 exactly — two marks each calibrated alone are not
-       * a calibrated pair, and the composite is what has to be judged. */
-      /* ---- THE GRIT, which is what makes it ore rather than tile --------
-       *
-       * The three colours above are all continuous fields across a cell, and a
-       * surface described only by continuous fields is a POLISHED one. These
-       * two are the discontinuous mark that says the rock is rough: dark
-       * pitting and the matte of a fracture face, with brighter mineral
-       * inclusions scattered among it.
-       *
-       * BOTH POLARITIES ARE REQUIRED. Dark alone reads as dirt on the surface;
-       * bright alone reads as sparkle, which is the shiny look being fixed.
-       * Rock is dark-speckled with occasional bright grains, and it is the
-       * combination that reads as ore-bearing stone.
-       *
-       * Kept in the layer's own hue, like every other mark in the project — a
-       * neutral grey grit would sit ON the fragment rather than in it. */
+       * The discrete mark the texture tiles are too fine to make: dark
+       * pitting with brighter mineral inclusions among it. BOTH POLARITIES
+       * ARE REQUIRED — dark alone reads as dirt, bright alone as sparkle.
+       * Kept in the layer's own hue, so it sits in the fragment rather than
+       * on it. */
       grit: CC.Color.hsva(colour.h - 10, clamp(colour.s * 1.25, 0, 0.55),
                           0.05, alpha * 0.40),
       gritLight: CC.Color.hsva(colour.h + 14, clamp(colour.s * 0.45, 0, 0.32),
                                clamp(colour.v * 0.40 + 0.46, 0.48, 0.86),
-                               alpha * 0.42),
-      /* ONE LIGHT DIRECTION FOR THE WHOLE FIELD. Upper-left, matching the
-       * relief shading and the debris chunks, so a body lit from one side
-       * stays lit from one side across every mark on it. */
-      light: { x: -0.55, y: -0.83 }
+                               alpha * 0.42)
     };
   }
 
@@ -871,6 +874,10 @@ CC.DrawDetails = (function () {
       case "chunk":   return rockFill(colour, el, alpha);
       case "storm":   return stormFill(colour, el, alpha);
       case "capsule": return hullFill(colour, el, alpha);
+      /* Built things that are not hulls — the same metal, flat-faced. See
+       * draw/primitives/machines.js. */
+      case "plate":   return hullFill(colour, el, alpha);
+      case "borer":   return hullFill(colour, el, alpha);
       case "shard":   return gemFill(colour, el, alpha);
       /* A loop of glowing gas and a magnetically-structured dark patch —
        * neither expressible as a colour string. See each function. */

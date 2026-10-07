@@ -116,6 +116,7 @@ not.
 | `docs/HAZARDS.md` | Hazard, condition and flavour text pools |
 | `docs/ROADMAP.md` | MVP scope and build phases |
 | `docs/CLIMATE-PLAN.md` | **Planned, not built.** Design for the climate system: polar caps, sea ice, Orbital distance |
+| `docs/ASTEROID-OVERHAUL.md` | **Built** (Sessions U1 and U2). The asteroid's second pass: the body (silhouette, unshaded cells, brittleness) in U1; caves, the Caverns axis, the borer, `plate` and Radioactivity in U2. Support pillars deferred |
 
 ---
 

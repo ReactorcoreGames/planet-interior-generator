@@ -416,7 +416,11 @@ CC.TraitRoll = (function () {
       tiers: trait.tiers || 1,
       size: trait.size,
       sizeRel: trait.sizeRel,
-      depth: traitDepth(trait, body),
+      /* A LAYER MAY RE-STATE WHERE IN ITSELF A TRAIT SITS, by trait id —
+       * the asteroid's shell asks an impact basin to span its whole band,
+       * since its real edges wander past any fixed fraction of it. */
+      depth: (layer.traitDepth && layer.traitDepth[trait.id]) ||
+             traitDepth(trait, body),
       alpha: trait.alpha,
       arc: trait.arc,
       tone: trait.tone || "lighter",
@@ -533,6 +537,9 @@ CC.TraitRoll = (function () {
        * correctly three files away. Anything the renderer must see that is not
        * already part of the recipe format belongs on this loop. */
       made[i].escapes = trait.escapes;
+      /* SEATED ON THE DRAWN SURFACE — see `seatOn` in draw/scene.js. Stamped
+       * here for the same D159 reason as `escapes`. */
+      made[i].seat = trait.seat;
       /* Traits are not layer details, so the Flow indicators dropdown does not
        * govern them — it means "how diagrammatic is the circulation", which is
        * a statement about layers. */
@@ -930,6 +937,9 @@ CC.TraitRoll = (function () {
 
       var layer = anchorLayer(trait, body);
       if (!layer) continue;
+      /* The layer answers this trait with its own marks — see
+       * `absorbedScale` in gen/details.js. Nothing of the trait's is drawn. */
+      if (layer.absorbs && layer.absorbs[trait.id]) continue;
 
       var made = placeOne(trait, body, layer, params, seed, zones, ground,
                           sectors);

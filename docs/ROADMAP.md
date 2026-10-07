@@ -69,7 +69,7 @@ primitives every later family can use.
 five done-conditions checked rather than asserted; see
 [session-m-stars.md](progress/session-m-stars.md).
 
-**Next up: Phase 7 — moon, ice moon, asteroid.** The superseded pointer below
+**Next up: Phase 7's compact group** (neutron star, pulsar, black hole); the moon, ice moon and asteroid are done (Sessions S, T, U1, U2). Then the nebula. The superseded pointer below
 is kept for the reasoning it carries. See
 [roadmap/phase-6-stars.md](roadmap/phase-6-stars.md), and read
 [roadmap/climate-foundation.md](roadmap/climate-foundation.md) first — a star

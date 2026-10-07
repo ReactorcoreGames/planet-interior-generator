@@ -77,6 +77,32 @@ CC.Traits = (function () {
    * `gaseous` and `no-surface`; the crater traits require `solid-surface` and
    * are therefore simply not offered. Nothing anywhere asks "is this a gas
    * giant". */
+  /* AND WHEN ITS ANCHOR CAN RESOLVE ON THIS ARCHETYPE AT ALL.
+   *
+   * Tags say "this kind of body"; they do not say "this body has the layer
+   * the trait attaches to". A trait whose anchor names no role in the
+   * archetype's stack rolled, appeared on the card and drew nothing — four
+   * asteroid traits did exactly that for a whole session (ASTEROID-OVERHAUL
+   * §6). Checked against the archetype's STACK rather than a built body, so
+   * an optional layer still counts: the trait is offered, and on the bodies
+   * where that layer did not roll it simply has nowhere to go, which is the
+   * old behaviour and an honest one.
+   *
+   * `orbit` and `surface` are reserved tokens that resolve on every body. */
+  function anchorResolves(trait, archetype) {
+    var stack = archetype && archetype.stack;
+    if (!stack) return true;
+    var list = Array.isArray(trait.anchor) ? trait.anchor : [trait.anchor];
+    for (var i = 0; i < list.length; i++) {
+      var a = list[i];
+      if (a === undefined || a === "orbit" || a === "surface") return true;
+      for (var s = 0; s < stack.length; s++) {
+        if (stack[s].role === a) return true;
+      }
+    }
+    return false;
+  }
+
   function eligible(archetype) {
     var tags = (archetype && archetype.tags) || [];
     var out = [];
@@ -86,6 +112,7 @@ CC.Traits = (function () {
       for (var r = 0; r < (t.requires || []).length; r++) {
         if (tags.indexOf(t.requires[r]) < 0) { ok = false; break; }
       }
+      if (ok && !anchorResolves(t, archetype)) ok = false;
       if (ok) out.push(t);
     }
     return out;

@@ -824,6 +824,7 @@ CC.Presets = (function () {
       blurb: "Barely one object. A few hundred fragments held together by gravity, and not much of that.",
       set: {
         "cohesion": 4,
+        "caverns": 0,
         "starlight": 30,
         "interior-heat": 12,
         "boundary-irregularity": 100,
@@ -849,6 +850,7 @@ CC.Presets = (function () {
       blurb: "The exposed heart of something larger. Solid metal, and no easy way into it.",
       set: {
         "cohesion": 96,
+        "caverns": 8,
         "starlight": 38,
         "interior-heat": 30,
         "boundary-irregularity": 85,
@@ -859,7 +861,7 @@ CC.Presets = (function () {
         "contrast": 120,
         "detail-density": 62
       },
-      traits: ["metal-rich", "ore-deposits"],
+      traits: ["ore-deposits"],
       traitsOff: ["shattered"]
     },
     {
@@ -868,12 +870,13 @@ CC.Presets = (function () {
       archetype: "asteroid",
       /* THE REASON TO GO. A cold carbonaceous body with water packed into
        * the voids — fuel, air and shielding from one hole in the ground.
-       * Cohesion mid-low so there are voids for the ice to sit in, which
-       * is the coupling that makes the trait and the slider one picture
-       * rather than two. */
+       * NO TRAIT: the ice is the mosaic's own `voidIce`, driven by Starlight
+       * (ASTEROID-OVERHAUL §3). Starlight low so the voids keep their ice;
+       * Cohesion mid-low so there are voids for it to sit in. */
       blurb: "Water ice in every gap. Out here that is fuel, air and shielding at once.",
       set: {
         "cohesion": 30,
+        "caverns": 45,
         "starlight": 14,
         "interior-heat": 5,
         "boundary-irregularity": 92,
@@ -884,21 +887,23 @@ CC.Presets = (function () {
         "contrast": 110,
         "detail-density": 76
       },
-      traits: ["ice-rich"],
+      traits: [],
       traitsOff: []
     },
     {
       id: "hollowed-rock",
       label: "Hollowed Rock",
       archetype: "asteroid",
-      /* THE PHASE DOC'S OWN "most evocative" ENTRY: "a low-Cohesion
-       * asteroid with something built inside it". Both artificial traits
-       * at once, so the chamber and the plant that dug it read as one
-       * story — the workings are bolted to the crust and the space they
-       * excavated is underneath them. */
-      blurb: "Somebody got here first. There is a chamber inside it that nothing natural cut.",
+      /* THE PHASE DOC'S OWN "most evocative" ENTRY: "an asteroid with
+       * something built inside it". The chamber half went with the retired
+       * `hollowed-out` trait (ASTEROID-OVERHAUL §4) and is back as a position
+       * on the Caverns axis (§7): near the top, so the interior is mined
+       * halls and bores, with the plant on the crust and a borer still
+       * working. Cohesion held above the cap's ramp so all of it stands. */
+      blurb: "Somebody got here first. Halls and bores right through it, and the plant still bolted to the crust.",
       set: {
         "cohesion": 62,
+        "caverns": 96,
         "starlight": 42,
         "interior-heat": 18,
         "boundary-irregularity": 88,
@@ -909,7 +914,7 @@ CC.Presets = (function () {
         "contrast": 116,
         "detail-density": 68
       },
-      traits: ["hollowed-out", "mining-station"],
+      traits: ["mining-station", "tunnel-borer"],
       traitsOff: ["shattered"]
     }
   ];

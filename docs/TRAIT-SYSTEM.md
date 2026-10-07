@@ -478,7 +478,8 @@ is what stops each trait needing its own renderer.
 | `flow-line` | Curved motion line, no head | Subtle circulation | ✅ |
 | `ring-band` | Concentric elliptical band | Ring systems | ✅ |
 | `chunk` | Small angular polygon | Debris, asteroids | ✅ |
-| `plate` | Rectangle, rotatable | Platforms, hab modules, city blocks | ⬜ P9 |
+| `plate` | Rectangle, rotatable — a block, a truss frame or a pad, by seed | Platforms, hab modules, city blocks; the asteroid's mining station | ✅ Session U2 |
+| `borer` | A tunnel-boring machine pointing along its own bore | Tunnel borer; the bore itself is part of the cave system | ✅ Session U2 |
 | `truss` | Thin connecting line | Orbital rings, structure spans | ⬜ P9 |
 | `glyph` | Triangle / X / small marker | Ships, satellites, minefields | ⬜ P9 |
 | `gradient-band` | Soft colour transition | Atmospheres, halos | ✅ |

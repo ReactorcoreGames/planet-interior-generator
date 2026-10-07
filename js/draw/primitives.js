@@ -366,7 +366,10 @@ CC.Primitives = (function () {
      * that meets the ground. Same {rim, mid, floor} triple the wedge takes. */
     if (style && style.rim) {
       var w = Math.max(0.5, view.px(el.thickness || el.size));
-      var rc = view.px(el.radius);
+      /* Scaled by the body's form at this bearing: a radial gradient cannot
+       * bend, so it is matched to the warp locally (draw/canvas.js). */
+      var fk = view.formAt ? view.formAt(el.radius, el.angle) : 1;
+      var rc = view.px(el.radius) * fk;
       var g0 = Math.max(0, rc - w * 0.5);
       var g1 = rc + w * 0.5;
       if (g1 - g0 > 0.5) {
@@ -630,8 +633,9 @@ CC.Primitives = (function () {
      * resolved in draw/details.js as it is for every other primitive, so this
      * function still mixes nothing and knows nothing about palettes. */
     if (style && style.rim) {
-      var gOut = view.px(rOut);
-      var gIn = view.px(rIn);
+      var wk = view.formAt ? view.formAt(rOut, el.angle) : 1;
+      var gOut = view.px(rOut) * wk;
+      var gIn = view.px(rIn) * wk;
       if (gOut - gIn > 0.5) {
         var g = ctx.createRadialGradient(view.cx, view.cy, gIn,
                                          view.cx, view.cy, gOut);

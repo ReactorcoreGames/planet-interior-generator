@@ -40,7 +40,7 @@ After those are done, I'll want a build_release.bat that would take the existing
 --- youtube video title
 --- youtube video description + my links
 --- youtube video tags (comma separated)
--- reddit posts (a few options, each tailored to the subreddit. Before suggesting a subreddit, go check it out if they exist and their rules allow us here.)
+-- reddit posts (a few options, each tailored to the subreddit. Before suggesting a subreddit, go check it out if they exist and their rules allow us here. NOTE: In another session we discovered that we actually can't check this via Claude - they're blocked from doing it.)
 --- 3-5X options/avenues with EITHER title + post (tell me where and how I can weave the link to a post) OR title + (link provided by me, either to youtube video trailer or the actual release page).
 -- maybe some other place(s) you think would be good to release the project in - up to 3 extra places. Skip if not applicable.
 -- generally I want to post my projects into persistent places where people will organically find them while they browse/look for what they want or think what they know what the want.

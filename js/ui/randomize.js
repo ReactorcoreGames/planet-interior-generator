@@ -29,6 +29,10 @@ CC.Randomize = (function () {
      * produce the middle one. It costs nothing on the bodies that have no
      * mosaic, which simply ignore it. */
     { id: "cohesion", lo: 0, hi: 100 },
+    /* Caverns the whole way too: untouched rock, natural caves and a
+     * hollowed-out body are three different pictures, and Cohesion already
+     * thins it on the loose bodies. */
+    { id: "caverns", lo: 0, hi: 100 },
     { id: "ocean-depth", lo: 0, hi: 100 },
     { id: "interior-heat", lo: 0, hi: 100 },
     { id: "rotation", lo: 0, hi: 360 },

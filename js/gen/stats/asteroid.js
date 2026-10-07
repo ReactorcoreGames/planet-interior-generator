@@ -58,8 +58,14 @@ var CC = CC || {};
       if (els[i].kind !== "mosaic") continue;
       var m = els[i];
       var sites = m.sites || [];
-      var hollow = 0;
-      for (var s = 0; s < sites.length; s++) if (sites[s].hollow) hollow++;
+      var hollow = 0, icy = 0;
+      for (var s = 0; s < sites.length; s++) {
+        if (!sites[s].hollow) continue;
+        /* An ICY void is drawn filled and pale, so it is not empty space and
+         * must not be reported as such — the card would then claim holes
+         * where the picture shows ice. Counted separately. */
+        if (sites[s].icy) icy++; else hollow++;
+      }
       return {
         cells: sites.length,
         /* THE VOID FRACTION AS DRAWN, counted off the cells that will actually
@@ -67,8 +73,13 @@ var CC = CC || {};
          * a body with forty cells those two figures differ by several percent,
          * and the one the reader can see is this one. */
         voidFraction: sites.length ? hollow / sites.length : 0,
+        iceFraction: sites.length ? icy / sites.length : 0,
         materials: m.materialCount || 1,
-        cohesion: m.cohesion === undefined ? 1 : m.cohesion
+        cohesion: m.cohesion === undefined ? 1 : m.cohesion,
+        /* HOT FRAGMENTS AS DRAWN — the cells buildMosaic marked radioactive,
+         * counted rather than rederived from the slider. */
+        hotFraction: sites.length ? (m.hotCount || 0) / sites.length : 0,
+        radioactivity: m.radioactivity || 0
       };
     }
     return null;
@@ -130,6 +141,18 @@ var CC = CC || {};
    * because the practical consequence is what makes the difference matter. */
   function structureOf(mosaic) {
     if (!mosaic) return null;
+    var line = structureLadder(mosaic);
+    /* THE ICE IS ON THE PICTURE, SO IT IS ON THE CARD. Pale filled voids are
+     * the most visible mark a cold body carries; leaving them unexplained
+     * would be the picture saying something the card does not. */
+    if (mosaic.iceFraction > 0.03) {
+      line += " Ice fills another " + Math.round(mosaic.iceFraction * 100) +
+              "% - water, frozen into the gaps between the pieces.";
+    }
+    return line;
+  }
+
+  function structureLadder(mosaic) {
     var vf = mosaic.voidFraction;
     var n = mosaic.cells;
 
@@ -149,6 +172,73 @@ var CC = CC || {};
     }
     return "Effectively monolithic - " + n + " large welded blocks and almost " +
            "no void. You could anchor to this.";
+  }
+
+  /* ---- radioactivity ---------------------------------------------------- */
+
+  /* WHAT THE HOT FRAGMENTS MEAN for someone going there (ASTEROID-OVERHAUL
+   * §8). Read off the cells that were drawn hot; null when none were, so the
+   * row is absent on an ordinary rock. The glow arrives at the same point on
+   * the slider as the "glowing" wording, so the card and the picture agree. */
+  function radioactivityOf(mosaic) {
+    if (!mosaic || mosaic.hotFraction <= 0) return null;
+    var pct = Math.max(1, Math.round(mosaic.hotFraction * 100));
+    if (mosaic.radioactivity > 0.62) {
+      return "Dangerously radioactive. About " + pct + "% of the fragments are " +
+             "hot enough to glow - shielding is not optional.";
+    }
+    if (pct >= 4) {
+      return "Radioactive. About " + pct + "% of the fragments are hot " +
+             "material; keep the visits short.";
+    }
+    return "Slightly radioactive - a few fragments of hot material, nothing a " +
+           "suit cannot handle.";
+  }
+
+  /* ---- caverns ---------------------------------------------------------- */
+
+  /* WHAT HAS BEEN CUT THROUGH IT, read off the cave system that was drawn
+   * (gen/caves.js) — its passages, chambers and mouths counted, and its area
+   * MEASURED by rasterizing the same geometry the renderer draws. Null when
+   * nothing is cut, so the row does not appear on untouched rock. */
+  function cavernsOf(caves) {
+    if (!caves) return null;
+    var n = caves.counts || {};
+    var pct = Math.round((caves.area || 0) * 100);
+    var bits = [];
+    function count(k, one, many) {
+      if (k > 0) bits.push(k + " " + (k === 1 ? one : many));
+    }
+    count(n.caves, "winding passage", "winding passages");
+    count(n.pockets, "natural chamber", "natural chambers");
+    count(n.bores, "bored tunnel", "bored tunnels");
+    count(n.halls, "mined hall", "mined halls");
+
+    var head;
+    if (n.halls >= 3 && caves.area > 0.12) {
+      head = "Hollowed out - a mine, and a big one.";
+    } else if (n.halls || n.bores) {
+      head = n.caves ? "Natural caves, with tunnels bored between them."
+                     : "Mined. Somebody has tunnelled into it.";
+    } else if (n.caves || n.pockets) {
+      head = "Natural caves.";
+    } else {
+      head = "Bored into.";
+    }
+    var line = head;
+    if (bits.length) {
+      line += " " + bits.join(", ").replace(/, ([^,]*)$/, " and $1") +
+              (pct >= 1 ? ", about " + pct + "% of the interior" : "") + ".";
+    }
+    if (caves.exits > 0) {
+      line += " " + (caves.exits === 1 ? "One opens" : caves.exits + " open") +
+              " to space.";
+    }
+    if (n.borers > 0) {
+      line += n.borers === 1 ? " A boring machine is still working its way in."
+                             : " " + n.borers + " boring machines are still working their way in.";
+    }
+    return line;
   }
 
   /* ---- standing on it --------------------------------------------------- */
@@ -264,8 +354,13 @@ var CC = CC || {};
        * value is known. */
       var mosaic = mosaicOf(details);
       var voidFrac = mosaic ? mosaic.voidFraction : 0.06;
+      /* CAVES ARE HOLE TOO. They cut through fragments and rubble voids
+       * alike, so the share they add is their area of what was not already
+       * empty. Measured off the drawn geometry (gen/caves.js `measure`). */
+      var caveArea = details.caves ? (details.caves.area || 0) : 0;
+      var emptyFrac = voidFrac + (1 - voidFrac) * caveArea;
       /* Solid rock, less whatever fraction of the volume is hole. */
-      var rho = 3300 * (1 - clamp(voidFrac, 0, 0.45));
+      var rho = 3300 * (1 - clamp(emptyFrac, 0, 0.55));
       var gravity = 6.674e-11 * (4 / 3) * Math.PI * rho * (radius * 1000) / 9.81;
 
       var lo = toCelsius(climate.min), hi = toCelsius(climate.max);
@@ -302,6 +397,12 @@ var CC = CC || {};
         cohesion: mosaic ? mosaic.cohesion : 1,
         voidFraction: mosaic ? mosaic.voidFraction : 0,
         cells: mosaic ? mosaic.cells : 0,
+        iceFraction: mosaic ? mosaic.iceFraction : 0,
+        caveArea: caveArea,
+        /* The share of fragments drawn hot — the hazard scorer reads it. */
+        radioactive: mosaic ? mosaic.hotFraction : 0,
+        excavated: !!details.caves && !!details.caves.counts &&
+                   (details.caves.counts.halls + details.caves.counts.bores) > 0,
         materials: mosaic ? mosaic.materials : 1,
         rubble: !!mosaic && mosaic.voidFraction > 0.18,
         monolithic: !!mosaic && mosaic.voidFraction < 0.05,
@@ -346,6 +447,8 @@ var CC = CC || {};
         { key: "composition", label: "Composition",
           value: compositionOf(shared.palette, mosaic) },
         { key: "structure", label: "Structure", value: structureOf(mosaic) },
+        { key: "caverns", label: "Inside", value: cavernsOf(details.caves) },
+        { key: "radioactivity", label: "Radioactivity", value: radioactivityOf(mosaic) },
         { key: "atmosphere", label: "Atmosphere", value: atmosphere.text },
         { key: "notable", label: "Notable", value: CC.Flavour.notableOf(facts, rng) },
         { key: "resources", label: "Resources", value: CC.Flavour.resourceOf(facts, rng) },
@@ -376,7 +479,7 @@ var CC = CC || {};
   var LEVELS = {
     compact: ["size", "gravity", "structure", "danger"],
     standard: ["size", "gravity", "standing", "temp", "composition",
-               "structure", "danger"],
+               "structure", "caverns", "radioactivity", "danger"],
     full: null
   };
 
@@ -386,6 +489,8 @@ var CC = CC || {};
     mosaicOf: mosaicOf,
     compositionOf: compositionOf,
     structureOf: structureOf,
+    cavernsOf: cavernsOf,
+    radioactivityOf: radioactivityOf,
     standingOn: standingOn
   };
 })();

@@ -28,6 +28,7 @@ echo  Copying app files...
 copy /y "index.html"  "dist\"  >nul || goto :copyfail
 copy /y "style.css"   "dist\"  >nul || goto :copyfail
 if exist "README.md" copy /y "README.md" "dist\" >nul
+if exist "favicon.ico" copy /y "favicon.ico" "dist\" >nul
 
 REM Source folders. Trailing backslash on the destination tells xcopy the
 REM target is a directory rather than prompting "(F)ile or (D)irectory?",

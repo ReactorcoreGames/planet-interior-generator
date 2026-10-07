@@ -6,18 +6,20 @@
  *
  * ---- WHAT IS NOT HERE, AND WHY -------------------------------------------
  *
- * The spec's eligible list is
+ * WHAT AN AGGREGATE IS MADE OF BELONGS TO THE MOSAIC, NOT TO THIS POOL
+ * (ASTEROID-OVERHAUL §3). The ore is in particular fragments, so composition is
+ * the material fan, the palette and the card that reads them back. A trait
+ * that restated it would be a second source of truth for one fact. So:
  *
- *   metal-rich · ice-rich · shattered · mineral-veins · ore-deposits ·
- *   hollowed-out (artificial) · mining-station · docked-ships · derelict-hulk
+ *   ice-rich        deleted. An icy asteroid is a cold body whose voids hold
+ *                   ice — see `voidIce` on the mosaic recipe.
+ *   metal-rich,     no longer anchor to `interior`; they stay alive on the
+ *   mineral-veins   planet and moon mantles.
+ *   hollowed-out    retired. It was a `wedge` — a pie slice from the centre —
+ *                   and no tuning makes that an excavated chamber. Interior
+ *                   structure is planned as an axis, not a trait (§7).
  *
- * `metal-rich`, `mineral-veins` and `ore-deposits` ALREADY EXIST in
- * js/data/traits/solid.js and are not redeclared here. What they needed was an
- * anchor that resolves on a body with no crust and no mantle, which is a
- * one-word edit to their `anchor` field rather than a duplicate trait — see
- * D77: `anchor` may be a list, and a role may not exist on every archetype in
- * a family. Copying them would have given the asteroid its own private
- * mineral vein that drifts from the planet's the first time either is tuned.
+ * Traits here describe what HAPPENED to the body, not what it IS.
  *
  * `rubble-pile` and `void-riddled` are DELIBERATELY ABSENT as traits. The spec
  * folds them into the Cohesion axis, for the reason quoted in index.html: they
@@ -77,108 +79,20 @@ var CC = CC || {};
     tags: ["damage"]
   };
 
-  /* ---- ice-rich --------------------------------------------------------- */
-
-  /* WATER, HELD IN THE VOIDS AND ALONG THE JOINTS.
-   *
-   * The spec's trait, and the reason half the asteroids in fiction are worth
-   * visiting: a carbonaceous body carries water and water is fuel. What makes
-   * it a picture rather than a caption is WHERE it sits — an asteroid's ice is
-   * not a shell and not a sea, it is filling in the gaps between the
-   * fragments, which is the one place this body has that no other body does.
-   *
-   * BLOBS RATHER THAN VEINS, and the choice matters. A vein is a crack that
-   * something flowed along; ice here did not flow, it was there when the
-   * fragments settled around it. So the mark is a rounded pocket sitting
-   * between pieces, and it is BRIGHT — the only bright mass in an interior
-   * whose every other mark is dark. That is the different register the trait
-   * needs, and it is also simply what ice looks like against rock. */
-  var ICE_RICH = {
-    id: "ice-rich",
-    label: "Ice-Rich",
-    anchor: "interior",
-    reach: "on",
-    depth: [0.08, 0.92],
-    arc: [0, 360],
-    repeat: [5, 14],
-    spacing: "clustered",
-    jitter: 0.62,
-    mirror: false,
-    offset: [0, 360],
-    element: "blob",
-    tiers: 3,
-    sizeRel: true,
-    size: [0.06, 0.16],
-    alpha: [0.45, 0.80],
-    density: { min: 12, max: 64 },
-    /* LIGHTER, and it is the whole mark. Everything else in this layer runs
-     * from mid to black; a pale mass is immediately legible as a different
-     * material rather than as another fragment. */
-    tone: "lighter",
-    requires: ["fragmented"],
-    excludes: [],
-    tags: ["resource"]
-  };
-
-  /* ---- hollowed-out ----------------------------------------------------- */
-
-  /* SOMEBODY GOT HERE FIRST.
-   *
-   * The spec marks it `(artificial)` and it is the most evocative output the
-   * family makes — the phase doc's own "most evocative" list ends with "a
-   * low-Cohesion asteroid with something built inside it".
-   *
-   * A CHAMBER, NOT A CAVITY. The mosaic already produces voids by the dozen at
-   * a low Cohesion, so an excavation drawn as another hole would be invisible
-   * on exactly the bodies the trait is best on. What says "made" rather than
-   * "happened" is that it is REGULAR: a large smooth-walled space with a flat
-   * floor, where everything around it is angular. `wedge` with a dark floor is
-   * the excavation primitive the impact basin already uses, and here it is
-   * doing the same job from the inside out.
-   *
-   * It sits DEEP and takes a big arc, because a hollowed asteroid is hollowed
-   * at its centre — that is where the rock is thickest overhead, which is the
-   * entire reason anyone would do it. */
-  var HOLLOWED_OUT = {
-    id: "hollowed-out",
-    label: "Hollowed Out",
-    anchor: "interior",
-    reach: "on",
-    depth: [0.0, 0.52],
-    arc: [55, 120],
-    repeat: [1, 2],
-    spacing: "even",
-    jitter: 0.2,
-    mirror: false,
-    offset: [0, 360],
-    element: "wedge",
-    tiers: 1,
-    alpha: [0.80, 0.95],
-    density: { min: 1, max: 2 },
-    tone: "darker",
-    /* Its floor goes nearly black, for the impact basin's reason: what makes a
-     * space read as a space rather than as a dark patch is that you cannot see
-     * the back of it. */
-    floor: 0.90,
-    requires: ["fragmented"],
-    excludes: [],
-    tags: ["artificial"]
-  };
-
   /* ---- mining-station --------------------------------------------------- */
 
   /* THE WORKINGS, and they are on the OUTSIDE.
    *
-   * `hollowed-out` is the excavated space; this is the plant that did it —
-   * pressure hulls and processing gear set into the crust, which is where they
-   * would actually be. Anchored to the shell rather than the interior so the
-   * two traits compose into one story when they both roll: a station on the
-   * surface and the chamber it dug beneath.
+   * Buildings, frames and pads set into the crust, which is where they would
+   * actually be — anchored to the shell rather than the interior.
    *
-   * `capsule` is the machined-hull primitive the gas-miner platforms use, and
-   * reusing it is the point — a pressure hull is a pressure hull wherever it
-   * is bolted, and inventing a second one would be a new mark for a difference
-   * that does not exist.
+   * RECTANGLES, NOT CAPSULES (ASTEROID-OVERHAUL §5). This used to reuse the
+   * gas miner's `capsule` on the argument that a pressure hull is a pressure
+   * hull wherever it is bolted. The user disagreed and the reason is about
+   * gravity: a capsule is a shape for holding pressure or riding a wind, and
+   * an installation on a body with a thousandth of a g is a FRAME — boxes,
+   * trusses, landing pads. `plate` draws all three (machines.js), so a
+   * clustered handful reads as one installation.
    *
    * `named: true` exempts it from the tier-alpha penalty and the clumping
    * variation, because these are a handful of individually meaningful objects
@@ -187,21 +101,80 @@ var CC = CC || {};
     id: "mining-station",
     label: "Mining Station",
     anchor: ["outer-shell", "crust"],
-    reach: "on",
-    depth: [0.10, 0.95],
+    /* ON THE SURFACE, A QUARTER SUNK IN. `spanning` takes it out of the
+     * shell's own clipped pass, where it was buried in the crust and its top
+     * cut off at the outline; `seat` sits each module on the outline as
+     * drawn and tilts it to the local slope (draw/scene.js `seatOn`). */
+    reach: "spanning",
+    seat: 0.25,
+    depth: [0.5, 0.5],
     arc: [0, 360],
-    repeat: [2, 6],
+    repeat: [2, 5],
     spacing: "clustered",
-    jitter: 0.5,
+    jitter: 0.35,
     mirror: false,
     offset: [0, 360],
-    element: "capsule",
+    element: "plate",
+    /* Block proportions, from squat to long. A pad sets its own. */
+    aspect: [0.38, 0.85],
     tiers: 2,
     named: true,
     sizeRel: true,
     size: [0.55, 1.30],
     alpha: [0.78, 0.96],
-    density: { min: 3, max: 11 },
+    /* More marks than the capsule had, because a mark is now one MODULE of
+     * an installation rather than a whole hull. */
+    density: { min: 6, max: 16 },
+    tone: "lighter",
+    requires: ["fragmented"],
+    excludes: [],
+    tags: ["artificial"]
+  };
+
+  /* ---- tunnel-borer ---------------------------------------------------- */
+
+  /* A MACHINE DIGGING IN, AND THE TUNNEL IT LEFT (ASTEROID-OVERHAUL §5).
+   *
+   * The user's idea, from looking at the old capsule stations: "a cylinder
+   * with two spiky triangles on one end and a tunnel trail behind the
+   * cylinder as the tunnel borer dives into the interior". Why it works where
+   * `hollowed-out` failed:
+   *
+   *   - it has a DIRECTION. Every other mark here is a region or a scatter;
+   *     a borer is a vector — it entered there and is now here, and its
+   *     history is drawn behind it;
+   *   - it crosses the shell into the interior, which is what `spanning` is
+   *     for, and argues that the two layers are one body;
+   *   - it is unambiguously artificial in a picture that is otherwise all
+   *     geology, without a caption.
+   *
+   * THE TRAIL IS PART OF THE CAVE SYSTEM, not a mark of its own: gen/caves.js
+   * lays a constant-width bore from where it entered to where it is now, and
+   * draw/caves.js draws it in the same passes as every cavern, so a borer
+   * that reaches a chamber reads as one excavation. This element is only the
+   * machine (draw/primitives/machines.js).
+   *
+   * Placed by the ordinary grammar at the HEAD: a point a good way into the
+   * interior. Sized in body radii — the trail is what carries it at sheet
+   * scale, and the machine can be a dozen pixels. */
+  var TUNNEL_BORER = {
+    id: "tunnel-borer",
+    label: "Tunnel Borer",
+    anchor: "interior",
+    reach: "spanning",
+    depth: [0.42, 0.84],
+    arc: [0, 360],
+    repeat: [1, 3],
+    spacing: "random",
+    jitter: 1,
+    mirror: false,
+    offset: [0, 360],
+    element: "borer",
+    tiers: 1,
+    named: true,
+    size: [0.060, 0.085],
+    alpha: [0.92, 1.0],
+    density: { min: 1, max: 3 },
     tone: "lighter",
     requires: ["fragmented"],
     excludes: [],
@@ -210,8 +183,7 @@ var CC = CC || {};
 
   CC.Traits.register([
     SHATTERED,
-    ICE_RICH,
-    HOLLOWED_OUT,
-    MINING_STATION
+    MINING_STATION,
+    TUNNEL_BORER
   ]);
 })();

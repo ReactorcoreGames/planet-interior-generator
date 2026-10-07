@@ -190,6 +190,9 @@ CC.Layers = (function () {
    * `reverse` traces the same shape the other way round, which is what an
    * even-odd clip needs for the inner edge of an annulus. */
   function traceBoundary(ctx, view, radius, wob, reverse) {
+    /* A warped view has no circles: trace the identity as segments so the
+     * form (draw/canvas.js) bends this edge like every other. */
+    if (!wob && view.form) wob = function () { return 1; };
     if (!wob) {
       /* moveTo first so this starts its OWN subpath. Without it, an arc()
        * following an earlier subpath is joined to it by a straight line,
@@ -330,9 +333,10 @@ CC.Layers = (function () {
     ctx.save();
     ctx.beginPath();
     traceBoundary(ctx, view, layer.outer, wob);
-    ctx.fillStyle = style;
     ctx.globalAlpha = layer.opacity;
-    ctx.fill();
+    /* A recorded gradient on a warped body — see draw/formfill.js. */
+    if (style && style.warped) CC.FormFill.fillWarped(ctx, view, style, wob);
+    else { ctx.fillStyle = style; ctx.fill(); }
     ctx.restore();
   }
 

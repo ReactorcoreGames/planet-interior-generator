@@ -75,7 +75,7 @@ CC.Scene = (function () {
     var r0 = view.px(Math.max(0, layer.inner));
     if (r1 - r0 < 2) return colour.hex;
 
-    var g = ctx.createRadialGradient(view.cx, view.cy, r0, view.cx, view.cy, r1);
+    var g = CC.FormFill.bandGradient(ctx, view, r0, r1);
 
     /* THE GRADIENT BRANCH COMES FIRST, INCLUDING FOR EMISSIVE LAYERS.
      *
@@ -198,6 +198,38 @@ CC.Scene = (function () {
   }
 
 
+
+  /* A MARK THAT SITS ON THE SURFACE, slightly sunk into it.
+   *
+   * Placement happens in body space against nominal radii, and the drawn
+   * outline is that radius times the wobble, the relief and the form — on
+   * the asteroid, a long way from nominal. So an element declaring `seat`
+   * (0..1, how much of its own thickness is buried) is re-seated HERE, where
+   * the silhouette's real boundary function exists: its footprint is sampled
+   * across the outline, it is centred on the mean ground height there, and it
+   * is tilted to the slope between the footprint's ends — a building stands
+   * on the facet it was put on, not on a circle.
+   *
+   * Drawn in the unclipped pass (the spanning trait loop), because the band
+   * clip is what buried the mining stations and cut their tops off. Returns
+   * a copy; the cached element is not touched. */
+  function seatOn(view, el, outer, fn) {
+    var half = el.size * 0.5 / Math.max(0.1, outer);
+    var rAt = function (a) { return outer * (fn ? fn(a) : 1); };
+    var sum = 0, N = 5;
+    for (var k = 0; k < N; k++) sum += rAt(el.angle + (k / (N - 1) * 2 - 1) * half);
+    var p0 = view.at(rAt(el.angle - half), el.angle - half);
+    var p1 = view.at(rAt(el.angle + half), el.angle + half);
+    var out = {};
+    for (var key in el) {
+      if (Object.prototype.hasOwnProperty.call(el, key)) out[key] = el[key];
+    }
+    /* The radial extent of a flat plate is its width, `size × aspect`. */
+    var thick = el.size * (el.aspect === undefined ? 0.5 : el.aspect);
+    out.radius = sum / N + thick * (0.5 - el.seat);
+    out.rot = Math.atan2(p1.x - p0.x, -(p1.y - p0.y));
+    return out;
+  }
 
   function render(ctx, width, height, body, settings, palette, details) {
     settings = settings || {};
@@ -370,6 +402,10 @@ CC.Scene = (function () {
       bodyFrac: settings.bodySize === undefined ? 0.78 : settings.bodySize,
       extent: extent,
       offsetX: settings.offsetX,
+      /* The body's form (js/gen/form.js): the warp every boundary and element
+       * rides, applied inside view.at. Null on every body that declares none. */
+      form: body.form ? CC.Form.fn(body.form) : null,
+      formRotation: body.rotation || 0,
       /* FRAMING RIDES THROUGH UNTOUCHED, which is what makes an export honour
        * the close-up the user set up on screen: export re-renders through this
        * same function with the same settings, so it needs no framing code of
@@ -530,6 +566,27 @@ CC.Scene = (function () {
       }
 
       bounds.push(lvl);
+    }
+
+    /* A LAYER WHOSE EDGE BREAKS UP THROUGH THE ONE ABOVE (js/gen/form.js
+     * `breachFn`). Composed after every boundary exists, because it lifts
+     * this edge toward the ACTUAL drawn edge above — relief included — and at
+     * full breach meets it, so the band above has no thickness there. The
+     * clip and the detail pass both read `bounds`, so the band's own marks
+     * vanish from a breach with no further work. */
+    for (i = 1; i < layers.length; i++) {
+      if (!layers[i].breach || layers[i].outward || layers[i - 1].outward) continue;
+      var brf = CC.Form.breachFn(layers[i], settings, settings.seed);
+      if (!brf) continue;
+      bounds[i] = (function (own, above, rOwn, rAbove, w) {
+        return function (a) {
+          var b = own ? own(a) : 1;
+          var k = w(a);
+          if (k <= 0) return b;
+          var top = (above ? above(a) : 1) * rAbove / rOwn;
+          return b + (top - b) * k;
+        };
+      })(bounds[i], bounds[i - 1], layers[i].outer, layers[i - 1].outer, brf);
     }
 
     /* A layer sitting directly on a relief-bearing layer is DEFERRED: it is
@@ -985,6 +1042,37 @@ CC.Scene = (function () {
       ctx.restore();
     }
 
+    /* --- 3g. caves ---
+     *
+     * Cut through the interior AFTER every layer is drawn, because an exit
+     * runs out through the crust and must cut it; clipped to the body's own
+     * outline, so an exit ends as a mouth at the edge. Before the traits, so
+     * a borer is drawn over the bore it cut. See draw/caves.js. */
+    if (details.caves && silhouette >= 0) {
+      var cvLayer = null, cvMosaic = null;
+      for (i = 0; i < layers.length; i++) {
+        if (layers[i].role === details.caves.role) cvLayer = layers[i];
+      }
+      var cvEls = details.get(details.caves.role);
+      for (i = 0; i < cvEls.length; i++) {
+        if (cvEls[i].kind === "mosaic") { cvMosaic = cvEls[i]; break; }
+      }
+      if (cvLayer && cvMosaic) {
+        var cvStyle = CC.DrawDetails.styleFor("mosaic", palette.get(cvLayer.role),
+                                              cvMosaic, 1);
+        ctx.save();
+        ctx.beginPath();
+        CC.Layers.traceBoundary(ctx, view, layers[silhouette].outer,
+                                bounds[silhouette], false);
+        ctx.clip();
+        CC.CaveDraw.draw(ctx, view, details.caves, {
+          wall: cvStyle.seam, ramp: cvStyle.voidRamp,
+          grainAlpha: cvStyle.grainAlpha, mottleAlpha: cvStyle.mottleAlpha
+        });
+        ctx.restore();
+      }
+    }
+
     /* --- 4. surface-attached traits ---
      *
      * Polar caps and impact basins sit ON the surface, so they are drawn after
@@ -1058,9 +1146,29 @@ CC.Scene = (function () {
       var dTerr = details.terrain[layers[silhouette].role];
       var dReach = layers[silhouette].outer
         + Math.max(0, dTerr ? dTerr.range().hi : 0) * SILHOUETTE_RELIEF;
+      /* NO FROSTING, NO REASON TO REACH PAST THE ROCK. The terrain-peak circle
+       * exists only so a scar can meet the deposit piled above the ground. A
+       * surface nothing is deposited on (the asteroid's shell) clips to its
+       * real silhouette instead — against the peak circle an impact basin
+       * hung off a faceted outline as a dark crescent in open space. */
+      var dSil = layers[silhouette];
+      var dFrosted = (details.filmZoneByRole && details.filmZoneByRole[dSil.role]) ||
+        (details.filmZones && details.filmZones.zones.length);
       ctx.beginPath();
-      CC.Layers.traceBoundary(ctx, view, dReach, null, false);
-      ctx.clip();
+      if (dFrosted) {
+        CC.Layers.traceBoundary(ctx, view, dReach, null, false);
+        ctx.clip();
+      } else {
+        /* And to the BAND, both edges as drawn: the wedge's own inner arc is
+         * a circle, and on a faceted shell it read as a ruled line across
+         * the crust. A basin is a sector of the band, so the band shapes it. */
+        CC.Layers.traceBoundary(ctx, view, dSil.outer, bounds[silhouette], false);
+        if (silhouette + 1 < layers.length) {
+          CC.Layers.traceBoundary(ctx, view, layers[silhouette + 1].outer,
+                                  bounds[silhouette + 1], true);
+        }
+        ctx.clip("evenodd");
+      }
 
       for (var dt = 0; dt < details.damageTraits.length; dt++) {
         var de = details.damageTraits[dt];
@@ -1170,7 +1278,7 @@ CC.Scene = (function () {
          * escaping to interstellar space" into "material stopping at an
          * invisible wall". The guarantee is still the right default; this is
          * the documented exception to it, taken in the second pass below. */
-        if (se.escapes) continue;
+        if (se.escapes || se.seat !== undefined) continue;
         var sAlpha = clampUnit(se.alpha * elementOpacity);
         if (sAlpha <= 0.004) continue;
         var sfn = CC.Primitives.KINDS[se.kind];
@@ -1195,7 +1303,10 @@ CC.Scene = (function () {
        * exists and why it is not the default. */
       for (var xt = 0; xt < details.spanningTraits.length; xt++) {
         var xe = details.spanningTraits[xt];
-        if (!xe.escapes) continue;
+        if (!xe.escapes && xe.seat === undefined) continue;
+        if (xe.seat !== undefined) {
+          xe = seatOn(view, xe, layers[silhouette].outer, bounds[silhouette]);
+        }
         var xAlpha = clampUnit(xe.alpha * elementOpacity);
         if (xAlpha <= 0.004) continue;
         var xfn = CC.Primitives.KINDS[xe.kind];

@@ -13,10 +13,10 @@ Checklist at the end of every session; add new narrative to
 **Phase 6 polish, the tidal bulge ✅ (Session P)** ·
 **Phase 6 polish, the traits ✅ (Session Q)** ·
 **Phase 6 limb, calibrated against the app ✅ (Session R)** ·
-**Phase 7 moon ✅ (Session S)** · **Phase 7 asteroid ✅ (Session T)** · **Asteroid overhaul, the body ✅ (Session U1)** · **Asteroid overhaul, on and in the rock ✅ (Session U2)**
-**Next (Session V):** the **compact group** — neutron star, pulsar, black hole. The asteroid is signed off by the user after U2 (D204 seated the stations); its minor open items stay listed in [session-u2-asteroid-interior.md](progress/session-u2-asteroid-interior.md), and support pillars remain optional.
-**Then:** Phase 7's last two groups, one per session: the **compact** group (neutron star, pulsar, black hole — [PHASE-7-PROMPT.md](PHASE-7-PROMPT.md)), then the **diffuse** group (nebula). After Phase 7: Phase 8 (overlay, scale, polish), Phase 9 (machine worlds), Phase 10 (release) — see [ROADMAP.md](ROADMAP.md).
-**Last updated:** 2026-10-08 (Session U2 — the asteroid's interior: caves, the borer, `plate`, Radioactivity; D193–D203). Earlier: 2026-08-28 (Session S — Phase 7's moon: a frac table whose
+**Phase 7 moon ✅ (Session S)** · **Phase 7 asteroid ✅ (Session T)** · **Asteroid overhaul, the body ✅ (Session U1)** · **Asteroid overhaul, on and in the rock ✅ (Session U2)** · **Phase 7 compact group ✅ (Session V)**
+**Next (Session W):** the user's review of the compact group in the app — its open items are listed in [session-v-compact.md](progress/session-v-compact.md). Then Phase 7's last group, the **diffuse** group (nebula — [PHASE-7-PROMPT.md](PHASE-7-PROMPT.md)).
+**Then:** After Phase 7: Phase 8 (overlay, scale, polish — the compact family's spec calls the scale bar essential), Phase 9 (machine worlds), Phase 10 (release) — see [ROADMAP.md](ROADMAP.md).
+**Last updated:** 2026-10-08 (Session V — the compact group: neutron star, pulsar, black hole; a cross-section black hole with a Kerr interior that opens up with spin; D205–D216). Earlier: Session U2 — the asteroid's interior: caves, the borer, `plate`, Radioactivity; D193–D203. Earlier: 2026-08-28 (Session S — Phase 7's moon: a frac table whose
 authored radii were not its drawn radii for three separate reasons, an optional
 layer that contradicted the body's own temperature on 89% of seeds, a second
 temperature declared rather than detected, a frosting spec that had to become
@@ -226,6 +226,21 @@ assumed.
       did nothing on a star; it drives the companion now and `axes.dial`
       relabels the slider per archetype. Wired on all three routes into the
       archetype control, D114's audit applied rather than rediscovered
+
+### Phase 7 — the compact group ✅ (Session V)
+
+[session-v-compact.md](progress/session-v-compact.md) — D205–D216. `neutron-star`, `pulsar`, `black-hole`. **No existing body changed** (27 renders hash identically to `3045346`), and **no archetype branch in `js/draw/`**.
+
+- [x] **the black hole is the void** — three approaches prototyped (lensed, cross-section, gravity well); the user chose the **cross-section**: the disc sliced into a flaring bow-tie with flow marked into and out of the page, streams plunging into a horizon that is truer black than space, the sky darkening toward it (D213)
+- [x] **a black hole's inside depends on its spin** (D214) — the user's question. At 0 one black ball with a point singularity; spinning, the Kerr solution's ergosphere, a blue-shifted inner horizon and a ring singularity seen as two points, all driven by Spin rate
+- [x] **`ElemGen.registerBuilder`** (D205), **`poles`** (D206), **`beams`** in the emissive pass with the light cylinder as two vertical lines (D207), **`hole`** and **`frame`** (D208)
+- [x] **palette `void`, `heatValue`, `glowCentre`**; glow-only bands via `opacity: 0`; `modulate` `curve` (D209)
+- [x] **Field strength, Surface heat, Beam tilt, Mass class** are `dials` relabels; **Spin rate** and **Accretion rate** are new sliders (D210)
+- [x] **a different KIND of mark per neutron-star band** — crystal lattice in grains, nuclear pasta grading drops → rods → sheets with depth, vortex lines parallel to the spin axis, dipole field loops about the tilted axis (D211)
+- [x] **two stat templates, two mindsets** — "how much in how little" and "distance and time"; Absolute at last; three figures fixed by checking the arithmetic (D212)
+- [x] **eight marks that read wrong first**, each found at the scale it fails at (D215)
+- [x] seven traits, ten presets, all three in the archetype `<select>` (D216, D171)
+- [x] **the user's first review** (D217, Session W) — starquake scars at several sites instead of always one patch, field loops fading further out, and the light cylinder rebuilt as a switchable trait: a ticked solid band round the star, not dashed lines across the frame
 
 ### Asteroid overhaul, on and in the rock ✅ (Session U2)
 
@@ -675,6 +690,7 @@ part needs to be pulled in:
 | [session-r-limb.md](progress/session-r-limb.md) | D155–D162 — Phase 6 limb, calibrated against the running app: a frame convention asserted in prose and wrong in both primitives that used it, a fade that reached a tenth and stopped rather than reaching zero, two marks each calibrated alone and wrong as a pair, a flag silently dropped between the trait and the renderer, a separation failsafe that guaranteed hue and not value, and a coronal hole that finally worked by changing REGISTER rather than shape (Session R) |
 | [session-q-traits.md](progress/session-q-traits.md) | D146–D154 — Phase 6 polish doc 3, the stellar traits: an unexamined `requires: []` that let rings orbit a star, a flare storm that was two independent bugs neither of which shows a result alone, a ribbon widened along the one axis that is correct at its apex and meaningless at its feet, an absence built because dark paint under `screen` cannot work, and a test harness whose framing was tighter than the app's (Session Q) |
 | [session-p-tidal.md](progress/session-p-tidal.md) | D140–D145 — Phase 6 polish doc 2, the tidal bulge reaching the skin: a signed displacement that is `airAt`'s sibling, its own anchor list, and elements that had to be told to ride the swell (Session P) |
+| [session-v-compact.md](progress/session-v-compact.md) | D205–D216 — Phase 7's compact group: an element-builder registry, a body's magnetic axis resolved once, beams and jets as emitted light, a hole whose surroundings are not rings, a true-black void, three black-hole approaches and the cross-section chosen, a Kerr interior that opens up with spin, and eight marks that read wrong until rendered at the scale they fail at (Session V) |
 | [session-u2-asteroid-interior.md](progress/session-u2-asteroid-interior.md) | D193–D203 — the asteroid overhaul's second half: a layer that answers a trait with its own craters, a basin shaped by its band, `plate` and a rectangular station, a tunnel borer whose bore belongs to the caves, one cave system drawn in tone passes so it merges, Cohesion capping it, a card that measures it, a clip that cost 70 ms until it stopped being 900 circles, and Interior heat relabelled Radioactivity (Session U2) |
 | [session-u1-asteroid-body.md](progress/session-u1-asteroid-body.md) | D184–D192 — the asteroid overhaul's first half: a body form applied as one warp inside `view.at`, mosaic sites laid out where they will be seen, concentric gradients that cannot bend, flat textured cells lit by nothing, Cohesion finally driving the shell, and composition moved out of the trait pool into the mosaic (Session U1) |
 | [session-t-asteroid.md](progress/session-t-asteroid.md) | D175–D183 — Phase 7, the asteroid: an omitted `frac` that deleted a layer on every seed, a gravity clamp whose floor sat above the whole family's range, a body too small to keep its own heat, a silhouette that stayed round at every amplitude because the missing statements were angularity and frequency, two large boundaries that had to stop being independent, and a Voronoi interior that could not read as rough while every mark describing it was a continuous field (Session T) |

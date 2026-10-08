@@ -73,6 +73,9 @@ CC.Scene = (function () {
   function bandFill(ctx, view, layer, colour) {
     var r1 = view.px(layer.outer);
     var r0 = view.px(Math.max(0, layer.inner));
+    /* A VOID IS ONE FLAT COLOUR — see `void` in gen/palette.js. No shading:
+     * a gradient on nothing reads as a surface. */
+    if (colour.flat) return colour.hex;
     if (r1 - r0 < 2) return colour.hex;
 
     var g = CC.FormFill.bandGradient(ctx, view, r0, r1);
@@ -189,6 +192,13 @@ CC.Scene = (function () {
         g.addColorStop(0.82, colour.lighter(0.14));
         g.addColorStop(1.00, colour.lighter(0.30));
       }
+    } else if (colour.glowCentre) {
+      /* A SELF-LIT CENTRE GLOWS FROM THE MIDDLE — `glowCentre` on the
+       * palette spec. The default shading below is lit from OUTSIDE, which
+       * put a dark dimple at the heart of a neutron star's white-hot core. */
+      g.addColorStop(0, colour.lighter(0.18));
+      g.addColorStop(0.55, colour.hex);
+      g.addColorStop(1, colour.darker(0.08));
     } else {
       g.addColorStop(0, colour.darker(0.16));
       g.addColorStop(0.72, colour.hex);
@@ -399,7 +409,10 @@ CC.Scene = (function () {
      * Composition, not framing: an export that wants the body centred simply
      * omits it, which is what `renderTo` does. */
     var view = CC.Canvas.makeView(width, height, {
-      bodyFrac: settings.bodySize === undefined ? 0.78 : settings.bodySize,
+      /* `body.frame` scales it for a body whose surroundings are the
+       * picture — a black hole's disc and jets (gen/structure.js). */
+      bodyFrac: (settings.bodySize === undefined ? 0.78 : settings.bodySize) *
+                (body.frame || 1),
       extent: extent,
       offsetX: settings.offsetX,
       /* The body's form (js/gen/form.js): the warp every boundary and element
@@ -464,6 +477,9 @@ CC.Scene = (function () {
      * draw/emissive.js — including why it is excluded from the extent sweep
      * while the coronal wobble is included in it. */
     CC.Emissive.drawEmissiveGlow(ctx, view, body, palette, settings);
+    /* And light along the body's axis — beams, jets, the light cylinder.
+     * A no-op on every body that declares no `beams` or `poles`. */
+    CC.Emissive.drawAxial(ctx, view, body, palette, settings);
 
     /* --- 2. outward traits, back half ---
      *

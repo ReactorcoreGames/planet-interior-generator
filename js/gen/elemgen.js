@@ -1121,12 +1121,32 @@ CC.ElemGen = (function () {
       case "prominence":    return buildProminences(recipe, layer, plan, rng, opts);
       case "plume":         return buildPlumes(recipe, layer, plan, rng, opts);
       case "heat-vein":     return buildHeatVeins(recipe, layer, plan, rng, opts);
-      default:              return buildScattered(recipe.kind, recipe, layer, plan, rng, opts);
+      default:
+        /* A BUILDER REGISTERED FROM ANOTHER FILE, the way primitives are
+         * (CC.Primitives.register). This file is past the 500-line rule, so
+         * a new family's builders live in its own file and are found here
+         * by kind. Same signature as `build`. */
+        if (BUILDERS[recipe.kind]) {
+          return BUILDERS[recipe.kind](recipe, layer, plan, count, rng, opts);
+        }
+        return buildScattered(recipe.kind, recipe, layer, plan, rng, opts);
     }
+  }
+
+  var BUILDERS = {};
+  function registerBuilder(kind, fn) {
+    if (BUILDERS[kind]) throw new Error("element builder already registered: " + kind);
+    BUILDERS[kind] = fn;
   }
 
   return {
     build: build,
+    registerBuilder: registerBuilder,
+    /* The shared scatter, for registered builders that only decorate. */
+    scatter: function (kind, recipe, layer, plan, rng, opts, decorate) {
+      return withOpts(opts, { decorate: decorate },
+        function (o) { return buildScattered(kind, recipe, layer, plan, rng, o); });
+    },
     tierSplit: tierSplit,
     countFor: countFor,
     sizeRange: sizeRange,

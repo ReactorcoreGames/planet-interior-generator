@@ -1,5 +1,15 @@
 # Compact Objects
 
+> **BUILT — Session V (D205–D216), reviewed in Session W (D217).** See [session-v-compact.md](../progress/session-v-compact.md). Where the code differs from the tables below, the code and that write-up are authoritative:
+>
+> - **Roles are renamed** (element tables are keyed by role across families): `plasma-skin`, `iron-lattice`, `nuclear-pasta`, `superfluid`, `quark-core`, `magnetosphere`; on the black hole `photon-sphere`, `infall`, `cauchy-shell`, `inner-region`. `frac` was re-cut to the THICKNESSES the tables meant (D118/D163).
+> - **The superfluid is a step dimmer** than the spec's near-white, so the core stays the white-hot band.
+> - **The light cylinder** is a trait (`light-cylinder`, D217), drawn as two faint ticked lines parallel to the spin axis — a cylinder cut through that axis — in a band round the star, not across the frame.
+> - **The black hole's interior is NOT empty on a spinning hole** (the user's call): Spin rate opens the Kerr structure — ergosphere outside the horizon, a blue-shifted inner horizon, a ring singularity seen as two points. At Spin rate 0 it is exactly the void described below.
+> - **The disc is drawn sliced** (the cross-section approach), and the photon sphere is glow-only.
+> - Controls: Field strength, Surface heat, Beam tilt and Mass class are relabels of existing controls; Spin rate and Accretion rate are new. Traits: see `js/data/traits/compact.js`.
+
+
 **Archetypes:** `neutron-star` · `pulsar` · `black-hole`
 
 Stellar corpses. Tiny, absurdly dense, and dangerous at a distance. The cutaway

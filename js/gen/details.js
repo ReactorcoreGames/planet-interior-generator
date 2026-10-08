@@ -511,6 +511,10 @@ CC.Details = (function () {
         for (var m = 0; m < made.length; m++) {
           made[m].role = role;
           made[m].flow = !!recipe.flow;
+          /* The body's magnetic geometry (js/gen/compact.js), for the marks
+           * that are drawn along it. Stamped here, not on the recipe (D159).
+           * Absent on every body that declares no `poles`. */
+          if (body.poles) made[m].poles = body.poles;
         }
 
         list = list.concat(made);

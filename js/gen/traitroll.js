@@ -390,6 +390,21 @@ CC.TraitRoll = (function () {
       }
     }
 
+    /* KEPT CLEAR OF THE JETS AND THE DISC — `clear: true` on an orbital
+     * trait. The wedges are the body's own, so the trait cannot know them;
+     * see CC.Compact.clearAngles. The pad is the mark's half-width plus,
+     * for a cluster, the half-arc it spreads over. */
+    if (trait.clear && trait.anchor === "orbit" && CC.Compact && CC.Compact.clearAngles) {
+      var od = orbitBand(trait, body) || trait.depth || [2, 2];
+      var orR = (od[0] + od[1]) / 2 * (body.surface || 1);
+      var sz = trait.size ? trait.size[1] : 0;
+      var pad = Math.atan2(sz, orR);
+      if (trait.arc && trait.spacing !== "even") {
+        pad += (trait.arc[1] - trait.arc[0]) * Math.PI / 360;
+      }
+      angles = CC.Compact.clearAngles(angles, body, orR, pad);
+    }
+
     var g = ground && ground[layer.role];
 
     /* A PLACED TRAIT DRAWS ONE INSTANCE PER ANCHOR POINT.
@@ -540,6 +555,10 @@ CC.TraitRoll = (function () {
       /* SEATED ON THE DRAWN SURFACE — see `seatOn` in draw/scene.js. Stamped
        * here for the same D159 reason as `escapes`. */
       made[i].seat = trait.seat;
+      /* The body's magnetic geometry, for a mark drawn along it (an
+       * accretion stream follows a field line). Absent on every body that
+       * declares no `poles`. See js/gen/compact.js. */
+      if (body.poles) made[i].poles = body.poles;
       /* Traits are not layer details, so the Flow indicators dropdown does not
        * govern them — it means "how diagrammatic is the circulation", which is
        * a statement about layers. */

@@ -654,6 +654,18 @@ CC.Palette = (function () {
         }
       }
 
+      /* `heatValue: [atCold, atHot]` — A LAYER WHOSE LIGHTNESS IS ITS HEAT.
+       *
+       * The rule above weights heat by depth, which is right for a planet:
+       * the heat is in the middle and a crust barely feels it. A neutron
+       * star's crust is the opposite case — the body's own heat is what
+       * makes it glow, and the spec's cooling crust is a whole step dimmer.
+       * A multiplier on value between the two ends of the dial, independent
+       * of depth. Absent on every layer that does not declare it. */
+      if (spec.heatValue) {
+        v = clamp(v * lerp(spec.heatValue[0], spec.heatValue[1], heat), 0.03, 1);
+      }
+
       /* Contrast between layers: push each layer's value away from the mean
        * of its profile, so adjacent bands separate more or less strongly. */
       var vMid = (spec.val[0] + spec.val[1]) / 2;
@@ -787,7 +799,13 @@ CC.Palette = (function () {
        * convection cells, arrows and flow-lines all derive from the band
        * colour, so once the band varies with depth the flow structure gains
        * contrast exactly where the mantle is most violent. See D59. */
-      var hotEdge = makeHotEdge(spec, heat, h, s, v);
+      /* A VOID — `void: true` — is TRUE BLACK, darker than the sky. Every
+       * clamp above floors value at 0.03, which is lighter than the default
+       * background, and a horizon that is paler than space is a black disc
+       * laid on the stars rather than a hole in them. Hue and saturation are
+       * kept so the faint marks drawn in it still take the body's colour. */
+      if (spec.void) v = 0;
+      var hotEdge = spec.void ? null : makeHotEdge(spec, heat, h, s, v);
 
       out[role] = {
         h: h, s: s, v: v,
@@ -814,6 +832,10 @@ CC.Palette = (function () {
          * adjacency pass below can rebuild it from the moved value. */
         hotEdge: hotEdge,
         heatSpec: spec,
+        /* Painted as one flat colour, no band shading (draw/scene.js). */
+        flat: !!spec.void,
+        /* A self-lit centre, brightest in the middle (draw/scene.js). */
+        glowCentre: !!spec.glowCentre,
         /* Self-lit, so the renderer knows to shade it as glowing from within
          * rather than lit from outside. */
         emissive: emissive,
@@ -843,6 +865,9 @@ CC.Palette = (function () {
     }
     for (i = 1; i < order.length; i++) {
       var prev = order[i - 1], cur = order[i];
+      /* A void stays black: it is not a material to be told apart from its
+       * neighbour, and pushing it lighter is the one thing it must not do. */
+      if (cur.flat || prev.flat) continue;
 
       /* COMPARE THE EDGES THAT ACTUALLY TOUCH, not the two base colours.
        *

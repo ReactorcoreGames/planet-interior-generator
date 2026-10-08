@@ -198,7 +198,12 @@ CC.Structure = (function () {
       if (!Array.isArray(mods)) mods = [mods];
       for (var m = 0; m < mods.length; m++) {
         var mv = params[mods[m].param];
-        if (mv !== undefined) out += mods[m].amount * mv;
+        /* `curve` bends the response: a black hole's inner horizon barely
+         * moves until the spin is high and then races outward, and a linear
+         * nudge cannot say that. Absent everywhere else, so 1. */
+        if (mv !== undefined) {
+          out += mods[m].amount * (mods[m].curve ? Math.pow(clamp(mv, 0, 1), mods[m].curve) : mv);
+        }
       }
     }
 
@@ -667,6 +672,8 @@ CC.Structure = (function () {
     var extent = 1.0;
     for (i = 0; i < layers.length; i++) extent = Math.max(extent, layers[i].outer);
 
+    var poles = CC.Compact ? CC.Compact.poles(archetype.poles, params, seed) : null;
+
     return {
       archetype: archetype.id,
       /* A BODY THAT RADIATES INTO THE SPACE AROUND IT.
@@ -686,6 +693,21 @@ CC.Structure = (function () {
        * `view.at` applies. Null on every archetype that does not declare one.
        * See js/gen/form.js. */
       form: CC.Form ? CC.Form.roll(archetype.form, irregularity, seed) : null,
+      /* THE BODY'S MAGNETIC GEOMETRY AND WHAT IT EMITS ALONG IT — the axis
+       * tilt, the field's twist, the spin, the light cylinder, and the twin
+       * beams or jets. Resolved once from named parameters so every mark that
+       * is drawn along the axis agrees about where it points. Null on every
+       * archetype that does not declare `poles`. See js/gen/compact.js. */
+      poles: poles,
+      beams: CC.Compact ? CC.Compact.beams(archetype.beams, poles, params) : null,
+      /* A HOLE: the spin geometry (horizons, ergosphere, innermost orbit),
+       * the disc sliced through, and the darkening of the space around it.
+       * Null on every archetype that declares no `hole`. */
+      hole: CC.Compact ? CC.Compact.hole(archetype.hole, params, seed) : null,
+      /* How large the body is drawn in its own frame, 1 by default. A body
+       * whose surroundings ARE the picture — a black hole's disc and jets —
+       * declares less, so they fit. Read by draw/scene.js. */
+      frame: archetype.frame || 1,
       layers: layers,
       surface: surface,
       extent: extent,

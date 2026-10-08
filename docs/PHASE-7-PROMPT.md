@@ -35,8 +35,19 @@ STATUS
    and frequency, not size — D179), and the fragments read as polished
    because every mark describing them was a continuous field (D181).
    **Overhauled in Sessions U1 and U2 (D184–D204)** after the user's review — see docs/ASTEROID-OVERHAUL.md and docs/progress/session-u1-asteroid-body.md / session-u2-asteroid-interior.md. A blob silhouette applied inside `view.at`, flat textured cells, the Caverns axis (caves, bores, exits), the tunnel borer, `plate`, and Interior heat relabelled Radioactivity through a general `dials` declaration. Signed off by the user.
-⬜ **compact group (NEXT)** — neutron-star, pulsar, black-hole.
-⬜ **diffuse** — nebula. A later session.
+✅ **compact group** — built in Session V (D205–D216). Write-up:
+   docs/progress/session-v-compact.md. `neutron-star` and `pulsar` share one
+   stack (lattice crust, nuclear pasta, vortex-threaded superfluid, quark
+   core, a dipole magnetosphere); the pulsar adds a tilted axis, beams and a
+   light cylinder. `black-hole` is the CROSS-SECTION approach the user chose
+   from three prototypes, with a Kerr interior that Spin rate opens up
+   (ergosphere, blue-shifted inner horizon, ring singularity) — the user's
+   own question, answered in the code. Four new general mechanisms (`poles`,
+   `beams`, `hole`, `frame`), a builder registry, `void`/`heatValue`/
+   `glowCentre` in the palette; Spin rate and Accretion rate sliders; three
+   `dials` relabels plus Mass class; seven traits; ten presets. No `js/draw/`
+   archetype branch; no existing body moved.
+⬜ **diffuse (NEXT)** — nebula.
 
 Do ONE group per session. Phase 6 needed four sessions for one family, and
 the compact and diffuse groups are further from anything already built than
@@ -98,6 +109,11 @@ DONE WHEN (per group, from the phase doc):
 - a black hole is the void — whatever that turns out to mean, it is not a
   dark circle with a ring drawn on it
 - nothing in js/draw/ needed an archetype-specific branch
+
+✅ Met by the compact group (Session V): the black hole reads as a void
+because everything round it is cut-open matter and inside there is none —
+and the photon sphere, which first drew as exactly the forbidden "ring round
+a dark circle", is glow-only. Nothing in js/draw/ learned an archetype name.
 
 ✅ Met by the asteroid (Session T): its Voronoi interior reads as broken rock
 rather than as a mosaic pattern laid over a circle — voids that are genuinely

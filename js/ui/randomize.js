@@ -33,6 +33,12 @@ CC.Randomize = (function () {
      * hollowed-out body are three different pictures, and Cohesion already
      * thins it on the loose bodies. */
     { id: "caverns", lo: 0, hi: 100 },
+    /* Spin rate the whole way: a slow old neutron star and a millisecond
+     * pulsar are different pictures. Inert on every other body. */
+    { id: "spin-rate", lo: 0, hi: 100 },
+    /* Accretion the whole way: a dormant black hole is the boldest picture
+     * the generator makes, and a feeding one the brightest. */
+    { id: "accretion-rate", lo: 0, hi: 100 },
     { id: "ocean-depth", lo: 0, hi: 100 },
     { id: "interior-heat", lo: 0, hi: 100 },
     { id: "rotation", lo: 0, hi: 360 },

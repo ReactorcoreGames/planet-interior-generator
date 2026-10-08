@@ -922,11 +922,18 @@ CC.Presets = (function () {
   var byId = {};
   LIST.forEach(function (p) { byId[p.id] = p; });
 
+  /* A FAMILY'S PRESETS MAY LIVE IN ITS OWN FILE — this one is past the
+   * 500-line rule. Appended in load order, so the gallery lists them after
+   * the families above. */
+  function register(list) {
+    list.forEach(function (p) { LIST.push(p); byId[p.id] = p; });
+  }
+
   function all() { return LIST.slice(); }
   function get(id) { return byId[id] || null; }
   function forArchetype(a) {
     return LIST.filter(function (p) { return p.archetype === a; });
   }
 
-  return { all: all, get: get, forArchetype: forArchetype };
+  return { all: all, get: get, forArchetype: forArchetype, register: register };
 })();

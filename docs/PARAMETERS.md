@@ -125,12 +125,12 @@ as Ocean depth and Interior heat: an axis, not two checkboxes.
 | *Interior heat → **Radioactivity*** | asteroid | 0–100% | — | The same control, relabelled by the archetype's `dials`. Above about a third, a share of the mosaic's fragments (up to a tenth) turn hot material, sickly green or cold blue-white, and glow near the top. Composition only; moves no structure |
 | **Luminosity source** | nebula | 0–100% | `dark` / `reflection` / `emission` | Layer opacity, lightness, hue bias, whether protostars light their surroundings |
 | ~~**Stellar activity**~~ | all stars | — | — | **SUPERSEDED by the universal Star activity axis — do not build this.** See the note below |
-| **Field strength** | neutron star, pulsar | 0–100% | `magnetar` | Magnetosphere extent, field-line count and twist, particle glints |
-| **Surface heat** | neutron star, pulsar | 0–100% | `cooling-crust` | Crust lightness, temperature stat |
-| **Spin rate** | pulsar | 0–100% | `millisecond-spin` | Beam-cone width, light-cylinder radius, pulse-period stat |
-| **Beam tilt** | pulsar | 15–60° | — | The archetype's signature; directly dialable |
-| **Accretion rate** | black hole | 0–100% | `feeding` / `dormant` | Disc presence, brightness, density, jet strength, inner-disc gradient |
-| **Mass class** | black hole | preset | `supermassive` / `stellar-mass` | Horizon radius and every derived stat — spans 3 km to 10,000,000+ km |
+| *Star activity → **Field strength*** | neutron star, pulsar | 0–100% | `magnetar` | **Built as a `dials` relabel (D210)** — on a star Star activity is already the magnetic violence axis. Magnetosphere reach, field-loop count and twist, particle glints, beam strength, starquake frequency |
+| *Interior heat → **Surface heat*** | neutron star, pulsar | 0–100% | `cooling-crust` | **A `dials` relabel.** Crust lightness (`heatValue`), the temperature stat |
+| **Spin rate** | neutron star, pulsar, black hole | 0–100% (default 50) | `millisecond-spin`, `rapid-spin` | **A new slider.** Vortex density in the superfluid; on a pulsar beam width and light-cylinder radius; on a black hole the whole interior (ergosphere, inner horizon, ring singularity) and the disc's inner edge. See `js/gen/compact.js` |
+| *Axial tilt → **Beam tilt*** | pulsar | 0–100% = 15–60° | — | **A `dials` relabel.** The magnetic axis — beams, field lines, accretion stream; the card states the degrees |
+| **Accretion rate** | black hole | 0–100% (default 60) | `feeding` / `dormant` | **A new slider.** Disc presence (none below ~4%), brightness, density, the hot inner torus, jets (from about a quarter up) |
+| *Core size bias → **Mass class*** | black hole | −100…+100 | `supermassive` / `stellar-mass` | **A `dials` relabel**, log-scaled: ~5 suns at the bottom, ~10⁵ in the middle, ~10⁹ at the top. Horizon size and every derived stat; the picture is a diagram and keeps its scale |
 | **Operational status** | machine world | 0–100% | `dormant` / `automated` / `hive-populated` | Light and window-grid density, power-core brightness, accent-hue intensity across every layer, habitation presence |
 | **Hull integrity** | machine world | 0–100% | `damaged` / `partial-construction` | How much of the outer hull is missing (zone `remove: true`); the `construction` flag swaps torn edges for scaffolded ones |
 | **Enclosure** | dyson-structure trait | 0–100% | `dyson-swarm` / `dyson-sphere` | Collector spacing, jitter and arc — scattered swarm → half-built shell → full sphere |
@@ -535,11 +535,18 @@ uses.
 
 | Preset | Sets |
 |---|---|
-| **Magnetar** | Neutron star, Field strength 100 — vast twisted magnetosphere |
+| **Magnetar** | Neutron star, Field strength 100 — vast twisted magnetosphere, starquakes |
+| **Cooling Neutron Star** | Neutron star, low Surface heat, Field strength and Spin rate |
+| **Accreting Neutron Star** | Neutron star, accretion stream onto a pole |
 | **Millisecond Pulsar** | Pulsar, Spin rate 100, high beam tilt |
-| **Feeding Black Hole** | Black hole, Accretion rate 100, relativistic jets |
-| **Dormant Black Hole** | Black hole, Accretion rate 0 — almost entirely black |
+| **Young Pulsar** | Pulsar, hot, fast, strong field, glitching |
+| **Beacon Pulsar** | Pulsar, navigation beacon |
+| **Feeding Black Hole** | Black hole, Accretion rate 100, jets |
+| **Dormant Black Hole** | Black hole, Accretion rate 0, Spin rate 0 — almost entirely black |
+| **Spinning Black Hole** | Black hole, Spin rate 96 — the full Kerr interior |
 | **Supermassive** | Black hole, Mass class supermassive, moderate accretion |
+
+Built in Session V — `js/data/presets-compact.js`.
 
 **Diffuse**
 

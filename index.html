@@ -103,6 +103,11 @@
                 <option value="old-giant-star">Old giant star</option>
                 <option value="dwarf-star">Dwarf star</option>
               </optgroup>
+              <optgroup label="Compact">
+                <option value="neutron-star">Neutron star</option>
+                <option value="pulsar">Pulsar</option>
+                <option value="black-hole">Black hole</option>
+              </optgroup>
             </select>
             <label class="lock" title="Lock: Randomize will not change the archetype.">
               <input type="checkbox" id="lock-archetype"><span class="lock-icon">&#128274;</span>
@@ -187,6 +192,30 @@
             <input type="range" id="caverns" min="0" max="100" value="30">
             <output data-readout="caverns"></output>
             <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-caverns"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <!-- SPIN RATE. The one compact-object control that is not an
+               existing quantity under a new name (see the header of
+               js/data/archetypes/compact-neutron.js for the three that are).
+               Sets the density of vortex lines in a neutron star's superfluid
+               - a faster body is threaded more densely - and on a pulsar the
+               beam width and the light cylinder's radius. Detail stage. -->
+          <div class="control-row" title="How fast a neutron star, pulsar or black hole turns. Faster packs the vortex lines in a neutron star's superfluid core closer together; on a pulsar it also widens the beams and pulls the light cylinder in, and 100% is a millisecond pulsar. On a black hole it opens up the inside: at 0% it is one black ball with a point at its centre; spinning, it grows an ergosphere outside the horizon, a blazing inner horizon inside it and a ring-shaped singularity, and the disc's inner edge moves in. Compact objects only.">
+            <label for="spin-rate">Spin rate</label>
+            <input type="range" id="spin-rate" min="0" max="100" value="50">
+            <output data-readout="spin-rate"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-spin-rate"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <!-- ACCRETION RATE. The black hole's feeding/dormant axis
+               (PARAMETERS.md): disc presence, brightness and density, the hot
+               torus at its inner edge, and the jets. At 0% there is no disc
+               at all and the picture is nearly all black. Detail stage. -->
+          <div class="control-row" title="How fast a black hole is feeding. 0% is dormant - no disc at all, and the picture is almost entirely black. As it rises the disc appears, brightens, thickens into a hot torus at its inner edge, and jets fire along the spin axis. Black holes only.">
+            <label for="accretion-rate">Accretion rate</label>
+            <input type="range" id="accretion-rate" min="0" max="100" value="60">
+            <output data-readout="accretion-rate"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-accretion-rate"><span class="lock-icon">&#128274;</span></label>
           </div>
 
           <div class="control-row" title="0% is a desert or airless world with no ocean at all. High values drown the crust in a global sea.">
@@ -724,6 +753,8 @@
 <script src="js/data/archetypes/stellar-main.js"></script>
 <script src="js/data/archetypes/stellar-giant.js"></script>
 <script src="js/data/archetypes/stellar-dwarf.js"></script>
+<script src="js/data/archetypes/compact-neutron.js"></script>
+<script src="js/data/archetypes/compact-blackhole.js"></script>
 <script src="js/data/elements/registry.js"></script>
 <script src="js/data/elements/solid.js"></script>
 <script src="js/data/elements/solid-moon.js"></script>
@@ -732,6 +763,7 @@
 <script src="js/data/elements/stellar-common.js"></script>
 <script src="js/data/elements/stellar-envelope.js"></script>
 <script src="js/data/elements/stellar-interior.js"></script>
+<script src="js/data/elements/compact.js"></script>
 <script src="js/data/traits/registry.js"></script>
 <script src="js/data/traits/orbital.js"></script>
 <script src="js/data/traits/solid.js"></script>
@@ -741,13 +773,17 @@
 <script src="js/data/traits/stellar-spots.js"></script>
 <script src="js/data/traits/stellar-evolved.js"></script>
 <script src="js/data/traits/stellar-built.js"></script>
+<script src="js/data/traits/compact.js"></script>
 <script src="js/data/presets.js"></script>
+<script src="js/data/presets-compact.js"></script>
 <script src="js/data/phrasebook.js"></script>
 <script src="js/data/flavour/registry.js"></script>
 <script src="js/data/flavour/solid.js"></script>
 <script src="js/data/flavour/solid-asteroid.js"></script>
 <script src="js/data/flavour/gaseous.js"></script>
 <script src="js/data/flavour/stellar.js"></script>
+<script src="js/data/flavour/compact.js"></script>
+<script src="js/data/flavour/blackhole.js"></script>
 
 <!-- generation -->
 <script src="js/gen/form.js"></script>
@@ -762,6 +798,7 @@
 <script src="js/gen/climate.js"></script>
 <script src="js/gen/climatesummary.js"></script>
 <script src="js/gen/elemgen.js"></script>
+<script src="js/gen/compact.js"></script>
 <script src="js/gen/traitroll.js"></script>
 <script src="js/gen/details.js"></script>
 <script src="js/gen/climatetext.js"></script>
@@ -772,6 +809,8 @@
 <script src="js/gen/stats/gaseous.js"></script>
 <script src="js/gen/stats/stellar-derive.js"></script>
 <script src="js/gen/stats/stellar.js"></script>
+<script src="js/gen/stats/compact.js"></script>
+<script src="js/gen/stats/blackhole.js"></script>
 
 <!-- drawing -->
 <script src="js/draw/canvas.js"></script>
@@ -789,6 +828,9 @@
 <script src="js/draw/primitives/stellar-flare.js"></script>
 <script src="js/draw/primitives/stellar-wind.js"></script>
 <script src="js/draw/primitives/stellar-field.js"></script>
+<script src="js/draw/primitives/compact.js"></script>
+<script src="js/draw/primitives/compact-stream.js"></script>
+<script src="js/draw/hole.js"></script>
 <script src="js/draw/details.js"></script>
 <script src="js/draw/grain.js"></script>
 <script src="js/draw/film.js"></script>

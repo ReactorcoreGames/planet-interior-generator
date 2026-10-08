@@ -301,8 +301,123 @@ CC.Emissive = (function () {
     ctx.restore();
   }
 
+  /* ---- LIGHT ALONG THE AXIS --------------------------------------------
+   *
+   * Twin cones of emission along the body's magnetic or spin axis — a
+   * pulsar's lighthouse, a black hole's jets. (The light cylinder is a
+   * trait now, drawn by `light-cylinder` in draw/primitives/compact-stream.js
+   * — it is an annotation, not light.)
+   *
+   * THE SAME PASS AS THE GLOW, FOR THE SAME REASONS. It is emitted light: it
+   * composites additively, has no edge to clip against, fades rather than
+   * stops, and runs off the frame — so it is also excluded from the extent
+   * sweep, and a beam reaching three radii does not shrink the body to fit.
+   * Drawn behind the body, which hides the root of each cone under the pole.
+   *
+   * Declared on the archetype as `beams` and `poles` and resolved once in
+   * js/gen/compact.js, so this names nothing and the field lines drawn by the
+   * layer pass point exactly where the beams do. */
+  function drawAxial(ctx, view, body, palette, settings) {
+    var B = body.beams;
+    /* A hole's surroundings first — the darkened sky, the ergosphere, the
+     * sliced disc — so the jets are drawn over them. See draw/hole.js. */
+    if (body.hole && CC.Hole) CC.Hole.draw(ctx, view, body, palette, settings);
+    if (!B) return;
+    var src = palette.get(body.layers[0] && body.layers[0].role);
+    if (!src) return;
+    var D = CC.CompactDraw;
+
+    /* THE BEAM'S COLOUR IS THE BODY'S, PUSHED TO FULL VALUE — brighter than
+     * anything else in the picture, which is what the spec asks of it, while
+     * keeping the hue so a blue pulsar shines blue (D123). The nesting in
+     * `beam-cone` carries the core toward white on its own. */
+    var hue = src.h;
+    var sat = Math.max(0.30, Math.min(0.62, src.s * 1.1 + 0.08));
+    var col = function (s, v) {
+      return function (a) { return CC.Color.hsva(hue, s, v, Math.max(0, Math.min(1, a))); };
+    };
+
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+
+    if (B && CC.Primitives.KINDS["beam-cone"]) {
+      var rng = CC.RNG.stream(settings.seed, "emissive/beams/" + body.archetype);
+      var cone = CC.Primitives.KINDS["beam-cone"];
+      for (var dir = -1; dir <= 1; dir += 2) {
+        var el = { axis: B.axis, dir: dir, half: B.half, length: B.length,
+                   collimate: B.collimate, strength: B.strength, base: 0.96 };
+        cone(ctx, view, el, col(sat, 1));
+        var ax = D.rot(0, dir, B.axis);
+        var nx = { x: ax.y, y: -ax.x };
+        var widthAt = function (d) {
+          var wc = Math.tan(B.half) * d;
+          var wj = Math.tan(B.half) * (0.96 + B.length * 0.12) *
+                   (1 + (d - 0.96) / B.length * 0.6);
+          return wc * (1 - B.collimate) + wj * B.collimate;
+        };
+
+        /* STREAKS — straight emission running out along the cone, biased to
+         * its middle. Faded at both ends, so each one ENDS at nothing. */
+        ctx.lineCap = "round";
+        for (var k = 0; k < B.streaks; k++) {
+          var off = (rng() * 2 - 1);
+          off = off * Math.abs(off);
+          var d0 = 0.98 + rng() * B.length * 0.35;
+          var d1 = d0 + B.length * (0.20 + rng() * 0.55);
+          var w0 = widthAt(d0) * off * 0.9, w1 = widthAt(d1) * off * 0.9;
+          var p0 = D.xy(view, ax.x * d0 + nx.x * w0, ax.y * d0 + nx.y * w0);
+          var p1 = D.xy(view, ax.x * d1 + nx.x * w1, ax.y * d1 + nx.y * w1);
+          var a = (0.16 + rng() * 0.30) * B.strength * (1 - (d0 - 0.96) / B.length);
+          var gs = ctx.createLinearGradient(p0.x, p0.y, p1.x, p1.y);
+          gs.addColorStop(0, col(sat * 0.7, 1)(0));
+          gs.addColorStop(0.25, col(sat * 0.7, 1)(a));
+          gs.addColorStop(1, col(sat * 0.7, 1)(0));
+          ctx.strokeStyle = gs;
+          ctx.lineWidth = view.lw(0.6 + rng() * 1.2);
+          ctx.beginPath();
+          ctx.moveTo(p0.x, p0.y);
+          ctx.lineTo(p1.x, p1.y);
+          ctx.stroke();
+        }
+
+        /* GLINTS — particles in the beam, thicker near the pole. */
+        ctx.beginPath();
+        var glintCol = col(sat * 0.5, 1);
+        for (k = 0; k < B.glints; k++) {
+          var u = rng();
+          var dd = 0.98 + B.length * u * u * 0.9;
+          var ww = widthAt(dd) * (rng() * 2 - 1);
+          var pg = D.xy(view, ax.x * dd + nx.x * ww, ax.y * dd + nx.y * ww);
+          var rr = Math.max(0.6, view.px(0.0035 + rng() * 0.004));
+          ctx.fillStyle = glintCol((0.35 + rng() * 0.5) * B.strength * (1 - u * 0.8));
+          ctx.beginPath();
+          ctx.arc(pg.x, pg.y, rr, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        /* KNOTS — shocks along a jet: bright lumps strung down the axis,
+         * fading with distance. A pulsar declares none. */
+        for (k = 0; k < B.knots; k++) {
+          var dk = 1.15 + (k + 0.3 + rng() * 0.5) / B.knots * B.length * 0.85;
+          var pk = D.xy(view, ax.x * dk, ax.y * dk);
+          var rk = view.px(widthAt(dk) * (0.55 + rng() * 0.4));
+          var gk = ctx.createRadialGradient(pk.x, pk.y, 0, pk.x, pk.y, rk);
+          var ak = 0.55 * B.strength * (1 - (dk - 1) / (B.length + 0.2));
+          gk.addColorStop(0, col(sat * 0.4, 1)(ak));
+          gk.addColorStop(1, col(sat, 1)(0));
+          ctx.fillStyle = gk;
+          ctx.beginPath();
+          ctx.arc(pk.x, pk.y, rk, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+    ctx.restore();
+  }
+
   return {
     paintLimbDarkening: paintLimbDarkening,
-    drawEmissiveGlow: drawEmissiveGlow
+    drawEmissiveGlow: drawEmissiveGlow,
+    drawAxial: drawAxial
   };
 })();

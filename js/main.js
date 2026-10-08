@@ -47,6 +47,14 @@ var CC = CC || {};
        * for the same reason as Cohesion: it fills a layer, it does not move
        * a boundary. */
       caverns: (c.get("caverns") === undefined ? 30 : c.get("caverns")) / 100,
+      /* HOW FAST A NEUTRON STAR TURNS — vortex density, and on a pulsar the
+       * beam width and the light cylinder (js/gen/compact.js). Read by the
+       * structure stage's `poles`, which is why it sits in the detail key:
+       * that key covers both stages. */
+      spinRate: (c.get("spin-rate") === undefined ? 50 : c.get("spin-rate")) / 100,
+      /* HOW FAST A BLACK HOLE IS FEEDING — the disc and the jets
+       * (js/gen/compact.js `hole`). Same stage and key as Spin rate. */
+      accretionRate: (c.get("accretion-rate") === undefined ? 60 : c.get("accretion-rate")) / 100,
       oceanDepth: (c.get("ocean-depth") || 0) / 100,
       interiorHeat: (c.get("interior-heat") || 0) / 100,
       boundaryIrregularity: (c.get("boundary-irregularity") || 0) / 100,
@@ -197,6 +205,7 @@ var CC = CC || {};
             s.textureStrength,
             (s.traits || []).join(","), (s.traitExcluded || []).join(","),
             s.traitCount, s.tidalLock, s.tidalFacing, s.cohesion, s.caverns,
+            s.spinRate, s.accretionRate,
             /* The climate field lives in this stage: it modulates the
              * snowline and the frosting rather than a layer radius, exactly as
              * tidal locking does. */
@@ -386,6 +395,8 @@ var CC = CC || {};
      * where its boundaries are. */
     { id: "cohesion", stage: "detail", format: pct },
     { id: "caverns", stage: "detail", format: pct },
+    { id: "spin-rate", stage: "detail", format: pct },
+    { id: "accretion-rate", stage: "detail", format: pct },
     { id: "ocean-depth", stage: "structure", format: pct },
     { id: "interior-heat", stage: "structure", format: pct },
     { id: "boundary-irregularity", stage: "structure", format: pct },

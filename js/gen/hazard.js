@@ -112,6 +112,14 @@ CC.Hazard = (function () {
      * on. A star is Lethal, which is the top of the scale a body with a
      * surface can reach, and it is the same reasoning that stops a hot planet
      * reaching Absolute. */
+    /* THE COMPACT FAMILY IS WHAT ABSOLUTE WAS RESERVED FOR (see above).
+     * "Nothing survives approach" is the literal truth of a body whose tides
+     * shred matter before it lands, and it is uniform across the family —
+     * so, like a star's, the score is not consulted. */
+    if (facts.family === "compact" || facts.family === "black-hole") {
+      return { rating: RATINGS[RATINGS.length - 1], score: 10, radiation: 1 };
+    }
+
     if (facts.family === "stellar") {
       /* Activity is the ONE thing that still separates one star from another
        * here, and it separates Severe from Lethal rather than deciding whether

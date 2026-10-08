@@ -142,7 +142,7 @@ that you want to look closer, not sparse and artsy.
 
 > **`ice-caps` was on this list and is CUT.** It was a drawn `wedge` answering a
 > question deposition already answers. Caps now emerge from the frosting when
-> the snowline drops, which is what [CLIMATE-PLAN.md](../CLIMATE-PLAN.md) Step 3
+> the snowline drops, which is what [CLIMATE-PLAN.md](../archive/CLIMATE-PLAN.md) Step 3
 > builds. Do not reintroduce a cap primitive — see D27 and TRAIT-SYSTEM.md.
 
 **Done when:** a tidally locked planet renders with distinct hot face, twilight

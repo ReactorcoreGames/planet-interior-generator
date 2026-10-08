@@ -2,6 +2,8 @@
 
 *Part of [ROADMAP.md](../ROADMAP.md).*
 
+> **Status (2026-10-08):** moon ✅ (Session S), asteroid ✅ (T, overhauled U1/U2), compact group ✅ (V, reviewed W). **Only the nebula remains.** Per-group write-ups are linked from [PROGRESS.md](../PROGRESS.md); the Phase 7 kickoff prompt, with its "learned the hard way" list, is archived at [archive/PHASE-7-PROMPT.md](../archive/PHASE-7-PROMPT.md).
+
 - **Solid:** `moon`, `asteroid` (Voronoi interiors)
 - **Compact:** `neutron-star`, `pulsar`, `black-hole` (exotic textures, the void)
 - **Diffuse:** `nebula` (extreme wobble, translucency, highest element budget)

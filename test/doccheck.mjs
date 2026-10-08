@@ -113,7 +113,33 @@ console.log("\nstack composition (the failure mode in every frac table so far)")
  * that branch take their alternative range, and layers gated on an absent role
  * drop out. Still generic over every archetype and still mechanically
  * true-or-false — adding a family adds no code here. */
+/* A stack may also be CHOSEN by a setting (`presence: { param, is }`, the
+ * nebula's form): each value the stack names is its own stack, and a layer
+ * gated on other values drops out of it. Composed before the role switches
+ * below, so both kinds of branching nest. */
+function formsOf(a) {
+  const vals = new Map();
+  for (const l of a.stack) {
+    const p = l.presence;
+    if (p && p.is) for (const v of p.is) {
+      if (!vals.has(p.param)) vals.set(p.param, new Set());
+      vals.get(p.param).add(v);
+    }
+  }
+  if (!vals.size) return [a.stack];
+  let combos = [{}];
+  for (const [param, set] of vals) {
+    combos = combos.flatMap(c => [...set].map(v => ({ ...c, [param]: v })));
+  }
+  return combos.map(c => a.stack.filter(l => !(l.presence && l.presence.is) ||
+                                             l.presence.is.includes(c[l.presence.param])));
+}
+
 function branchesOf(a) {
+  return formsOf(a).flatMap(stack => roleBranchesOf({ stack }));
+}
+
+function roleBranchesOf(a) {
   const switches = new Set();
   for (const l of a.stack) {
     for (const k of Object.keys(l.frac_when || {})) switches.add(k);

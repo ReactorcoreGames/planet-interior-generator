@@ -904,8 +904,13 @@ CC.Scene = (function () {
         continue;
       }
 
+      /* A REGION MAY SIT OFF THE BODY'S CENTRE (`drift`, draw/feather.js):
+       * its fill and its riding details are drawn through a moved view.
+       * The identity on every layer that declares none. */
+      var lView = CC.Feather.driftView(view, layer.drift);
+
       /* a. base fill, to the layer's own (possibly relief-displaced) edge */
-      CC.Layers.fillLayer(ctx, view, layer, bandFill(ctx, view, layer, colour),
+      CC.Layers.fillLayer(ctx, lView, layer, bandFill(ctx, lView, layer, colour),
                           settings.seed, bounds[i]);
 
       /* b. layer details, clipped to the band so nothing spills across a
@@ -916,7 +921,10 @@ CC.Scene = (function () {
       if (elements.length || terrain || details.zones) {
         ctx.save();
         layer.innerFn = (i + 1 < layers.length) ? bounds[i + 1] : null;
-        CC.Layers.clipToLayer(ctx, view, layer, settings.seed, bounds[i]);
+        /* A layer whose details RIDE its boundary is not clipped: its marks
+         * follow the wobbled outline and dissolve at the edge on their own
+         * (draw/feather.js). Absent everywhere else. */
+        if (!layer.ride) CC.Layers.clipToLayer(ctx, view, layer, settings.seed, bounds[i]);
 
         /* The angular zone tint, under everything else: it belongs to the
          * material, so terrain shading and detail elements both sit on top. */
@@ -930,7 +938,9 @@ CC.Scene = (function () {
           });
         }
 
-        CC.DrawDetails.drawLayer(ctx, view, elements, colour, {
+        CC.DrawDetails.drawLayer(ctx,
+          layer.ride ? CC.Feather.rideView(lView, bounds[i]) : view,
+          elements, colour, {
           elementOpacity: elementOpacity,
           flowMode: details.flowMode,
           /* The layer's radial extent, so detail elements can ride the same

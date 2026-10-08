@@ -55,6 +55,15 @@ var CC = CC || {};
       /* HOW FAST A BLACK HOLE IS FEEDING — the disc and the jets
        * (js/gen/compact.js `hole`). Same stage and key as Spin rate. */
       accretionRate: (c.get("accretion-rate") === undefined ? 60 : c.get("accretion-rate")) / 100,
+      /* WHERE A NEBULA'S LIGHT COMES FROM — dark, reflection, emission
+       * (js/data/archetypes/diffuse-nebula.js). Read by the structure stage
+       * (region opacity), the detail stage (what is drawn) and the palette,
+       * so it sits in the detail key like Spin rate. */
+      luminosity: (c.get("luminosity") === undefined ? 70 : c.get("luminosity")) / 100,
+      /* WHICH OF THE NEBULA'S TWO STACKS — a filled cloud, or a shell empty
+       * in the middle (js/data/archetypes/diffuse-nebula.js). Structure
+       * stage: it decides which layers exist. */
+      nebulaForm: c.get("nebula-form") || "cloud",
       oceanDepth: (c.get("ocean-depth") || 0) / 100,
       interiorHeat: (c.get("interior-heat") || 0) / 100,
       boundaryIrregularity: (c.get("boundary-irregularity") || 0) / 100,
@@ -190,6 +199,7 @@ var CC = CC || {};
   function structureKey(s) {
     return [s.archetype, s.seed, s.thicknessVariation, s.optionalLayers,
             s.coreBias, s.oceanDepth, s.interiorHeat, s.boundaryIrregularity,
+            s.nebulaForm,
             /* Starlight biases the atmosphere's thickness, so it genuinely
              * belongs here — see CONTROL_SPECS. */
             s.starlight,
@@ -205,7 +215,7 @@ var CC = CC || {};
             s.textureStrength,
             (s.traits || []).join(","), (s.traitExcluded || []).join(","),
             s.traitCount, s.tidalLock, s.tidalFacing, s.cohesion, s.caverns,
-            s.spinRate, s.accretionRate,
+            s.spinRate, s.accretionRate, s.luminosity,
             /* The climate field lives in this stage: it modulates the
              * snowline and the frosting rather than a layer radius, exactly as
              * tidal locking does. */
@@ -397,6 +407,8 @@ var CC = CC || {};
     { id: "caverns", stage: "detail", format: pct },
     { id: "spin-rate", stage: "detail", format: pct },
     { id: "accretion-rate", stage: "detail", format: pct },
+    { id: "luminosity", stage: "detail", format: pct },
+    { id: "nebula-form", stage: "structure" },
     { id: "ocean-depth", stage: "structure", format: pct },
     { id: "interior-heat", stage: "structure", format: pct },
     { id: "boundary-irregularity", stage: "structure", format: pct },

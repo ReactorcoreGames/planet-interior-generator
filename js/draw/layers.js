@@ -329,6 +329,11 @@ CC.Layers = (function () {
    * avoids hairline seams between adjacent bands. */
   function fillLayer(ctx, view, layer, style, seed, outerFn) {
     var wob = outerFn === undefined ? boundaryFn(layer, seed) : outerFn;
+    /* A region with no hard edge — see draw/feather.js. */
+    if (layer.feather && !(style && style.warped)) {
+      CC.Feather.fill(ctx, view, layer, style, wob);
+      return;
+    }
 
     ctx.save();
     ctx.beginPath();
@@ -342,7 +347,7 @@ CC.Layers = (function () {
 
   /* The line marking a layer's outer edge. */
   function strokeBoundary(ctx, view, layer, style, width, seed, outerFn) {
-    if (layer.boundary === "soft-gradient") return;
+    if (layer.boundary === "soft-gradient" || layer.feather) return;
     var wob = outerFn === undefined ? boundaryFn(layer, seed) : outerFn;
 
     ctx.save();

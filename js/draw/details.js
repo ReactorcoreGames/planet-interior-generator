@@ -1099,13 +1099,24 @@ CC.DrawDetails = (function () {
       var blend = group[0].blend;
       if (blend) { ctx.save(); ctx.globalCompositeOperation = blend; }
 
-      ctx.beginPath();
-      for (i = 0; i < group.length; i++) {
-        CC.Primitives.speckle(ctx, view, group[i]);
-      }
       ctx.fillStyle = toneColour(
         heatShift(zoneShift(colour, group[0]), group[0], heatBand),
         group[0].tone, alpha);
+      /* `chunk`: flush the path every N dots. FILLING ONE PATH COSTS
+       * SUPERLINEARLY IN ITS CONTOUR COUNT — measured, 7,000 dots took
+       * 4,040 ms as one path, 94 ms in hundreds and 34 ms one by one (D201's
+       * 900 circles at 70 ms was the same effect). Opt-in per element so no
+       * existing body's pixels move: separate fills compound alpha where two
+       * dots overlap, and one path does not. */
+      var chunk = group[0].chunk || group.length;
+      ctx.beginPath();
+      for (i = 0; i < group.length; i++) {
+        CC.Primitives.speckle(ctx, view, group[i]);
+        if ((i + 1) % chunk === 0 && i + 1 < group.length) {
+          ctx.fill();
+          ctx.beginPath();
+        }
+      }
       ctx.fill();
 
       if (blend) ctx.restore();

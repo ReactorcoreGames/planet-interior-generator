@@ -69,8 +69,25 @@ CC.Math = (function () {
     return out;
   }
 
+  /* A piecewise-linear curve through [[x, y], ...] (x ascending), read at x.
+   * Flat beyond either end. How a single dial says "this much at dark, this
+   * much at reflection, this much at emission" without a branch per point. */
+  function curve(table, x) {
+    if (!table || !table.length) return 1;
+    if (typeof table === "number") return table;
+    if (x <= table[0][0]) return table[0][1];
+    for (var i = 1; i < table.length; i++) {
+      if (x <= table[i][0]) {
+        var a = table[i - 1], b = table[i];
+        return a[1] + (b[1] - a[1]) * (x - a[0]) / Math.max(1e-9, b[0] - a[0]);
+      }
+    }
+    return table[table.length - 1][1];
+  }
+
   return {
     TAU: TAU,
+    curve: curve,
     merge: merge,
     clamp: clamp,
     lerp: lerp,

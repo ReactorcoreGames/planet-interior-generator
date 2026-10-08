@@ -4,9 +4,9 @@
 >
 > This document is now a RECORD OF THE DESIGN rather than a plan of work. What
 > shipped, what it was verified against, and the six defects found on the way
-> are in [PROGRESS.md](PROGRESS.md) **D40–D46**; the controls are documented in
-> [PARAMETERS.md](PARAMETERS.md) and the emergent-cap mechanism in
-> [celestials/solid-bodies.md](celestials/solid-bodies.md).
+> are in [PROGRESS.md](../PROGRESS.md) **D40–D46**; the controls are documented in
+> [PARAMETERS.md](../PARAMETERS.md) and the emergent-cap mechanism in
+> [celestials/solid-bodies.md](../celestials/solid-bodies.md).
 >
 > **`node test/climate.mjs` is the harness.** It holds every numeric check this
 > plan specified, plus the renders — and `_cap-crop.png` is the view to judge
@@ -20,7 +20,7 @@
 
 *Written at the end of Session E, when Step 0 was built and Steps 1–7 were not.*
 
-**Read [PROGRESS.md](PROGRESS.md) D27, D35, D36 and this document's "What was
+**Read [PROGRESS.md](../PROGRESS.md) D27, D35, D36 and this document's "What was
 already decided" and "Settled decisions" sections before writing code.** This
 design deliberately re-uses a mechanism the project already has and deliberately
 avoids a shape the project already rejected.

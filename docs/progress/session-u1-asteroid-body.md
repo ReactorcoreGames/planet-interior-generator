@@ -1,6 +1,6 @@
 # Session U1 — the asteroid's body
 
-**D184–D192.** The first half of [ASTEROID-OVERHAUL.md](../ASTEROID-OVERHAUL.md): everything that changes what the rock looks like — §3 (deletions) → §1 (silhouette) → §2 (cells) → §8's brittleness half. Everything on and in the rock (§4–§7, radioactivity) is Session U2, deliberately, so traits are tuned against a body that has stopped changing.
+**D184–D192.** The first half of [ASTEROID-OVERHAUL.md](../archive/ASTEROID-OVERHAUL.md): everything that changes what the rock looks like — §3 (deletions) → §1 (silhouette) → §2 (cells) → §8's brittleness half. Everything on and in the rock (§4–§7, radioactivity) is Session U2, deliberately, so traits are tuned against a body that has stopped changing.
 
 **No other body changed.** Every non-asteroid archetype renders byte-identically to HEAD, checked by hashing PNGs from a worktree of the previous commit (`test/_tmp/_u1regress.mjs`), and the only trait-eligibility change anywhere is the asteroid's.
 
@@ -94,7 +94,7 @@ A void is now drawn: a dark, desaturated pocket with a depth gradient (floor lif
 
 **The first attempt read as a fourth, slate-coloured stone**, and the cause was hue, not value: the materials' hue is leaned 70% toward stone (`mosaicFill`), and the voids used the palette's raw hue. In the fan's own stone-leaned hue they read as the same rock in shadow. Icy voids are unchanged.
 
-**The user also settled §7 after U1** — see the revised §7 in [ASTEROID-OVERHAUL.md](../ASTEROID-OVERHAUL.md). Smoothing the voids' edges was considered and dropped: what reads as pointy is the fragments' corners, and rounding those would turn the field from shards to pebbles.
+**The user also settled §7 after U1** — see the revised §7 in [ASTEROID-OVERHAUL.md](../archive/ASTEROID-OVERHAUL.md). Smoothing the voids' edges was considered and dropped: what reads as pointy is the fragments' corners, and rounding those would turn the field from shards to pebbles.
 
 ## Still open, for the user's eye
 

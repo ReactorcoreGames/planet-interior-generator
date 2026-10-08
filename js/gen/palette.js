@@ -744,6 +744,24 @@ CC.Palette = (function () {
         }
       }
 
+      /* ONE DIAL MOVING THE WHOLE PALETTE — `colorProfile.dial`.
+       *
+       * `{ param, val, sat, hue: { to, amount } }`, each a curve over the
+       * named parameter (CC.Math.curve). The nebula's Luminosity source is
+       * the first user: dark is near-black and grey, reflection is cooled
+       * toward blue, emission is vivid. A profile-level declaration, so it
+       * applies to every layer the profile colours; absent on every other
+       * archetype. Applied before the user's own Saturation and Brightness,
+       * so those keep meaning what they mean. */
+      if (profile.dial) {
+        var pd = profile.dial;
+        var pdv = params[pd.param];
+        pdv = clamp(pdv === undefined ? (pd.dflt === undefined ? 0.5 : pd.dflt) : pdv, 0, 1);
+        if (pd.hue) h = mixHue(h, pd.hue.to, clamp(M.curve(pd.hue.amount, pdv), 0, 1));
+        if (pd.sat) s = clamp(s * M.curve(pd.sat, pdv), 0, 1);
+        if (pd.val) v = clamp(v * M.curve(pd.val, pdv), 0.03, 1);
+      }
+
       s = clamp(s * satScale, 0, 1);
       v = clamp(v * valScale, 0.03, 1);
 

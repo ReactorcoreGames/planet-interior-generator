@@ -46,10 +46,13 @@ style.css
 js/                   application source, ≤500 lines each
 lib/                  vendored third-party (committed)
 docs/                 the spec set — read before building
-tools/                dev-only helpers; never shipped
+test/                 dev-only harness; never shipped
+test/_tmp/            throwaway probes; gitignored
 launch_app_win.bat    starts the local server for dev
 build_release.bat     copies shippable files into dist/
 dist/                 generated; gitignored
+shots/                generated renders; gitignored, cleared freely
+archive/              v1/v2 code and promo pics; gitignored
 ```
 
 **`dist/` is a copy, not a build.** No compilation, no minification, no
@@ -106,7 +109,8 @@ not.
 
 | Doc | Contents |
 |---|---|
-| **`docs/PROGRESS.md`** | **Build checklist + decisions log. Read this first — it supersedes the specs where they disagree** |
+| **`docs/PROGRESS.md`** | **Current status, what's next, the test suite. Read this first — it supersedes the specs where they disagree** |
+| `docs/progress/` | The decisions log, one file per session. `README.md` is the index, `checklist.md` the ticked build checklist |
 | `docs/PROJECT-VISION.md` | Why this exists, who it's for, what good output is |
 | `docs/ARCHITECTURE.md` | Systems, pipeline, rendering model |
 | `docs/TRAIT-SYSTEM.md` | The trait placement grammar |
@@ -115,8 +119,7 @@ not.
 | `docs/PARAMETERS.md` | Every setting and GUI control |
 | `docs/HAZARDS.md` | Hazard, condition and flavour text pools |
 | `docs/ROADMAP.md` | MVP scope and build phases |
-| `docs/CLIMATE-PLAN.md` | **Planned, not built.** Design for the climate system: polar caps, sea ice, Orbital distance |
-| `docs/ASTEROID-OVERHAUL.md` | **Built** (Sessions U1 and U2). The asteroid's second pass: the body (silhouette, unshaded cells, brittleness) in U1; caves, the Caverns axis, the borer, `plate` and Radioactivity in U2. Support pillars deferred |
+| `docs/archive/` | Finished planning docs, kept for their reasoning: the climate plan (built, Session F), the Phase 6 polish docs, the Phase 7 prompt, the asteroid overhaul (built, U1/U2; support pillars deferred) |
 
 ---
 

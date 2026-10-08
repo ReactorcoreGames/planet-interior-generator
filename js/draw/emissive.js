@@ -181,6 +181,14 @@ CC.Emissive = (function () {
     if (!spec) return;
 
     var strength = spec.strength === undefined ? 1 : spec.strength;
+    /* A STRENGTH MAY BE A CURVE over a named parameter — `{ param, curve }`
+     * (CC.Math.curve). The nebula's backlight is the first user: strong
+     * behind a dark cloud, gone behind one that makes its own light. */
+    if (typeof strength === "object") {
+      var sp = settings[strength.param];
+      strength = CC.Math.curve(strength.curve,
+        Math.max(0, Math.min(1, sp === undefined ? 0.5 : sp)));
+    }
     if (strength <= 0) return;
 
     /* THE GLOW TAKES THE BODY'S OWN COLOUR, LEANED — NEVER REPLACED.
@@ -207,11 +215,20 @@ CC.Emissive = (function () {
      * mostly survives, which is what makes a green star sit in a green haze. */
     var sat = Math.max(0, Math.min(1, src.s * 0.88));
     var val = Math.max(0, Math.min(1, src.v * 0.72 + 0.24));
+    /* A light BEHIND the body is not the body's light, so it may state its
+     * own saturation and value; the hue stays the body's. Absent on every
+     * glow that is the body's own. */
+    if (spec.sat !== undefined) sat = spec.sat;
+    if (spec.val !== undefined) val = spec.val;
 
     /* The glow starts where the outermost layer does, so it reads as light
      * leaving the body rather than as a ring hovering off it. */
     var inner = body.extent || 1;
     var outer = inner * (spec.reach === undefined ? 1.6 : spec.reach);
+    /* `from` starts the glow INSIDE the body, as a share of its extent: light
+     * BEHIND it rather than round it, for a body that is seen against what
+     * it blocks. Absent everywhere else, so the halo starts at the edge. */
+    if (spec.from !== undefined) inner *= spec.from;
     var r0 = view.px(inner), r1 = view.px(outer);
     if (r1 <= r0 + 1) return;
 
@@ -233,7 +250,11 @@ CC.Emissive = (function () {
        * outer half is a whisper. A linear ramp reads as a painted disc with a
        * soft edge; this reads as air lit by something. */
       var u = 1 - t;
-      g.addColorStop(t, CC.Color.hsva(hue, sat, val, 0.30 * strength * u * u));
+      g.addColorStop(t, CC.Color.hsva(hue, sat, val, 0.30 * strength *
+        /* `falloff`: the exponent, 2 by default. A backlight is broad and
+         * nearly flat, so the cloud has something to block across its whole
+         * width rather than only at its centre. */
+        (spec.falloff === undefined ? u * u : Math.pow(u, spec.falloff))));
     }
     ctx.beginPath();
     ctx.arc(view.cx, view.cy, r1, 0, TAU);
@@ -344,15 +365,20 @@ CC.Emissive = (function () {
       var rng = CC.RNG.stream(settings.seed, "emissive/beams/" + body.archetype);
       var cone = CC.Primitives.KINDS["beam-cone"];
       for (var dir = -1; dir <= 1; dir += 2) {
+        /* `base` is where the beams start (gen/compact.js), 0.96 on a body
+         * whose surface they leave; every figure below is measured from it,
+         * so the default reproduces the old constants exactly. */
+        var b0 = B.base === undefined ? 0.96 : B.base;
         var el = { axis: B.axis, dir: dir, half: B.half, length: B.length,
-                   collimate: B.collimate, strength: B.strength, base: 0.96 };
+                   collimate: B.collimate, strength: B.strength, base: b0,
+                   root: B.root };
         cone(ctx, view, el, col(sat, 1));
         var ax = D.rot(0, dir, B.axis);
         var nx = { x: ax.y, y: -ax.x };
         var widthAt = function (d) {
           var wc = Math.tan(B.half) * d;
-          var wj = Math.tan(B.half) * (0.96 + B.length * 0.12) *
-                   (1 + (d - 0.96) / B.length * 0.6);
+          var wj = Math.tan(B.half) * (b0 + B.length * 0.12) *
+                   (1 + (d - b0) / B.length * 0.6);
           return wc * (1 - B.collimate) + wj * B.collimate;
         };
 
@@ -362,12 +388,12 @@ CC.Emissive = (function () {
         for (var k = 0; k < B.streaks; k++) {
           var off = (rng() * 2 - 1);
           off = off * Math.abs(off);
-          var d0 = 0.98 + rng() * B.length * 0.35;
+          var d0 = b0 + 0.02 + rng() * B.length * 0.35;
           var d1 = d0 + B.length * (0.20 + rng() * 0.55);
           var w0 = widthAt(d0) * off * 0.9, w1 = widthAt(d1) * off * 0.9;
           var p0 = D.xy(view, ax.x * d0 + nx.x * w0, ax.y * d0 + nx.y * w0);
           var p1 = D.xy(view, ax.x * d1 + nx.x * w1, ax.y * d1 + nx.y * w1);
-          var a = (0.16 + rng() * 0.30) * B.strength * (1 - (d0 - 0.96) / B.length);
+          var a = (0.16 + rng() * 0.30) * B.strength * (1 - (d0 - b0) / B.length);
           var gs = ctx.createLinearGradient(p0.x, p0.y, p1.x, p1.y);
           gs.addColorStop(0, col(sat * 0.7, 1)(0));
           gs.addColorStop(0.25, col(sat * 0.7, 1)(a));
@@ -385,7 +411,7 @@ CC.Emissive = (function () {
         var glintCol = col(sat * 0.5, 1);
         for (k = 0; k < B.glints; k++) {
           var u = rng();
-          var dd = 0.98 + B.length * u * u * 0.9;
+          var dd = b0 + 0.02 + B.length * u * u * 0.9;
           var ww = widthAt(dd) * (rng() * 2 - 1);
           var pg = D.xy(view, ax.x * dd + nx.x * ww, ax.y * dd + nx.y * ww);
           var rr = Math.max(0.6, view.px(0.0035 + rng() * 0.004));

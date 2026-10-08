@@ -39,6 +39,9 @@ CC.Randomize = (function () {
     /* Accretion the whole way: a dormant black hole is the boldest picture
      * the generator makes, and a feeding one the brightest. */
     { id: "accretion-rate", lo: 0, hi: 100 },
+    /* Luminosity the whole way: dark, reflection and emission nebulae are
+     * three different pictures. Inert on every other body. */
+    { id: "luminosity", lo: 0, hi: 100 },
     { id: "ocean-depth", lo: 0, hi: 100 },
     { id: "interior-heat", lo: 0, hi: 100 },
     { id: "rotation", lo: 0, hi: 360 },
@@ -144,6 +147,12 @@ CC.Randomize = (function () {
     }
     if (!CC.Controls.isLocked("star-colour")) {
       CC.Controls.set("star-colour", CC.Math.pick(rng, STAR_COLOURS));
+    }
+    /* MOSTLY CLOUDS. The shells are the striking exception, and a Randomize
+     * that handed one back every other press would stop them being one. */
+    if (!CC.Controls.isLocked("nebula-form")) {
+      var nf = rng();
+      CC.Controls.set("nebula-form", nf < 0.6 ? "cloud" : (nf < 0.8 ? "planetary" : "remnant"));
     }
 
     /* THE BACKGROUND COLOUR ROLLS; THE BACKGROUND TYPE DOES NOT.

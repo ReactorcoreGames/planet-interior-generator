@@ -1,6 +1,6 @@
 # Session U2 — what is on and in the asteroid
 
-**D193–D204.** The second half of [ASTEROID-OVERHAUL.md](../ASTEROID-OVERHAUL.md), in the doc's U2 order: §6 (the dead anchors) → §5 (the `plate` primitive, a rectangular mining station, the tunnel borer, the ore rename) → §7 (caves, tunnels, exits, one slider, Cohesion capping it, the card measuring it, Hollowed Rock's chamber back) → §8's radioactivity half. The body U1 built — silhouette, mosaic, cell texture, void look — was not touched.
+**D193–D204.** The second half of [ASTEROID-OVERHAUL.md](../archive/ASTEROID-OVERHAUL.md), in the doc's U2 order: §6 (the dead anchors) → §5 (the `plate` primitive, a rectangular mining station, the tunnel borer, the ore rename) → §7 (caves, tunnels, exits, one slider, Cohesion capping it, the card measuring it, Hollowed Rock's chamber back) → §8's radioactivity half. The body U1 built — silhouette, mosaic, cell texture, void look — was not touched.
 
 **No other body changed.** Every non-asteroid archetype renders byte-identically to HEAD (`test/_tmp/_u1regress.mjs` against a worktree of `8d5a54f`). Two shared mechanisms changed behaviour *only* where something opts in: the damage-trait clip (only on a surface with no frosting, which in practice is the asteroid) and the hazard scorer (reads a `radioactive` fact only the asteroid sets). The one change other bodies can *see* is the ore-deposits trait's label, which is shared.
 

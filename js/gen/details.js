@@ -486,7 +486,7 @@ CC.Details = (function () {
          * gen/traitroll.js — which calls the same dispatch — needs no change
          * and no builder that ignores it can be broken by it. */
         var made = CC.ElemGen.build(recipe, layer, plan, count, rng,
-                                    { phase: phase, params: params,
+                                    { phase: phase, params: params, seed: seed,
                                       /* The body's form, so a mosaic can lay its
                                        * cells where they will be seen (gen/form.js). */
                                       form: formFn });

@@ -6,7 +6,7 @@ aridity, and exotic ocean limits (D40–D46).*
 
 ---
 
-*Built from [CLIMATE-PLAN.md](CLIMATE-PLAN.md), Steps 1–7. Step 0 (the snowline
+*Built from [CLIMATE-PLAN.md](../archive/CLIMATE-PLAN.md), Steps 1–7. Step 0 (the snowline
 scale bug) was already fixed in Session E. `npm test` green throughout, and
 every step was verified with the numeric check the plan attached to it before
 the next was started — `node test/climate.mjs` is the harness and it holds all

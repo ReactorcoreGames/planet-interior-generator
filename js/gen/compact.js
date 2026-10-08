@@ -100,6 +100,10 @@ CC.Compact = (function () {
   function beams(spec, axis, params) {
     if (!spec) return null;
     params = params || {};
+    /* `when: { param, is }` — beams only while a setting names one of the
+     * listed values. A supernova remnant's pulsar fires them; a planetary
+     * nebula's white dwarf and a cloud do not. */
+    if (spec.when && spec.when.is.indexOf(params[spec.when.param]) < 0) return null;
     var dens = param(params, "detailDensity", 0.65);
     var none = function () { return 0.5; };
     var strength = figure(spec.strength, params, none, 1);
@@ -113,6 +117,12 @@ CC.Compact = (function () {
       /* How tightly the cone stays a cone. 0 is a straight-sided wedge — a
        * pulsar's beam; toward 1 the sides pinch in, which is a jet. */
       collimate: spec.collimate || 0,
+      /* Where the beams start, in body radii: the star's surface by default.
+       * A pulsar at the heart of a nebula is a tiny point at its centre. */
+      base: spec.base === undefined ? 0.96 : spec.base,
+      /* The beam's width where it starts; undefined keeps the primitive's
+       * default (a star's polar cap). */
+      root: spec.root,
       streaks: count(spec.streaks),
       glints: count(spec.glints),
       knots: count(spec.knots)

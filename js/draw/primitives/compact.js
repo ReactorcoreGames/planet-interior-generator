@@ -351,7 +351,11 @@ var CC = CC || {};
          * leaves a polar cap rather than a point. */
         var wcone = Math.tan(el.half) * d;
         var wjet = Math.tan(el.half) * (base + len * 0.12) * (1 + tt * 0.6);
-        var hw = (wcone * (1 - col) + wjet * col) * Ly.w + 0.03 * Ly.w;
+        /* `root`: the width at the base, in body radii (0.03 by default, a
+         * polar cap on a star's surface). A beam from a point at the heart
+         * of a nebula must start as a point, or it leaves a fat flat end. */
+        var hw = (wcone * (1 - col) + wjet * col) * Ly.w +
+                 (el.root === undefined ? 0.03 : el.root) * Ly.w;
         var cxp = ax.x * d, cyp = ax.y * d;
         left.push(xy(view, cxp + nx.x * hw, cyp + nx.y * hw));
         right.push(xy(view, cxp - nx.x * hw, cyp - nx.y * hw));

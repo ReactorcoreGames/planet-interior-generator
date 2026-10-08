@@ -122,6 +122,30 @@ CC.Structure = (function () {
       };
     }
 
+    /* Form 6: ONE OF A SET OF STRUCTURES, NAMED BY A SETTING.
+     *
+     * `presence: { param, is: ["remnant", ...], dflt, chance }` — present
+     * only while the named setting is one of the listed values. The nebula is
+     * the first user: a planetary nebula or a supernova remnant is EMPTY IN
+     * THE MIDDLE, which no value of any slider expresses, so the archetype
+     * declares both stacks and the Nebula form setting picks one. The moon's
+     * branch is rolled; this one is chosen, because the user asked for the
+     * hollow ones by name.
+     *
+     * `chance` adds an optional roll on top, scaled by Optional layers. The
+     * roll is consumed whatever the setting says, so switching form never
+     * reshuffles the layers below. */
+    if (p.is !== undefined) {
+      var sv = params[p.param];
+      if (sv === undefined) sv = p.dflt;
+      var roll = p.chance !== undefined ? rng() : 0;
+      if (p.is.indexOf(sv) < 0) return { present: false, strength: 0 };
+      if (p.chance !== undefined && roll >= p.chance * optionalChance) {
+        return { present: false, strength: 0 };
+      }
+      return { present: true, strength: 1 };
+    }
+
     /* Form 3: governed by a parameter. */
     var v = params[p.param];
     if (v === undefined) return { present: true, strength: 1 };
@@ -360,7 +384,30 @@ CC.Structure = (function () {
         /* Per-trait depth overrides within this layer. See `placeOne` in
          * gen/traitroll.js. */
         traitDepth: spec.traitDepth,
-        opacity: spec.opacity === undefined ? 1 : spec.opacity,
+        /* A number, or a [lo, hi] range rolled from the layer's OWN stream
+         * so rolling it never reshuffles anything else. A translucent region
+         * (the nebula) is the first user of the range form. */
+        opacity: spec.opacity === undefined ? 1
+          : Math.min(spec.opacityBy ? 0.95 : 1, (Array.isArray(spec.opacity)
+              ? lerp(spec.opacity[0], spec.opacity[1],
+                     CC.RNG.stream(seed, "structure/opacity/" + spec.role)())
+              : spec.opacity) *
+          /* `opacityBy: { param, scale }` — a curve multiplier over a named
+           * parameter, capped at 0.95. A dark nebula's regions are near-opaque
+           * dust; an emission nebula's are thin glowing gas. */
+          (spec.opacityBy && params[spec.opacityBy.param] !== undefined
+            ? M.curve(spec.opacityBy.scale, clamp(params[spec.opacityBy.param], 0, 1)) : 1)),
+        /* A soft-edged region: see draw/feather.js. Absent everywhere else. */
+        feather: spec.feather || 0,
+        ride: !!spec.ride,
+        /* The region's centre, moved off the body's (draw/feather.js). Rolled
+         * from the layer's own stream; null on every layer that declares
+         * none. */
+        drift: spec.drift ? (function (d, r) {
+          var dist = lerp(d[0], d[1], r()) * irregularity;
+          var dir = r() * Math.PI * 2;
+          return { x: Math.sin(dir) * dist, y: -Math.cos(dir) * dist };
+        })(spec.drift, CC.RNG.stream(seed, "structure/drift/" + spec.role)) : null,
         shell: !!spec.shell,
         relative: !!relative,
         /* An optional ceiling on how thick this layer may end up. See the

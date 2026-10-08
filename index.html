@@ -108,6 +108,9 @@
                 <option value="pulsar">Pulsar</option>
                 <option value="black-hole">Black hole</option>
               </optgroup>
+              <optgroup label="Diffuse">
+                <option value="nebula">Nebula</option>
+              </optgroup>
             </select>
             <label class="lock" title="Lock: Randomize will not change the archetype.">
               <input type="checkbox" id="lock-archetype"><span class="lock-icon">&#128274;</span>
@@ -216,6 +219,34 @@
             <input type="range" id="accretion-rate" min="0" max="100" value="60">
             <output data-readout="accretion-rate"></output>
             <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-accretion-rate"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <!-- LUMINOSITY SOURCE. The nebula's character as one axis rather
+               than three mutually exclusive traits (diffuse-bodies.md): dark,
+               reflection, emission are three points on it, and the space
+               between them is reachable too. Moves opacity, lightness, hue
+               and whether there are stars inside, all at once - see
+               js/data/archetypes/diffuse-nebula.js. Detail stage. -->
+          <div class="control-row" title="Where a nebula's light comes from. 0% is a dark nebula - thick obscuring dust, near-black, blotting out what is behind it. Around 35% is a reflection nebula - lit from outside, one side bright, cooled toward blue. 100% is an emission nebula - glowing from within, vivid, with newborn stars inside lighting it up. Nebulae only.">
+            <label for="luminosity">Luminosity source</label>
+            <input type="range" id="luminosity" min="0" max="100" value="70">
+            <output data-readout="luminosity"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-luminosity"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <!-- NEBULA FORM. Which of the nebula's two stacks is built: a filled
+               cloud densest inward, or a SHELL empty in the middle - a
+               planetary nebula round a white dwarf, or a supernova remnant
+               round a pulsar. Structure, not degree, so a select rather than
+               a slider (diffuse-bodies.md, "the shell stack"). -->
+          <div class="control-row" title="What kind of nebula. A cloud is densest in the middle, with stars forming inside. A planetary nebula is a glowing shell thrown off by a dying star, empty in the middle with a white dwarf at the centre. A supernova remnant is the shell of an exploded star, ragged and threaded with filaments, with a pulsar at its heart firing two beams. Nebulae only.">
+            <label for="nebula-form">Nebula form</label>
+            <select id="nebula-form">
+              <option value="cloud" selected>Cloud</option>
+              <option value="planetary">Planetary nebula</option>
+              <option value="remnant">Supernova remnant</option>
+            </select>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-nebula-form"><span class="lock-icon">&#128274;</span></label>
           </div>
 
           <div class="control-row" title="0% is a desert or airless world with no ocean at all. High values drown the crust in a global sea.">
@@ -755,6 +786,7 @@
 <script src="js/data/archetypes/stellar-dwarf.js"></script>
 <script src="js/data/archetypes/compact-neutron.js"></script>
 <script src="js/data/archetypes/compact-blackhole.js"></script>
+<script src="js/data/archetypes/diffuse-nebula.js"></script>
 <script src="js/data/elements/registry.js"></script>
 <script src="js/data/elements/solid.js"></script>
 <script src="js/data/elements/solid-moon.js"></script>
@@ -764,6 +796,7 @@
 <script src="js/data/elements/stellar-envelope.js"></script>
 <script src="js/data/elements/stellar-interior.js"></script>
 <script src="js/data/elements/compact.js"></script>
+<script src="js/data/elements/diffuse.js"></script>
 <script src="js/data/traits/registry.js"></script>
 <script src="js/data/traits/orbital.js"></script>
 <script src="js/data/traits/solid.js"></script>
@@ -799,6 +832,7 @@
 <script src="js/gen/climatesummary.js"></script>
 <script src="js/gen/elemgen.js"></script>
 <script src="js/gen/compact.js"></script>
+<script src="js/gen/diffuse.js"></script>
 <script src="js/gen/traitroll.js"></script>
 <script src="js/gen/details.js"></script>
 <script src="js/gen/climatetext.js"></script>
@@ -816,6 +850,7 @@
 <script src="js/draw/canvas.js"></script>
 <script src="js/draw/layers.js"></script>
 <script src="js/draw/formfill.js"></script>
+<script src="js/draw/feather.js"></script>
 <script src="js/draw/primitives.js"></script>
 <script src="js/draw/primitives/orbital.js"></script>
 <script src="js/draw/rocktexture.js"></script>
@@ -830,6 +865,7 @@
 <script src="js/draw/primitives/stellar-field.js"></script>
 <script src="js/draw/primitives/compact.js"></script>
 <script src="js/draw/primitives/compact-stream.js"></script>
+<script src="js/draw/primitives/diffuse.js"></script>
 <script src="js/draw/hole.js"></script>
 <script src="js/draw/details.js"></script>
 <script src="js/draw/grain.js"></script>

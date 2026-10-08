@@ -238,7 +238,7 @@ provably wrong inside, suspect a shadow before suspecting the caller.**
 ### D36 · The snow zone is dead on every unzoned body — FIXED
 
 **Found and fixed:** Session E. The rest of the climate work is planned in
-[CLIMATE-PLAN.md](CLIMATE-PLAN.md); this bug was independent of it and was fixed
+[CLIMATE-PLAN.md](../archive/CLIMATE-PLAN.md); this bug was independent of it and was fixed
 immediately.
 
 The user reported that an ordinary planet grows no polar caps and its ocean
@@ -325,7 +325,7 @@ because a rule excluded it.
 ### D39 · The ocean can only ever be blue — measured, and planned
 
 **Found:** Session E. **Planned, not built** — see
-[CLIMATE-PLAN.md](CLIMATE-PLAN.md), "Exotic ocean colour".
+[CLIMATE-PLAN.md](../archive/CLIMATE-PLAN.md), "Exotic ocean colour".
 
 The user asked whether exotic sea colours are reachable. They are not. Across
 **300 randomly seeded bodies** with the primary hue rolling freely:

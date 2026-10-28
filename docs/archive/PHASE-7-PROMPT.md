@@ -47,7 +47,17 @@ STATUS
    `glowCentre` in the palette; Spin rate and Accretion rate sliders; three
    `dials` relabels plus Mass class; seven traits; ten presets. No `js/draw/`
    archetype branch; no existing body moved.
-⬜ **diffuse (NEXT)** — nebula.
+✅ **diffuse** — built in Session X (D219–D240). Write-up:
+   docs/progress/session-x-nebula.md. One archetype, `nebula`, with TWO
+   stacks chosen by a Nebula form select (a filled cloud; a hollow shell for
+   a planetary nebula or a supernova remnant, the latter with a pulsar's
+   beams). Regions that drift, `feather` and `ride`, a per-body density
+   field, Luminosity source as four curve declarations, fifteen traits gated
+   by form (`when`) and placed by the gas (`place`, `nest`), its own card,
+   a navigational hazard rating, seven presets. No `js/draw/` archetype
+   branch; no existing body moved.
+
+**PHASE 7 IS COMPLETE.**
 
 Do ONE group per session. Phase 6 needed four sessions for one family, and
 the compact and diffuse groups are further from anything already built than
@@ -109,6 +119,12 @@ DONE WHEN (per group, from the phase doc):
 - a black hole is the void — whatever that turns out to mean, it is not a
   dark circle with a ring drawn on it
 - nothing in js/draw/ needed an archetype-specific branch
+
+✅ Met by the nebula (Session X): a nebula is legible at the highest element
+budget without becoming mush — each region carries a different KIND of mark
+over one shared density field rather than more of the same, and the user
+signed the stack off in the app — and nothing in js/draw/ learned an
+archetype, role or form name: every new behaviour is a declared opt-in.
 
 ✅ Met by the compact group (Session V): the black hole reads as a void
 because everything round it is cut-open matter and inside there is none —

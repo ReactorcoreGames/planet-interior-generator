@@ -171,6 +171,21 @@ assumed.
       relabels the slider per archetype. Wired on all three routes into the
       archetype control, D114's audit applied rather than rediscovered
 
+### Phase 7 — the nebula ✅ (Session X) — Phase 7 complete
+
+[session-x-nebula.md](session-x-nebula.md) — D219–D240. `nebula`, the diffuse family. **No existing body changed** (36 renders hash identically to HEAD after every renderer change), and **no archetype branch in `js/draw/`**.
+
+- [x] **wobble alone cannot cross regions; regions `drift`** off-centre (D219), with no edge: `feather`, `ride`, rolled `opacity` (D220)
+- [x] **a region IS its density field** — one field per body, `cloud-field`, every soft mark placed by density across its whole region (D221); the authored table restated where it is drawn (D222)
+- [x] **a soft vocabulary** — puff, billow, filament, lane, knot, rim, protostar, every one dissolving (D223); `tiers: 2` keeps the smallest tiers (D224); chunked speckle (D225); the budget (D226)
+- [x] **Luminosity source** — one slider, four curve declarations (palette `dial`, `opacityBy`, recipe `dial`, `emissiveGlow`); a dark nebula silhouetted against a backlight (D227–D228)
+- [x] **Nebula form** select and the shell stack — `presence: { param, is }`, a hollow shell, the outer shock, a pulsar's `beams` from the remnant star; "the smash ball" fixed (D229–D232)
+- [x] **traits gated by form** — `when` on a trait, honoured by the roller and the picker (D233)
+- [x] **traits placed by the gas** — `place: "pocket"` through `CC.ElemGen.registerPlacer`, drawn in the spanning pass in body space (D234); `nest`, and `under` in the spanning pass (D235)
+- [x] **fifteen traits, each a different kind of mark**, six new primitives; dark lanes kept as a rift and the reason recorded (D236); eight marks that read wrong first, D224 among them (D237); a per-form pixel diff for every trait
+- [x] **the `nebula` card** — crossed, not reached; every figure computed and checked (D238); a navigational **hazard rating** calibrated against the frequency contract (D239)
+- [x] **flavour pool and seven presets**, each checked against its blurb (D240)
+
 ### Phase 7 — the compact group ✅ (Session V)
 
 [session-v-compact.md](session-v-compact.md) — D205–D216. `neutron-star`, `pulsar`, `black-hole`. **No existing body changed** (27 renders hash identically to `3045346`), and **no archetype branch in `js/draw/`**.

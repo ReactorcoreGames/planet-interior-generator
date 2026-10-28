@@ -8,17 +8,19 @@
 
 ## Status
 
-**Built:** Phases 0–6 ✅ · Phase 7: moon ✅ (S), asteroid ✅ (T, overhauled U1/U2), compact group ✅ (V, reviewed W) · the nebula is the last Phase 7 body.
+**Built:** Phases 0–7 ✅ · Phase 7: moon ✅ (S), asteroid ✅ (T, overhauled U1/U2), compact group ✅ (V, reviewed W), nebula ✅ (X).
 
-**In progress (Session X): the diffuse group — `nebula`.** Stages 1–3 of 4 are built and signed off by the user: the filled stack with drift, feather and a density field; the Luminosity source slider; and the Nebula form select (cloud / planetary nebula / supernova remnant, the shell stack, with a pulsar's beams at a remnant's heart). **Stage 4 remains:** traits, the `nebula` stat template, flavour, presets, then the session close-out (progress/README row, checklist, this Status block and phase table, Phase 7 marked complete). Write-up so far: [progress/session-x-nebula.md](progress/session-x-nebula.md) (D219–D232). Spec: [celestials/diffuse-bodies.md](celestials/diffuse-bodies.md).
+**Just finished (Session X): the nebula, and with it Phase 7.** Stages 1–3 (the filled stack, Luminosity source, Nebula form and the shell stack) were signed off by the user in the app. Stage 4 is built and **waiting for the user's eye**: fifteen traits gated by form (`when`) and placed by the gas (`place: "pocket"`, `nest`), the `nebula` card (a body you cross, not reach) with a navigational hazard rating, a flavour pool and seven presets. Write-up: [progress/session-x-nebula.md](progress/session-x-nebula.md) (D219–D240), whose "Still open" list has the judgement calls. Spec: [celestials/diffuse-bodies.md](celestials/diffuse-bodies.md).
+
+**Open for the user — chunked speckle filling (D225).** Filling a speckle batch in chunks instead of one path made the nebula's motes several times cheaper. Applied globally it would likely speed up every grainy body (a planet draws ~9,500 elements, mostly speckle), but separate fills compound alpha where dots overlap, so every body's pixels would change slightly. Opt-in on the nebula only until the user decides.
 
 **Then:** Phase 8 (overlay, scale bar, polish — the compact family's spec calls the scale bar essential), Phase 9 (machine worlds), Phase 10 (release; the user's release prompt is [RC prompt to make releases easier.md](RC%20prompt%20to%20make%20releases%20easier.md)). See [ROADMAP.md](ROADMAP.md).
 
 **Still open from the compact group, for the user's eye:** listed at the end of [progress/session-v-compact.md](progress/session-v-compact.md) — crack jaggedness, the magnetosphere fill, faint lensing arcs, no starfield lensing, the disc's hue bias.
 
-**Last updated:** 2026-10-08 — docs cleanup: PROGRESS.md split, finished plan docs moved to `docs/archive/`, `shots/` cleared. Previous: Session W, the user's review of the compact group (D217–D218).
+**Last updated:** 2026-10-09 — Session X stage 4 and close-out: nebula traits, card, flavour, presets; Phase 7 complete. Previous: 2026-10-08, docs cleanup.
 
-**Next free decision number: D233.**
+**Next free decision number: D241.**
 
 ---
 
@@ -47,7 +49,7 @@ One line per completed block of work. The ticked items behind each are in [progr
 | Asteroid overhaul — the body | U1 | D184–D192 | [session-u1-asteroid-body.md](progress/session-u1-asteroid-body.md) |
 | Asteroid overhaul — caves, borer, `plate`, Radioactivity | U2 | D193–D204 | [session-u2-asteroid-interior.md](progress/session-u2-asteroid-interior.md) |
 | Phase 7 — compact group (neutron star, pulsar, black hole) | V, W | D205–D218 | [session-v-compact.md](progress/session-v-compact.md) |
-| Phase 7 — nebula | X | — | ⬜ next |
+| Phase 7 — nebula (Phase 7 complete) | X | D219–D240 | [session-x-nebula.md](progress/session-x-nebula.md) |
 
 ---
 

@@ -492,6 +492,8 @@ var CC = CC || {};
         if (CC.PresetGallery) CC.PresetGallery.setArchetype(a);
         CC.Controls.syncAxisDials();
       }
+      /* A nebula's traits depend on its form (`when`), so the list follows. */
+      if (id === "nebula-form" && CC.TraitPicker) CC.TraitPicker.build();
       requestDraw();
     });
 
@@ -500,7 +502,7 @@ var CC = CC || {};
     if (CC.TraitPicker) {
       CC.TraitPicker.init(document.getElementById("trait-list"), function () {
         requestDraw();
-      });
+      }, gather);
       /* AND IT MUST BE TOLD WHICH BODY IT IS LOOKING AT, at init and not only
        * on change.
        *

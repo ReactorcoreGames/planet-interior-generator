@@ -642,6 +642,15 @@ CC.Details = (function () {
       }
       if (below.length) byRole[ur] = below.concat(above);
     }
+    /* The same partition for the spanning pass, which draws every trait of a
+     * body with no layers of its own to sink into — a nebula's. A cavity is
+     * the ground its contents sit on; drawn after them it blotted them out.
+     * No spanning trait declared `under` before, so nothing else moves. */
+    var spBelow = [], spAbove = [];
+    for (var si0 = 0; si0 < placed.spanning.length; si0++) {
+      (placed.spanning[si0].under ? spBelow : spAbove).push(placed.spanning[si0]);
+    }
+    if (spBelow.length) placed.spanning = spBelow.concat(spAbove);
     total += placed.outward.length + placed.surface.length +
              placed.damage.length + placed.spanning.length;
 

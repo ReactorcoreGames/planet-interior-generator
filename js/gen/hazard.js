@@ -120,6 +120,34 @@ CC.Hazard = (function () {
       return { rating: RATINGS[RATINGS.length - 1], score: 10, radiation: 1 };
     }
 
+    /* A NEBULA IS THINNER THAN A LABORATORY VACUUM, so nothing on the
+     * temperature, air or gravity rungs means anything in it: -260 C at a
+     * few hundred atoms per cubic centimetre will not chill a hull. Its
+     * dangers are NAVIGATIONAL, each one already a line on its card — flying
+     * blind, matter drifting unseen, shock fronts, the ultraviolet of young
+     * stars, and on a supernova remnant the pulsar. One point for getting
+     * lost (no landmarks, no comms) so a bare cloud is Benign and a cloud
+     * with anything in it Mild. Capped at Lethal: Absolute stays the compact
+     * objects' (a remnant's pulsar is far off at the middle, not underfoot). */
+    if (facts.family === "nebula") {
+      var t = facts.traits || [];
+      var nb = 1;
+      if (facts.dark) nb += 3; else if (facts.reflection) nb += 1;
+      if (facts.form === "remnant") nb += 3;
+      else if (facts.form === "planetary") nb += 1;
+      nb += Math.min(3, (facts.materials || []).length);
+      ["bow-shocks", "embedded-star", "protostar-cluster"]
+        .forEach(function (id) { if (t.indexOf(id) >= 0) nb += 1; });
+      if (facts.form === "cloud" && facts.luminosity > 0.75) nb += 1;
+      var ni = 0;
+      while (ni < CUTS.length && nb >= CUTS[ni]) ni++;
+      /* The pulsar alone makes a remnant Severe; it takes more on top of
+       * it to be Lethal (first calibration: +5 and no floor put 20% of all
+       * nebulae at Lethal, nearly every remnant). */
+      if (facts.form === "remnant" && ni < 3) ni = 3;
+      return { rating: RATINGS[Math.min(ni, 4)], score: nb, radiation: 0 };
+    }
+
     if (facts.family === "stellar") {
       /* Activity is the ONE thing that still separates one star from another
        * here, and it separates Severe from Lethal rather than deciding whether

@@ -89,7 +89,12 @@ CC.ExportUI = (function () {
    * one should call this rather than growing a second copy of the list. */
   function syncArchetypeConsumers() {
     var id = CC.Controls.get("archetype") || "planet";
-    if (CC.TraitPicker) CC.TraitPicker.setArchetype(id);
+    if (CC.TraitPicker) {
+      CC.TraitPicker.setArchetype(id);
+      /* setArchetype returns early on the same archetype; a paste may still
+       * have changed Nebula form, which a nebula's trait list follows. */
+      CC.TraitPicker.build();
+    }
     if (CC.PresetGallery) CC.PresetGallery.setArchetype(id);
     /* The angular axis's slider is labelled per archetype, and a paste is one
      * of the three routes that changes the archetype without firing its

@@ -222,6 +222,10 @@ CC.Randomize = (function () {
     if (CC.TraitPicker && !CC.Controls.isLocked("trait-count")) {
       CC.TraitPicker.clear();
       if (onReroll) onReroll();
+    } else if (CC.TraitPicker) {
+      /* Kept picks still list against the NEW settings: Nebula form may have
+       * changed, and a nebula's traits depend on it. */
+      CC.TraitPicker.build();
     }
 
     if (onDone) onDone();

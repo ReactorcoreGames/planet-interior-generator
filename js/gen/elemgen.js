@@ -1139,9 +1139,21 @@ CC.ElemGen = (function () {
     BUILDERS[kind] = fn;
   }
 
+  /* NAMED PLACEMENTS for traits (`place` — see placeOne in gen/traitroll.js).
+   * `fn(made, trait, body, layer, params, seed, rng)` returns the elements,
+   * moved. Kept here beside the builders because a family registers both from
+   * its own file, and this file loads before any of them. */
+  var PLACERS = {};
+  function registerPlacer(name, fn) {
+    if (PLACERS[name]) throw new Error("trait placer already registered: " + name);
+    PLACERS[name] = fn;
+  }
+
   return {
     build: build,
     registerBuilder: registerBuilder,
+    registerPlacer: registerPlacer,
+    placer: function (name) { return PLACERS[name] || null; },
     /* The shared scatter, for registered builders that only decorate. */
     scatter: function (kind, recipe, layer, plan, rng, opts, decorate) {
       return withOpts(opts, { decorate: decorate },

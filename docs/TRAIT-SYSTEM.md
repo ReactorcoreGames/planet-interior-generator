@@ -166,6 +166,12 @@ trait's instances cluster into that zone instead of spreading across the full
 `arc`. A tidally locked machine world puts its cities in the twilight band by
 declaring `zoneBias: "twilight"`. Null on most traits.
 
+**`when`** — `{ param, is: [...], dflt }`, the same shape as a layer's `presence`: the trait is offered only while that setting names one of the listed values. For an archetype with two stacks chosen by a setting, where a trait means something on one and nothing on the other — a nebula's wind-blown cavity is cloud-only, because a shell already is one. Honoured by the roller and the picker (Session X, D233). Absent on most traits.
+
+**`place`** — the name of a registered placer (`CC.ElemGen.registerPlacer`) that moves the built elements after the grammar has placed them. The grammar places round a body made of shells; a body made of gas has none, so a nebula's traits use `place: "pocket"` (js/gen/diffuse-pockets.js), which puts them where the gas is thick or thin, in clusters, belts, rows or files, aimed at the light. Its own fields are documented in that file (D234).
+
+**`nest`** — a list of trait ids: after every trait is placed, this one's whole group moves onto the first of them present, at `nestAt` of the host's radius from its centre, and draws after it. A hidden station in a cavity, a flotilla beside a belt. With no host present it stays where it was placed (D235).
+
 ---
 
 ## Orientation convention

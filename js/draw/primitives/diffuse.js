@@ -112,6 +112,23 @@ var CC = CC || {};
     var bend = (hash(el.seed, 7) - 0.5) * 1.5;
     var r = el.radius, a = el.angle;
     var pts = [];
+    /* A HEADING OF ITS OWN (`aim`, a body-space bearing — trait marks only):
+     * walk straight-ish in body x/y instead. The polar walk below steps the
+     * angle by ds / r, so a long mark placed near the centre spun on the spot
+     * and a rift across the whole cloud drew as a dot. */
+    if (el.aim !== undefined) {
+      var x0 = Math.sin(a) * r, y0 = -Math.cos(a) * r;
+      var hd = el.aim, bd = (hash(el.seed, 7) - 0.5) * 0.6;
+      var cx = x0 - Math.sin(hd) * len / 2, cy = y0 + Math.cos(hd) * len / 2;
+      for (var s = 0; s <= steps; s++) {
+        var tt = s / steps;
+        var hh = hd + bd * (tt - 0.5) + Math.sin(tt * 3.3 + el.seed * 19.1) * 0.08;
+        pts.push(view.at(Math.sqrt(cx * cx + cy * cy), Math.atan2(cx, -cy)));
+        cx += Math.sin(hh) * len / steps;
+        cy -= Math.cos(hh) * len / steps;
+      }
+      return pts;
+    }
     /* Start half a length back so the element's position is its middle. */
     var h = tilt, ds = len / steps;
     for (var back = 0; back < steps / 2; back++) {
@@ -169,14 +186,18 @@ var CC = CC || {};
      * tangentially like a filament, every lane curled round the middle and
      * the set of them drew rings. */
     var pts = wander(view, el, steps, 3.0);
-    var W = view.px(el.size) * 0.17;
+    /* `girth` — width against length. A lane is short and broad; a rift the
+     * length of the whole cloud at the same proportion is a blob. */
+    var W = view.px(el.size) * (el.girth === undefined ? 0.17 : el.girth);
     for (var i = 0; i <= steps; i++) {
       var t = i / steps;
       var k = Math.pow(Math.sin(Math.PI * t), 0.7);
       var wob = 0.75 + 0.5 * hash(el.seed, 50 + i);
       if (k < 0.03) continue;
       softDisc(ctx, pts[i].x, pts[i].y, Math.max(1.2, W * k * wob), 0.8,
-               hash(el.seed, 70 + i) * TAU, dark, c[3] * 0.36 * (0.5 + 0.5 * k));
+               hash(el.seed, 70 + i) * TAU, dark,
+               /* A slim lane's discs barely overlap, so each carries more. */
+               c[3] * (el.girth === undefined ? 0.36 : 0.7) * (0.5 + 0.5 * k));
     }
   }
 
@@ -370,6 +391,10 @@ var CC = CC || {};
     if (absorb > 0.01) pass(null, dark, Math.min(1, absorb), false);
     if (emit > 0.01) pass(el.blend || "screen", c, c[3] * emit, true);
   }
+
+  /* The shared helpers, for the trait marks in draw/primitives/diffuse-marks.js. */
+  CC.Primitives.softKit = { parts: parts, rgba: rgba, hash: hash,
+                            softDisc: softDisc, crescent: crescent };
 
   CC.Primitives.register({
     "cloud-field": cloudField,

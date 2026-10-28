@@ -315,6 +315,12 @@ CC.DrawDetails = (function () {
     var hue = colour.h + 4;
     var sat = clamp(colour.s * 0.22 + 0.04, 0.03, 0.20);
     var v = 0.62 + Math.sin(seed * 51.3) * 0.06;
+    /* `dim` — a hull with no power and no paint left: a derelict. Absent on
+     * every other hull. */
+    if (el.dim !== undefined) v *= el.dim;
+    /* `paint` — a livery, {h, s}: a working fleet's own colour, so it is not
+     * mistaken for the grey of anything else built (gen/diffuse-pockets.js). */
+    if (el.paint) { hue = el.paint.h; sat = el.paint.s; v = el.paint.v; }
 
     return {
       hull: CC.Color.hsva(hue, sat, v, alpha),

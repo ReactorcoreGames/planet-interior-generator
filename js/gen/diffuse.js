@@ -256,5 +256,10 @@ CC.Diffuse = (function () {
     });
   });
 
-  return { field: field };
+  return {
+    field: field,
+    /* The body's light bearing from its seed — for the trait placer
+     * (gen/diffuse-pockets.js), which has no recipe opts to read. */
+    lightOf: function (seed) { return lightOf({ seed: seed }); }
+  };
 })();

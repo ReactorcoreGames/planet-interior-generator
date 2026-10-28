@@ -27,7 +27,7 @@ The architecture is designed so later phases slot in without rework: archetypes 
 | 🎯 MVP | ✅ | [roadmap/mvp.md](roadmap/mvp.md) |
 | 5 — Second family: gaseous | ✅ (Sessions K–L) | [roadmap/phase-5-gaseous.md](roadmap/phase-5-gaseous.md) |
 | 6 — Stars | ✅ (Sessions M–R) | [roadmap/phase-6-stars.md](roadmap/phase-6-stars.md) |
-| 7 — Remaining families | 🔶 moon, asteroid, compact ✅ · **nebula next** | [roadmap/phase-7-remaining-families.md](roadmap/phase-7-remaining-families.md) |
+| 7 — Remaining families | ✅ (Sessions S–X) | [roadmap/phase-7-remaining-families.md](roadmap/phase-7-remaining-families.md) |
 | 8 — Overlay, scale, polish | ⬜ framing built early (Session I) | [roadmap/phase-8-polish.md](roadmap/phase-8-polish.md) |
 | 9 — Machine worlds | ⬜ | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
 | 10 — Release | ⬜ | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
@@ -39,12 +39,12 @@ The architecture is designed so later phases slot in without rework: archetypes 
 
 **Phases 0–6 are complete**, along with the climate system (Session F) and framing (Session I, pulled forward from Phase 8).
 
-**Phase 7 is three groups in, one to go:**
+**Phase 7 is complete:**
 
 - ✅ **moon and ice moon** — Session S
 - ✅ **asteroid** — Session T, then overhauled in Sessions U1 and U2 after the user's review
 - ✅ **compact group** (neutron star, pulsar, black hole) — Session V, reviewed and tuned in Session W
-- ⬜ **nebula** — next. The biggest test of the density system: extreme wobble, translucency, the highest element budget in the project, and a second stack (the planetary-nebula shell) that inverts every other body's densest-at-the-core assumption. Spec: [celestials/diffuse-bodies.md](celestials/diffuse-bodies.md)
+- ✅ **nebula** — Session X: extreme wobble with drifting regions, translucency, a per-body density field, Luminosity source, a second stack (the hollow shell of a planetary nebula or supernova remnant, with a pulsar's beams), fifteen traits placed by the gas, its own card and seven presets. Spec: [celestials/diffuse-bodies.md](celestials/diffuse-bodies.md)
 
 **After Phase 7:** Phase 8 (layer-name overlay, scale bar — which the compact family's spec calls essential — and polish), Phase 9 (machine worlds), Phase 10 (release). The user's release-prep prompt for Phase 10 is [RC prompt to make releases easier.md](RC%20prompt%20to%20make%20releases%20easier.md).
 

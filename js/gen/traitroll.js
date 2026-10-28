@@ -42,7 +42,9 @@ CC.TraitRoll = (function () {
    * honoured as given, filtered for compatibility, and nothing is rolled: the
    * user asked for these. When absent, traits are rolled to the budget. */
   function select(archetype, params, seed) {
-    var pool = CC.Traits.eligible(archetype);
+    /* With the settings, so a trait gated by `when` (registry.js) is neither
+     * rolled nor honoured from the picker on a form it means nothing on. */
+    var pool = CC.Traits.eligible(archetype, params);
     var chosen = [];
 
     /* Traits the user has excluded in the picker. These are barred from the
@@ -364,6 +366,13 @@ CC.TraitRoll = (function () {
       }
     }
 
+    /* A NAMED PLACER MAY SET THE COUNT ITSELF — `plan` on the placer. A
+     * pocket trait counts per cluster (three fields of two to nine cloudlets
+     * each), which the slider's one total cannot say. Absent everywhere else. */
+    var placer = trait.place && CC.ElemGen.placer(trait.place);
+    var pre = placer && placer.plan ? placer.plan(trait, layer, count, rng) : null;
+    if (pre) count = pre.count;
+
     if (count <= 0) return [];
 
     var angles = anchorAngles(trait, rng, zones);
@@ -529,8 +538,23 @@ CC.TraitRoll = (function () {
        * is wrong. */
       orbit: trait.anchor === "orbit"
         ? (orbitBand(trait, body) || trait.depth)
-        : null
+        : null,
+      /* The body seed and the settings, as gen/details.js hands them to a
+       * layer's builders — a builder that places by a per-body field needs
+       * both. Every builder that does not read them ignores them. */
+      seed: seed,
+      params: params
     });
+
+    /* A NAMED PLACEMENT — `place: "<name>"` on the trait. The grammar's
+     * anchor/angle/depth says where an instance goes round a body made of
+     * shells; a body made of gas has no shells to be round, and its traits
+     * belong where its gas is thick, or thin, or where another trait is. A
+     * placer registered by name (CC.ElemGen.registerPlacer) takes the built
+     * elements and moves them, so the element itself is still built by the
+     * same builder a layer detail uses. Absent on every trait that does not
+     * ask. */
+    if (placer) made = placer(made, trait, body, layer, params, seed, rng, pre);
 
     for (var i = 0; i < made.length; i++) {
       made[i].role = layer.role;
@@ -841,6 +865,92 @@ CC.TraitRoll = (function () {
     return d;
   }
 
+  /* ---- nesting ---------------------------------------------------------- */
+
+  /* ONE TRAIT INSIDE ANOTHER — `nest: [traitIds]`, with `nestAt` the share of
+   * the host's radius to sit out from its centre (default 0.45).
+   *
+   * A station hidden IN a wind-blown cavity, a mining flotilla working BESIDE
+   * a belt of ore: the picture's claim is the relationship, and two traits
+   * placed independently land wherever their own rolls put them. So after
+   * every trait is placed, each of a nesting trait's clusters (`pocketId`,
+   * stamped by the pocket placer; without one the whole group is a single
+   * cluster) is moved, rigidly, to a host cluster of its own — hosts taken in
+   * the order `nest` lists them, one cluster per host — keeping its internal
+   * layout. A host element may carry `pocket: {x, y, r}` (the centre and
+   * radius of the cluster it belongs to, body space); otherwise its own
+   * position and size stand in. A cluster left without a host stays where
+   * its own placement put it, which is an honest answer: a station with no
+   * cavity to hide in hides in the thick gas instead.
+   *
+   * Runs after placement, so it is independent of the order the traits were
+   * rolled in. Moves positions only; every trait it touches declares `rot`
+   * on its marks or has none, so a move does not turn anything. */
+  function nestAll(traits, lists, seed) {
+    if (!traits.some(function (t) { return t.nest; })) return;
+    var all = [];
+    for (var l = 0; l < lists.length; l++) all = all.concat(lists[l] || []);
+    function xy(e) {
+      return [Math.sin(e.angle) * e.radius, -Math.cos(e.angle) * e.radius];
+    }
+    function shift(e, dx, dy) {
+      var p = xy(e), x = p[0] + dx, y = p[1] + dy;
+      e.radius = Math.sqrt(x * x + y * y);
+      e.angle = Math.atan2(x, -y);
+      if (e.pocket) e.pocket = { x: e.pocket.x + dx, y: e.pocket.y + dy, r: e.pocket.r };
+    }
+    for (var i = 0; i < traits.length; i++) {
+      var t = traits[i];
+      if (!t.nest) continue;
+      var group = all.filter(function (e) { return e.trait === t.id; });
+      if (!group.length) continue;
+      /* The host clusters, one entry per distinct pocket. */
+      var hosts = [], seen = {};
+      for (var n = 0; n < t.nest.length; n++) {
+        for (var k = 0; k < all.length; k++) {
+          var h = all[k];
+          if (h.trait !== t.nest[n]) continue;
+          var hk = h.trait + "/" + (h.pocketId === undefined ? k : h.pocketId);
+          if (seen[hk]) continue;
+          seen[hk] = true;
+          hosts.push(h.pocket || { x: xy(h)[0], y: xy(h)[1], r: h.size || 0 });
+        }
+      }
+      if (!hosts.length) continue;
+      var clusters = {}, order = [];
+      for (k = 0; k < group.length; k++) {
+        var ck = group[k].pocketId === undefined ? 0 : group[k].pocketId;
+        if (!clusters[ck]) { clusters[ck] = []; order.push(ck); }
+        clusters[ck].push(group[k]);
+      }
+      var rr = CC.RNG.stream(seed, "trait/" + t.id + "/nest");
+      for (var c = 0; c < order.length && c < hosts.length; c++) {
+        var members = clusters[order[c]], hp = hosts[c];
+        var gx = 0, gy = 0;
+        for (k = 0; k < members.length; k++) {
+          var q = xy(members[k]);
+          gx += q[0]; gy += q[1];
+        }
+        gx /= members.length; gy /= members.length;
+        var dir = rr() * TAU;
+        var off = hp.r * (t.nestAt === undefined ? 0.45 : t.nestAt);
+        var dx = hp.x + Math.sin(dir) * off - gx;
+        var dy = hp.y - Math.cos(dir) * off - gy;
+        for (k = 0; k < members.length; k++) shift(members[k], dx, dy);
+      }
+      /* And drawn after its host, so the thing nested is ON it: a flotilla
+       * over its ore, not under it. In place, so the caller's lists see it. */
+      for (l = 0; l < lists.length; l++) {
+        var list = lists[l];
+        if (!list || !list.some(function (e2) { return e2.trait === t.id; })) continue;
+        var rest = list.filter(function (e2) { return e2.trait !== t.id; });
+        var mine = list.filter(function (e2) { return e2.trait === t.id; });
+        list.length = 0;
+        Array.prototype.push.apply(list, rest.concat(mine));
+      }
+    }
+  }
+
   /* ---- the stage -------------------------------------------------------- */
 
   /* Place every selected trait.
@@ -1015,6 +1125,9 @@ CC.TraitRoll = (function () {
       }
       total += made.length;
     }
+
+    nestAll(traits, [spanning, outward, damage].concat(
+      Object.keys(byRole).map(function (k) { return byRole[k]; })), seed);
 
     return {
       byRole: byRole,

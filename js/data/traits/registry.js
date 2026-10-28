@@ -103,7 +103,22 @@ CC.Traits = (function () {
     return false;
   }
 
-  function eligible(archetype) {
+  /* AND WHILE A SETTING ALLOWS IT — `when: { param, is: [...], dflt }`, the
+   * same shape as a layer's `presence`. An archetype with two stacks chosen by
+   * a setting (the nebula's cloud and shell) has traits that mean something
+   * on one and nothing on the other: a wind-blown cavity in a shell that IS a
+   * cavity. Tags cannot say that, because both stacks are one archetype.
+   * Checked only when `params` is given; absent on every trait that does not
+   * ask, so nothing else changes. */
+  function allowedBy(trait, params) {
+    var w = trait.when;
+    if (!w || !params) return true;
+    var v = params[w.param];
+    if (v === undefined) v = w.dflt;
+    return w.is.indexOf(v) >= 0;
+  }
+
+  function eligible(archetype, params) {
     var tags = (archetype && archetype.tags) || [];
     var out = [];
     for (var i = 0; i < ALL.length; i++) {
@@ -113,6 +128,7 @@ CC.Traits = (function () {
         if (tags.indexOf(t.requires[r]) < 0) { ok = false; break; }
       }
       if (ok && !anchorResolves(t, archetype)) ok = false;
+      if (ok && !allowedBy(t, params)) ok = false;
       if (ok) out.push(t);
     }
     return out;

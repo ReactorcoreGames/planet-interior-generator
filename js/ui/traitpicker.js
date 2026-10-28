@@ -38,6 +38,9 @@ CC.TraitPicker = (function () {
    * under Interior. Adding a family means checking this list. */
   var GROUPS = [
     { id: "atmospheric", label: "Weather" },
+    /* The nebula's two: what shapes the gas, and what is in it. */
+    { id: "structure",   label: "Structure" },
+    { id: "contents",    label: "Contents" },
     { id: "artificial",  label: "Built" },
     { id: "interior",    label: "Interior" },
     { id: "orbital",     label: "Orbital" },
@@ -92,14 +95,34 @@ CC.TraitPicker = (function () {
     "cratered": "Impact scars across the surface, in every size.",
     "impact-basin": "One to five enormous craters, deep enough to show in the crust.",
     "mining-station": "Boxy surface installations bolted into an asteroid's shell.",
-    "tunnel-borer": "Boring machines driving into an asteroid, each trailing the tunnel it cut."
+    "tunnel-borer": "Boring machines driving into an asteroid, each trailing the tunnel it cut.",
+    "dark-lanes": "One or two great dust lanes the length of the cloud, splitting it in two.",
+    "pillars": "Columns of dense gas standing toward the light, their heads lit and boiling away.",
+    "bow-shocks": "Curved fronts piled up ahead of stars ploughing through the gas.",
+    "cavity": "A hollow blown out by a star's wind, the star still at its heart. Cloud form only.",
+    "filament-web": "A tangle of glowing threads that meet and close into cells.",
+    "protostar-cluster": "A tight knot of newborn stars sharing one glow. Cloud form only.",
+    "embedded-star": "One great star buried in the cloud, lighting the gas round it. Cloud form only.",
+    "debris-fields": "Wide scatters of rubble in every size.",
+    "ice-belts": "Streams of pale, glinting ice crystals.",
+    "rock-belts": "Streams of dark, matte rock.",
+    "metal-belts": "Dense knots of metal flecks catching the light.",
+    "exotic-gas-pockets": "Small vivid pockets of a gas in a colour the cloud does not have.",
+    "hidden-station": "A small station tucked in the thickest gas, or in a cavity if there is one.",
+    "mining-flotilla": "Ships in file working a pocket of material.",
+    "derelict-fleet": "Dead hulls tumbling in the cloud."
   };
+
+  /* THE CURRENT SETTINGS, for traits gated by a setting (`when` —
+   * js/data/traits/registry.js): a nebula's cavity is offered on the cloud
+   * form only. Supplied by main.js; without it every trait is listed. */
+  var paramsOf = null;
 
   function build() {
     if (!host) return;
 
     var archetype = CC.Archetypes.get(archetypeId);
-    var pool = CC.Traits.eligible(archetype);
+    var pool = CC.Traits.eligible(archetype, paramsOf ? paramsOf() : null);
     var chosen = chosenIds();
 
     host.innerHTML = "";
@@ -191,9 +214,10 @@ CC.TraitPicker = (function () {
 
   /* ---- public ----------------------------------------------------------- */
 
-  function init(hostEl, changeHandler) {
+  function init(hostEl, changeHandler, settingsFn) {
     host = hostEl;
     onChange = changeHandler;
+    paramsOf = settingsFn || null;
     build();
   }
 

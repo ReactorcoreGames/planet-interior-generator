@@ -505,8 +505,10 @@ var CC = CC || {};
     ctx.save();
     ctx.translate(c.x, c.y);
     /* `angle` points away from the centre, so an upright hull is along it and
-     * a flat one is across it. */
-    ctx.rotate(el.angle + (el.upright ? 0 : Math.PI / 2));
+     * a flat one is across it. `rot` overrides both, as on `plate`: a ship
+     * in open space has a heading of its own, not one set by where it is. */
+    ctx.rotate(el.rot !== undefined ? el.rot
+                                    : el.angle + (el.upright ? 0 : Math.PI / 2));
 
     /* The hull: a rounded rectangle, long axis along local "up". */
     var hx = wide * 0.5, hy = len * 0.5;
@@ -582,6 +584,12 @@ var CC = CC || {};
     /* Few facets and a strong elongation: a crystal has a long axis. */
     var sides = 5 + Math.floor(seed * 3);
     var stretch = 1.7 + seed * 1.1;
+    /* `elongate` — a stubbier crystal (a nebula's ice); absent elsewhere.
+     * Well below 1 it is a rounded lump, so it takes more, smaller faces. */
+    if (el.elongate !== undefined) {
+      stretch = Math.max(1, 1 + (stretch - 1) * el.elongate);
+      if (el.elongate < 0.5) sides += 3;
+    }
     /* A FALLING crystal points the way it is going, so its long axis is
      * radial. A GROWING one in a shearing flow lies across that flow, which
      * here is around the body — the same shape saying two different things

@@ -1,10 +1,10 @@
 # Session X — Phase 7's last group: the nebula
 
-**D219–.** The diffuse family's one archetype, `nebula`, built in four stages with the user reviewing each: (1) the filled stack, extreme wobble and translucency; (2) Luminosity source; (3) the shell stack; (4) traits, stats, flavour, presets. **This file is being written as the session goes.** Stage 1 was reviewed by the user ("absolutely gorgeous and quite varied"), who then handed the two open design decisions to this session. Stages 2 and 3 are done.
+**D219–D240.** The diffuse family's one archetype, `nebula`, built in four stages with the user reviewing each: (1) the filled stack, extreme wobble and translucency; (2) Luminosity source; (3) the shell stack; (4) traits, stats, flavour, presets. Stages 1–3 were signed off by the user in the app ("absolutely gorgeous and quite varied" after stage 1); stage 4 is built and waiting for the user's eye. **This closes Phase 7.**
 
-**No existing body changed.** All 36 renders of the previous archetypes hash identically to HEAD (`1dcab45`), checked with `test/_tmp/_u1regress.mjs` against a worktree of that commit after every renderer change. `npm test` passes.
+**No existing body changed.** All 36 renders of the previous archetypes hash identically to HEAD (`1dcab45` for stages 1–3, `a1945d7` for stage 4), checked with `test/_tmp/_u1regress.mjs` against a worktree of that commit after every renderer change. `npm test` passes. Trait eligibility for every other archetype is unchanged, and none of their traits is offered on the nebula (printed before and after, `test/_tmp/_xelig.mjs`).
 
-Scratch tools: `test/_tmp/_xstack.mjs` (print the built stack, boundary swing and neighbour crossing), `_xwob.mjs` (sweep wobble multiplier and frequency against crossing), `_xgrid.mjs` (8-body contact sheet plus a large render, with timings), `_xprobe.mjs` (one render with settings overrides and an optional CC mutation, used to isolate one mark kind at a time), `_xdots.mjs` (the path-fill benchmark behind D225). Renders are in `shots/x/`.
+Scratch tools: `test/_tmp/_xstack.mjs` (print the built stack, boundary swing and neighbour crossing), `_xwob.mjs` (sweep wobble multiplier and frequency against crossing), `_xgrid.mjs` (8-body contact sheet plus a large render, with timings), `_xprobe.mjs` (one render with settings overrides and an optional CC mutation, used to isolate one mark kind at a time), `_xdots.mjs` (the path-fill benchmark behind D225). Stage 4 adds `_xelig.mjs` (trait eligibility per archetype), `_xtraits.mjs` (each trait on each form it is offered on, pixel-diffed against the same body without it, plus a sheet), `_xsheet.mjs` (every trait alone on one form), `_xcard.mjs` (the card across forms, light and traits), `_xhaz.mjs` (hazard frequency over 300 random nebulae) and `_xpresets.mjs` (the presets as the app applies them). Renders are in `shots/x/`.
 
 ---
 
@@ -153,9 +153,128 @@ Flipping through shells in the app, the user found the centre often looked like 
 
 Isolating it took two renders — beams removed, star removed — which is D88's principle again: when a mark reads wrong, take things away until it stops.
 
+## Stage 4 — traits, the card, flavour, presets
+
+### D233 — a trait may depend on a setting: `when`
+
+The nebula is one archetype with two stacks chosen by Nebula form, and some traits mean something on one and nothing on the other — a wind-blown cavity in a shell that already IS a cavity. Tags cannot say that (both stacks are one archetype), and anchoring alone is the D121 failure: a trait whose anchor is missing on the built body rolls, appears on the card, and draws nothing. So a trait may declare **`when: { param, is, dflt }`**, the same shape as a layer's `presence`, and `CC.Traits.eligible(archetype, params)` honours it when given settings. The roller passes them, so a gated trait is neither rolled nor honoured from the picker on the wrong form; the picker passes them through a settings function from `main.js` and rebuilds when Nebula form changes, on paste (`syncArchetypeConsumers`) and on Randomize with the trait count locked — D114's three routes. A ticked trait that the form hides stays ticked and comes back when the form does. Absent on every other trait, so nothing else changes.
+
+| Trait | Cloud | Planetary | Remnant | Why |
+|---|---|---|---|---|
+| pillars, bow shocks, filament web, the five material pockets, the three built | ✓ | ✓ | ✓ | On a shell the pillars point at the dead star: the Helix's cometary knots, a remnant's fingers |
+| dark rift | ✓ | ✓ | — | A planetary nebula's waist is often a dark band; a remnant's shock has swept its dust out |
+| cavity, protostar cluster, embedded star | ✓ | — | — | A shell is already a cavity; a dying star's ejecta forms no stars, and the remnant star is the star |
+
+The picker gained two sections, **Structure** and **Contents** (the first tag that matches a group wins, so no existing trait moved), and a tooltip for each trait.
+
+### D234 — traits placed by the gas: the `pocket` placer
+
+The grammar places instances ROUND a body: an anchor layer, a depth in its band, a set of bearings. A nebula's regions overlap and drift, so a band means nothing, and its traits belong where its gas is: ice where the cloud is thick, a station hidden in a void, pillars standing on a bank of dense gas with their heads toward the light. So a trait may declare **`place: "<name>"`**, and `placeOne` hands the elements its ordinary builder made to a placer registered by name (`CC.ElemGen.registerPlacer`), which moves them. The element is still built by the same builder a layer detail uses, which is the trait grammar's whole promise. The nebula's placer is `js/gen/diffuse-pockets.js`:
+
+- **pocket centres** are area-uniform candidates kept by a weighted reservoir on the body's density field (`seek`: + thick gas, − voids, 0 uniform), held apart from each other, inside `within` or, with `band`, the anchor layer's own annulus;
+- **`front`** prefers thick gas with thinner gas a step toward where the mark will point: an ionisation front, which is where real pillars stand;
+- **`formation`**: `scatter` (triangular falloff, stretched along an axis into a belt by `stretch`), `centre` (one element per pocket, sized by it), `row` (side by side across the aim), `line` (in file on one heading — ships under way);
+- **`aim`**: toward the body's one light bearing, toward the centre, along the pocket's heading, or random — stamped as `aim` and `rot`;
+- **`extras`**: marks at each pocket's centre (a cluster's shared glow, a cavity's star), **`hueShift`** rolled per pocket, a trait **`dial`** (the recipe dial for a trait), and **`byAnchor`** to restate any of it for the layer the trait actually resolved to — on a shell, search the ring and aim at the middle.
+
+Every nebula trait is `spanning`, so it is drawn after all the gas, through the plain view, in body space — which is the space the density field lives in. `placeOne` now hands builders the body seed and the settings, as the detail stage does; no builder used by an existing trait reads them.
+
+### D235 — one trait inside another: `nest`, and `under` in the spanning pass
+
+The spec's most evocative picture is a relationship — a hidden station *in* a cavity — and two traits placed by their own rolls land wherever those rolls put them. **`nest: [traitIds]`** (with `nestAt`, the share of the host's radius out from its centre) moves the nesting trait's whole group, rigidly, onto the first host present, after every trait is placed, so the order the traits were rolled in does not matter; the group then draws after its host. With no host it stays where its own placement put it — a station with no cavity hides in the thickest gas instead, which is an honest answer. The mining flotilla nests beside whichever material pocket the nebula has. Placed elements carry `pocket: {x, y, r}` so a host's cluster, not one of its rocks, is what is nested on.
+
+**`under`** now also sinks a trait in the spanning pass (gen/details.js, the same stable partition the layer lists had): a cavity is the ground its contents sit on, and drawn after a station its dark interior blotted the station out. No existing spanning trait declares `under`, so nothing else moved.
+
+### D236 — fifteen traits, each a different kind of mark
+
+The cloud's own vocabulary is soft discs, threads, lanes, knots and points of light. Every trait had to be a different statement, or it is more cloud (D76/D160). Six new primitives in `js/draw/primitives/diffuse-marks.js`, all reading positions through `view.at` and naming no role:
+
+| Trait | Mark | What separates it |
+|---|---|---|
+| Dark Rift (`dark-lanes`) | `lane`, the length of the cloud | see below |
+| Pillars | `pillar` — a column | the only mark with a direction it points: dark body dissolving into the bank, a lit sheath down both flanks, a lit head with nubs, gas boiling off toward the light |
+| Bow Shocks | `bow-shock` — a parabola | the only smooth geometric curve in the body; gas piled at the apex, wings fading out |
+| Wind-blown Cavity | `bubble` — a hole with a skin | its inside blocks the glow of an emission nebula and lets the backlight through a dark one (a trait `dial`), ringed by lumpy swept-up gas, its star at the middle |
+| Filament Web | `web` — a network | threads that MEET and close into cells (nearest-neighbour strands) |
+| Protostar Cluster | `protostar` × many, one shared glow | a place, not a scatter; lights its gas at any Luminosity, where the layers' protostars exist only above the middle |
+| Embedded Star | one large `protostar` and a broad glow | one dominant source lighting the cloud round it |
+| Debris Fields | `chunk`, all four tiers | mixed sizes, wide round scatters |
+| Ice Belts | `shard` | pale blue-white glinting crystal, in streams |
+| Rock Belts | `chunk`, two tiers | dark matte rock, in streams |
+| Metal Belts | `glint` — a hard fleck with a specular point | small, metallic, in dense knots; a thing catching light, not a light |
+| Exotic Gas Pockets | `gas-pocket` | a vivid blob in a hue the cloud does not have, painted over rather than screened so it stays more saturated than its surroundings |
+| Hidden Station | `plate`, aligned modules | a tight aligned cluster — built |
+| Mining Flotilla | `capsule` in file | ships on one heading |
+| Derelict Fleet | `capsule`, tumbling, `dim` | every heading different, no power |
+
+**Dark lanes were standard equipment** (the dense and core regions' own `lane` recipes), so D190's question had to be asked: does the trait add something visibly different, or is it dropped? It is kept, as a **rift**: one or two lanes the length of the whole cloud, slim (`girth`), and drawn over everything in the spanning pass where the layers' lanes are painted under the regions drawn after them. It splits the nebula in two — the Great Rift — which the layer lanes never do. Measured: 4.5% of the frame changes on a cloud, against 0.04–2.5% for most other traits.
+
+Four general opt-ins came with them, each absent on every other body: **`rot` on `capsule`** (as `plate` already had — a ship in open space has a heading of its own), **`dim` on a hull** (draw/details.js `hullFill`), and on `lane` **`girth`** (width against length) and **`aim`** (walk straight in body x/y instead of in polar steps; see D237).
+
+`pirate-haven` and `sensor-shadow` stay cut (the spec's own call): they live in the flavour pool as the story a hidden station in a cavity tells.
+
+### D237 — what read wrong first
+
+| Mark | First read | Cause and fix |
+|---|---|---|
+| belts, debris, derelicts | invisible, or star clusters | **D224 again**: `tiers: 2` without `named` keeps the two SMALLEST tiers, so flecks and hulls drew at a few tenths of a pixel and only the metal's specular points showed. Sizes re-authored for the tier that survives; the derelicts are `named` |
+| the rift | a fat blob, then a dot | a lane's width is 0.17 of its length, right for a short lane and a blob for a body-length one (`girth`); then the lane's walk steps the angle by ds / r, so a long lane placed near the centre spun on the spot. A mark with an `aim` now walks straight |
+| pillars | matchsticks | too short, too thin, lit only at the tip. A screened sheath laid under the dark body leaves a lit edge down both flanks — the thing that makes the Pillars read |
+| cavity | black discs | a stroked inner ring (a crisp circle — D156) and a flat black inside. Now three low harmonics of the radius, the inside as nested outlines compounding toward the middle (draw/feather.js's construction), and the shell as lumps |
+| cavity, dark end | pale grey eggs | the backlight through the hollow was twice what it needed |
+| two cavities | goggles | pocket centres held further apart |
+| web | a constellation diagram | too few points, so strands were long and straight. 70–110 points, short bowed strands, a glow pass under a core pass |
+| bow shocks | crescent-moon icons | longer, fading wings and gas piled at the apex |
+
+Each trait's final per-form pixel diff against the same body without it (seed `n0`, Luminosity 70%, 560 px): every trait changes pixels on every form it is offered on, with a maximum delta of at least 121, so every one both draws and can be seen. The smallest footprints are the built things (station 0.05%, derelicts 0.04–0.05%, flotilla 0.09–0.12%) — small objects in a light-years-wide cloud, which is the point of them.
+
+### D238 — the card: a nebula is crossed, not reached (D78)
+
+Every other card asks what a body is like to reach, land on or survive near. You are already inside a nebula, for light-years, so its card asks what it is like to **cross**: Size with a travel comparison, Density, Mass, Composition, Temperature, Visibility, Navigation, What's inside, then the spec's Gravity / Stand on it? / Breathe? and the flavour rows. It reads the BUILT body: the form from the stack (a shell, and whether the pulsar's beams fired), the light from Luminosity source, the colour from the drawn palette, the young stars COUNTED from the elements placed (the remnant star excluded), and the contents from the traits that drew.
+
+- **Size** is rolled per seed (the picture has no scale), log-spread in each form's real range: cloud 4–100 ly, planetary 0.4–3, remnant 6–110. Light takes as many years; Voyager 1 at 17 km/s takes 9.4607×10¹² km ÷ 17 km/s ÷ 3.156×10⁷ s ≈ 17,600 years per light-year. Big figures round to three significant figures.
+- **Density** in atoms per sugar-cube (cm³): dark cloud ~8,000, reflection ~2,000, emission ~200–600, planetary ~2,000, remnant ~3. **The spec's line is only sometimes true, and the card says which:** the emptiest laboratory chambers hold a few thousand per cm³ (1e-12 Torr at room temperature is ~3×10⁴), so an emission nebula is "thinner than the best vacuum we can make on Earth" and a dark cloud is "about as thin as" it. Air: 2.5×10¹⁹.
+- **Mass** = density × volume × the share filled (0.3 cloud, 0.5 shell) × 1.4 hydrogen masses per atom. Checked against reality: a 20 ly emission cloud ~750 Suns, a 1 ly planetary ~0.5 Sun (real ones 0.1–1), a 30 ly remnant ~20 Suns of swept gas.
+- **Composition** reads the drawn hue: emission colours are atomic lines (red hydrogen, green-blue oxygen — which only shines that way in gas this thin — yellow helium, violet red-and-blue together); reflection is dust scattering starlight, blue like the sky; a dark cloud is cold gas and dust; a planetary is the star's outer layers; a remnant its insides.
+- **Temperature**: ionised gas 7,000–10,000 °C rising with Luminosity ("and it would not warm you"), −250 °C where merely lit, −260 °C in the dark (13 K); a planetary's shell ~10,000 °C round an 80,000–150,000 °C white dwarf; a remnant's shock 1–10 million °C.
+- **Breathe?** "A cubic kilometre of it holds less gas than one breath" — true at every density here: 10⁴ /cm³ × 10¹⁵ cm³ = 10¹⁹, against ~1.25×10²² molecules in half a litre of air.
+- **Visibility** for a shell ignores Luminosity — its swept-out middle is clear — and so do the "flown blind" facts (D239).
+
+### D239 — the hazard rating for this family
+
+A nebula is thinner than a laboratory vacuum, so the temperature, air and gravity rungs mean nothing in it: −260 °C at a few hundred atoms per cm³ will not chill a hull. **Its dangers are navigational**, each already a line on its card: one point for getting lost (no landmarks, no comms), +3 flown blind (dark cloud) or +1 hazy (reflection), +1 per material pocket (capped at 3), +1 each for bow shocks, an embedded star, a protostar cluster, +1 for a vivid emission cloud's ultraviolet, +1 for a planetary's white dwarf, +3 for a remnant's pulsar **with a floor of Severe**. Capped at Lethal; Absolute stays the compact objects'.
+
+**The first calibration failed the frequency contract**: remnants at +5 with no floor put 20% of all nebulae at Lethal — nearly every remnant — and a dark remnant scored "flown blind" although its card's Visibility line says its hollow middle is clear. Darkness is now a cloud-only fact, and the pulsar is a floor rather than a pile-on. Over 300 random nebulae (forms 60/20/20, Luminosity uniform, two rolled traits): Benign 5%, Mild 59%, Hazardous 17%, Severe 20% (every remnant), Lethal rare but reachable.
+
+### D240 — flavour and presets
+
+**Flavour** (`js/data/flavour/nebula.js`): the spec's four lines, each guarded where it makes a claim ("stars are forming in the core" only where young stars were drawn), and form-specific lines — "this is what the Sun will leave behind" on a planetary nebula, the pulsar's sweeping beams and a supernova's heavy elements on a remnant, a hole in the sky on a dark cloud. The universal "stellar flares" line is kept off by `radiation: 0` (D212's reasoning): a remnant's radiation is its pulsar, and its own pool says so.
+
+**Presets** (`js/data/presets-nebula.js`, behind `CC.Presets.register`): the spec's three most evocative — **Pillars of Creation** (emission, pillars, a protostar cluster), **Supernova Remnant** (a pulsar's beams, a filament web), **Dark Nebula Hideout** (a dark cloud, a cavity, a station hidden in it) — then **Planetary Nebula**, **Reflection Nebula**, **Emission Nebula**, and **Mining Frontier** (ice and metal drifts with a flotilla working them — the Freelancer picture the family exists for). The three plain KINDS ban every trait: an empty selection means "roll", and a rolled derelict fleet in "a plain emission nebula" would be the preset contradicting its blurb. Each rendered on two seeds and checked against its blurb (`_xpresets.mjs`).
+
+---
+
+## The done-condition
+
+> a nebula is legible at the highest element budget without becoming mush
+
+Met by the user's judgement of stages 1–3 in the app, and held through stage 4: at maximum Detail density a nebula is ~7,600 elements plus ~2,240 cloud cells (D226), and the regions stay separable because each carries a different KIND of mark over one shared density field rather than more of the same (D221, D223). The traits are drawn over the gas in their own pass, so they stay legible at any density.
+
+> nothing in js/draw/ needed an archetype-specific branch
+
+Held. `grep` for the archetype id, any nebula role or any form name in `js/draw/` finds only the background's own pre-existing "nebula" mode and the caves' `cavityPath`. Every new renderer behaviour is a declared opt-in that is absent on every other body: `feather`, `ride`, `drift`, the cloud field's `emit`/`absorb`/`side`, `emissiveGlow`'s `from`/`falloff`/`sat`/`val`, `beams.base`/`root`/`when`, a speckle's `chunk`, a recipe's `spikes`, and in stage 4 `capsule.rot`, a hull's `dim`, a lane's `girth` and `aim`, and six primitives that name no role.
+
+**Phase 7 is complete.**
+
+---
+
 ## Still open, for the user's eye
 
-- **The core often reads as a ball of a different hue.** That is the spec's own colour model (primary at the surface, the triad's secondary at the core) meeting a small region. Softened (D221's `fade`), not removed. Spatial hue variation inside a region, with emission lines mixing, is the next lever if wanted.
-- **The halo is very faint** at the spec's colour table (value 0.20–0.45). The user found Element opacity gives more body when wanted, so it was left.
-- **The 18% band of Luminosity** is a murky in-between, neither a silhouette nor lit. Honest for a slider; the curves are one table each if it should move faster.
-- **The card still uses the solid template**, so its lines are wrong for a nebula until stage 4.
+- **Pillars** read as columns at app scale, but as somewhat uniform "fingers" with rounded heads rather than the ragged, tapering spires of the real Pillars. One primitive (`pillar` in `draw/primitives/diffuse-marks.js`); a judgement call.
+- **The filament web on a remnant** reads as a tangle, but the remnant's shell is already woven of filaments, so the trait is subtler there than on a cloud.
+- **The built things are small** (a station is a handful of modules a few pixels each at 1200 px). Deliberate — they are objects in a cloud light-years wide — but a size number per trait if they should read from further back.
+- **A cavity in a dark cloud** is lit from behind (the backlight through the cleared dust); halved once already, and the curve is one table on the trait.
+- **Chunked speckle filling (D225), globally.** Filling a speckle batch in chunks of 24 instead of one path made the nebula's motes several times cheaper; the same change applied to every body would likely speed up every grainy one (a planet draws ~9,500 elements, mostly speckle), but separate fills compound alpha where two dots overlap and one path does not, so **every body's pixels would change slightly**. Opt-in on the nebula only until you decide.
+- **The core often reads as a ball of a different hue** (stage 1): the spec's colour model meeting a small region. Softened, not removed.
+- **The halo is very faint** at the spec's colour table; Element opacity gives more body when wanted.
+- **The 18% band of Luminosity** is a murky in-between, neither silhouette nor lit; the curves are one table each.

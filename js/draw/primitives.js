@@ -719,9 +719,21 @@ CC.Primitives = (function () {
     return k.replace(/-([a-z])/g, function (m, c) { return c.toUpperCase(); });
   }
 
+  /* A STYLE FOR A REGISTERED KIND that wants more than one colour string:
+   * `fn(colour, el, alpha)` returns whatever object the primitive reads.
+   * draw/details.js styleFor consults it after its own cases, so a family's
+   * primitive file can bring its style with it, as it brings its builder. */
+  var STYLES = {};
+  function registerStyle(kind, fn) {
+    if (STYLES[kind]) throw new Error("primitive style already registered: " + kind);
+    STYLES[kind] = fn;
+  }
+
   var API = {
     KINDS: KINDS,
+    STYLES: STYLES,
     register: register,
+    registerStyle: registerStyle,
     speckle: speckle,
     blob: blob,
     vein: vein,

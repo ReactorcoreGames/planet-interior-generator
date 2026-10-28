@@ -15,8 +15,9 @@
  *
  * ONE STACK, TWO ARCHETYPES. A pulsar is a neutron star whose magnetic axis
  * is tilted, so the stack below is built by one function and the pulsar adds
- * only what is genuinely its own: the tilt as a control, the twin beams, and
- * the light cylinder.
+ * only what is genuinely its own: the tilt as a control, the twin beams, the
+ * hot polar caps they are rooted in, and the light cylinder (where its wind
+ * starts).
  *
  * ---- THE CONTROLS: THREE RELABELS AND ONE NEW SLIDER ---------------------
  *
@@ -48,12 +49,26 @@ var CC = CC || {};
 
   /* Every layer self-luminous, as on a star: nothing here is lit from
    * outside, and the reflective palette rules must not apply. */
-  function lit(spec) { spec.incandescent = true; return spec; }
+  function lit(spec) {
+    spec.incandescent = true;
+    /* The planet's heat rule (drain to grey when cold) is off: the
+     * blackbody `dial` below is what Surface heat does to colour here. */
+    spec.heatDriven = false;
+    return spec;
+  }
 
   /* THE STACK, PRINTED AND MEASURED (D118/D163) — `frac` is each layer's
    * OUTER edge, so the spec's ranges were re-cut to the thicknesses they were
    * meant to express. Printed with test/_tmp/_vstack.mjs. */
-  function stack(fieldReach) {
+  /* `beamed` picks the body's SURFACE STORY, which is what tells the two
+   * archetypes apart before the beams do (Session Y): a pulsar's heat is
+   * concentrated in two polar caps, where the beams are rooted and the
+   * return current strikes; a quiet neutron star glows over its whole
+   * surface, in patches where a tangled field lets heat out. Each switches
+   * the other's mark off with `elementScale`. */
+  function stack(fieldReach, beamed) {
+    var caps = beamed ? 1 : 0;
+    var patches = beamed ? 0 : 1;
     return [
       {
         /* THE FIELD — an outward halo whose reach IS Field strength. A
@@ -70,7 +85,9 @@ var CC = CC || {};
         /* More loops, and more particles in them, as the field strengthens. */
         elementScale: {
           "dipole-loop": { by: "starActivity", count: [0.55, 1.45] },
-          speckle: { by: "starActivity", count: [0.45, 1.6] }
+          speckle: { by: "starActivity", count: [0.45, 1.6] },
+          "polar-cap": { count: caps },
+          "hot-spot": { count: patches }
         }
       },
       {
@@ -85,17 +102,25 @@ var CC = CC || {};
       {
         role: "iron-lattice",
         frac: [0.978, 0.984],
-        boundary: "perfect"
+        boundary: "perfect",
+        elementScale: { "polar-cap": { count: caps },
+                        "hot-spot": { count: patches } }
       },
       {
         role: "nuclear-pasta",
         frac: [0.900, 0.930],
-        boundary: "perfect"
+        boundary: "perfect",
+        elementScale: { "polar-cap": { count: caps } }
       },
       {
         role: "superfluid",
         frac: [0.740, 0.820],
-        boundary: "perfect"
+        boundary: "perfect",
+        /* A GLOWING SPHERE, NOT A FLAT DISC — the star family's limb
+         * darkening (stellar-common.js LIMB), on the wide fluid band that is
+         * most of the face. Not on the crust: multiplied down, the bright
+         * rim went a dull grey, which is the opposite of hot. */
+        limbDarkening: 0.45
       },
       {
         /* Guaranteed at Optional layers 50% and up, the spec's figure. */
@@ -123,6 +148,25 @@ var CC = CC || {};
     return {
       hue: [0, 360],
       secondaryRel: "analogous",
+      /* A STAR'S COLOURS, NOT A PLANET'S (Session Y). With the hue free and
+       * every band near-grey, a cold crust read as dead rock and a hot one
+       * as a pastel planet — teal, pink, tan. Surface heat now runs the
+       * blackbody sequence: a dull ember when old, amber, white, and a
+       * blazing blue-white when newborn. The rolled hue survives only as a
+       * small lean, so two bodies at one heat are related, not identical.
+       * `sat` is a multiplier: high at both coloured ends, near zero at the
+       * white point, where the hue curve steps from amber to blue unseen. */
+      dial: {
+        param: "interiorHeat",
+        hue: {
+          curve: [[0, 10], [0.28, 24], [0.46, 42], [0.50, 46],
+                  [0.505, 212], [0.75, 218], [1, 226]],
+          amount: 0.90
+        },
+        sat: [[0, 5.2], [0.25, 3.8], [0.44, 1.5], [0.50, 0.75],
+              [0.56, 1.2], [0.75, 2.6], [1, 3.6]],
+        val: [[0, 0.80], [0.3, 0.92], [0.6, 1.0]]
+      },
       order: ["magnetosphere", "plasma-skin", "iron-lattice", "nuclear-pasta",
               "superfluid", "quark-core"],
       layers: {
@@ -135,9 +179,9 @@ var CC = CC || {};
          * with Interior heat independently of depth: the depth-weighted
          * heat rule moves a crust this shallow by a tenth, and the spec's
          * cooling crust is a whole step dimmer. */
-        "iron-lattice":  lit({ sat: [0.03, 0.11], val: [0.82, 0.94],
+        "iron-lattice":  lit({ sat: [0.07, 0.15], val: [0.82, 0.94],
                                heatValue: [0.70, 1.0] }),
-        "nuclear-pasta": lit({ sat: [0.05, 0.15], val: [0.68, 0.79],
+        "nuclear-pasta": lit({ sat: [0.09, 0.19], val: [0.68, 0.79],
                                heatValue: [0.80, 1.0] }),
         superfluid:      lit({ sat: [0.12, 0.25], val: [0.62, 0.74] }),
         "quark-core":    lit({ sat: [0.05, 0.16], val: [0.94, 1.00],
@@ -172,7 +216,7 @@ var CC = CC || {};
      * the app's default size the body filled the frame and its field — the
      * one thing only this family shows — appeared in the corners only. */
     frame: 0.72,
-    stack: stack([0.55, 1.45]),
+    stack: stack([0.55, 1.45], false),
     /* A small, rolled misalignment: real neutron stars' fields are not
      * perfectly aligned, and dead-straight loops look drawn with a ruler. */
     poles: {
@@ -204,7 +248,7 @@ var CC = CC || {};
     radiusKm: [10, 13],
     /* Smaller still than the neutron star's: the beams are the archetype. */
     frame: 0.66,
-    stack: stack([0.70, 1.70]),
+    stack: stack([0.70, 1.70], true),
     poles: {
       /* THE ARCHETYPE'S SIGNATURE, directly dialable — Axial tilt relabelled. */
       tilt: { param: "axialTilt", deg: [15, 60] },
@@ -212,7 +256,7 @@ var CC = CC || {};
       spin: "spinRate",
       field: "starActivity",
       /* Where co-rotation reaches light speed: further out the slower it
-       * turns. Drawn only with the `light-cylinder` trait. */
+       * turns. Where the `pulsar-wind` trait starts. */
       lightCylinder: { radius: [2.05, 1.32] }
     },
     /* THE BEAMS ARE THE ARCHETYPE. Wider at high spin (a millisecond

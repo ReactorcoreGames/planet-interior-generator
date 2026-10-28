@@ -139,6 +139,8 @@ Not traits, by TRAIT-SYSTEM.md's third test: `magnetar`, `cooling-crust`, `milli
 
 ## Still open, for the user's eye
 
+*Session Y: the user reviewed the compact group again and raised different issues (colours, the light cylinder, the two bodies looking alike); see [session-y-compact-review.md](session-y-compact-review.md). None of the items below were raised, so they stay as they are.*
+
 - **Starquake cracks** are jagged lightning-like lines; one number (`jag` in the `crack` primitive) if they should be calmer.
 - **The neutron star's magnetosphere fill** shows as a faint tinted disc reaching the frame edge.
 - **The light-bending arcs and photon ring** are deliberately faint; on a dormant hole they are most of what frames the void.

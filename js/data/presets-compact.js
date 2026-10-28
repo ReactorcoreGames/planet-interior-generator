@@ -53,19 +53,19 @@ var CC = CC || {};
       id: "millisecond-pulsar",
       label: "Millisecond Pulsar",
       archetype: "pulsar",
-      blurb: "Spun up to hundreds of turns a second. Broad beams, a tight light cylinder, and the steadiest clock in the sky.",
+      blurb: "Spun up to hundreds of turns a second. Broad beams, a densely threaded core, and the steadiest clock in the sky.",
       set: { "spin-rate": 100, "axial-tilt": 82, "star-activity": 30, "interior-heat": 45,
              "optional-layers": 100 },
-      traits: ["light-cylinder"],
+      traits: [],
       traitsOff: []
     },
     {
       id: "young-pulsar",
       label: "Young Pulsar",
       archetype: "pulsar",
-      blurb: "Fresh from its supernova: hot, fast and fiercely magnetic, and glitching as it settles.",
+      blurb: "Fresh from its supernova: hot, fast and fiercely magnetic, blowing a wind of shocked wisps, and glitching as it settles.",
       set: { "spin-rate": 72, "axial-tilt": 45, "star-activity": 80, "interior-heat": 95 },
-      traits: ["glitching"],
+      traits: ["glitching", "pulsar-wind"],
       traitsOff: []
     },
     {

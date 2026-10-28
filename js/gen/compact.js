@@ -64,9 +64,8 @@ CC.Compact = (function () {
    *   lightCylinder  `{ radius: [at spin 0, at spin 1] }` — where
    *                  co-rotation would reach the speed of light. Faster spin
    *                  pulls it in, which is the real relation (R = c / omega).
-   *                  Always resolved; WHETHER it is drawn is the
-   *                  `light-cylinder` trait (js/data/traits/compact.js), so
-   *                  it can be switched like any other mark. */
+   *                  Always resolved; it is where the `pulsar-wind` trait
+   *                  (js/data/traits/compact.js) starts. */
   function poles(spec, params, seed) {
     if (!spec) return null;
     params = params || {};
@@ -307,6 +306,32 @@ CC.Compact = (function () {
       size: lerp(s[0], s[1], spin),
       phase: rng()
     })];
+  });
+
+  /* A PULSAR'S POLAR CAPS — one element for both, drawn at the ends of the
+   * body's magnetic axis (`el.poles`, stamped by gen/details.js). Not a
+   * scatter: where a cap sits is a fact about the axis, not a roll. */
+  CC.ElemGen.registerBuilder("polar-cap", function (recipe, layer, plan, count, rng) {
+    if (count <= 0) return [];
+    var s = recipe.size || [0.2, 0.2];
+    return [structure("polar-cap", recipe, layer, rng, { size: lerp(s[0], s[1], rng()) })];
+  });
+
+  /* HOT SPOTS ON THE SURFACE — bearings and sizes drawn from the BODY's
+   * seed, not the layer's stream, so the field and the crust that both
+   * declare them agree about where each patch is. Each is one element at
+   * the surface; the layer's clip decides which slice of it shows. */
+  CC.ElemGen.registerBuilder("hot-spot", function (recipe, layer, plan, count, rng, opts) {
+    if (count <= 0) return [];
+    var r = CC.RNG.stream((opts && opts.seed) || "", "hot-spots");
+    var s = recipe.size || [0.1, 0.1];
+    var out = [];
+    for (var i = 0; i < count; i++) {
+      var ang = r() * TAU, sz = lerp(s[0], s[1], Math.pow(r(), 1.6));
+      out.push(structure("hot-spot", recipe, layer, rng,
+                         { angle: ang, radius: 1, size: sz }));
+    }
+    return out;
   });
 
   /* THE SINGULARITY — a mark, not a structure. A spinning hole's singularity

@@ -68,6 +68,33 @@ var CC = CC || {};
           depth: [0.00, 0.85],
           alpha: [0.45, 0.95],
           tone: "glow"
+        },
+        {
+          /* HOT PATCHES — a cooling neutron star does not glow evenly: its
+           * field is tangled, and heat leaks out where it lets it. The same
+           * spots on the field and the crust (bearings from the body's seed,
+           * not the layer's), so each reads as one patch glowing through
+           * the surface and bulging past the limb — a mottled hot edge
+           * rather than a ruled circle. The quiet neutron star's surface
+           * story; thinned on a pulsar, whose heat is in its caps instead
+           * (the archetype's `elementScale`). `count` is how many. */
+          kind: "hot-spot",
+          count: [9, 18],
+          size: [0.12, 0.30],
+          alpha: [0.32, 0.52],
+          tone: "glow"
+        },
+        {
+          /* A pulsar's HOT POLAR CAP, where the beam is rooted — the same
+           * mark on the field, the crust and the pasta below it, each layer
+           * showing its own slice, so the cap reads as one hot spot burning
+           * down through the surface. Switched off on a quiet neutron star
+           * by the archetype's `elementScale`. `size` is its radius. */
+          kind: "polar-cap",
+          count: [1, 1],
+          size: [0.34, 0.34],
+          alpha: [0.85, 0.95],
+          tone: "glow"
         }
       ]
     },
@@ -107,6 +134,25 @@ var CC = CC || {};
           alpha: [0.28, 0.48],
           tone: "darker"
         },
+        {
+          /* A pulsar's HOT POLAR CAP, where the beam is rooted — the same
+           * mark on the field, the crust and the pasta below it, each layer
+           * showing its own slice, so the cap reads as one hot spot burning
+           * down through the surface. Switched off on a quiet neutron star
+           * by the archetype's `elementScale`. `size` is its radius. */
+          kind: "polar-cap",
+          count: [1, 1],
+          size: [0.36, 0.36],
+          alpha: [0.90, 1.00],
+          tone: "glow"
+        },
+        {
+          kind: "hot-spot",
+          count: [9, 18],
+          size: [0.12, 0.30],
+          alpha: [0.55, 0.80],
+          tone: "glow"
+        },
         grain(120, 420, [0.003, 0.006])
       ]
     },
@@ -128,6 +174,18 @@ var CC = CC || {};
           size: [0.0125, 0.0150],
           alpha: [0.40, 0.62],
           tone: "darker"
+        },
+        {
+          /* A pulsar's HOT POLAR CAP, where the beam is rooted — the same
+           * mark on the field, the crust and the pasta below it, each layer
+           * showing its own slice, so the cap reads as one hot spot burning
+           * down through the surface. Switched off on a quiet neutron star
+           * by the archetype's `elementScale`. `size` is its radius. */
+          kind: "polar-cap",
+          count: [1, 1],
+          size: [0.30, 0.30],
+          alpha: [0.70, 0.85],
+          tone: "glow"
         },
         grain(160, 520, [0.003, 0.007])
       ]

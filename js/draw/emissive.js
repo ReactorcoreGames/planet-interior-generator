@@ -325,9 +325,9 @@ CC.Emissive = (function () {
   /* ---- LIGHT ALONG THE AXIS --------------------------------------------
    *
    * Twin cones of emission along the body's magnetic or spin axis — a
-   * pulsar's lighthouse, a black hole's jets. (The light cylinder is a
-   * trait now, drawn by `light-cylinder` in draw/primitives/compact-stream.js
-   * — it is an annotation, not light.)
+   * pulsar's lighthouse, a black hole's jets. (A pulsar's wind is a
+   * trait, `pulsar-wind` in draw/primitives/compact-stream.js — material,
+   * not light.)
    *
    * THE SAME PASS AS THE GLOW, FOR THE SAME REASONS. It is emitted light: it
    * composites additively, has no edge to clip against, fades rather than

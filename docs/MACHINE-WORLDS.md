@@ -31,7 +31,7 @@ has the controls to express that — it's a matter of using them differently:
 |---|---|---|
 | `spacing` | `random` or `clustered` | **`even`** |
 | `jitter` | 0.4–0.9 | **0.0–0.2** |
-| Primitives | `blob`, `vein`, `speckle` | **`plate`, `truss`, `glyph`** |
+| Primitives | `blob`, `vein`, `speckle` | **`truss`, `glyph`, `fixture`, `cellgrid`**, `texture` materials (as built, D253–D259) |
 | Boundaries | wobbled | **perfect circles, straight lines** |
 | Repetition | varied sizes | **identical repeated units** |
 | Colour | derived from body palette | **contrasting accent hue** |
@@ -191,18 +191,23 @@ mineral veins in.
 
 ### Standard stack
 
-| Layer role | Frac range | Optional | Boundary | Notes |
+*As built (Session Z, D248–D250); the figures are `js/data/archetypes/machine-world.js`.*
+
+| Layer role | Frac range | Present | Boundary | Notes |
 |---|---|---|---|---|
-| `defense-grid` | 1.05–1.30 | 60% | perfect circle | orbital weapon platforms |
-| `outer-hull` | 0.96–1.00 | — | **perfect circle** | armoured shell |
-| *gap* | — | — | — | **hollow, pillared** |
-| `surface-systems` | 0.88–0.95 | — | perfect circle | sensors, ports, radiators |
-| *gap* | — | — | — | **hollow, pillared** |
-| `habitation` | 0.70–0.87 | 70% | perfect circle | where anyone lives |
-| *gap* | — | — | — | **hollow, pillared** |
-| `machinery` | 0.35–0.69 | — | perfect circle | the bulk — engines, fabrication |
-| `computation` | 0.18–0.34 | 50% | perfect circle | processing core |
-| `power-core` | 0.06–0.17 | — | perfect circle | reactor |
+| `defense-grid` | over the surface, 0.10–0.26 deep | 80% | perfect circle | outward haze carrying the weapon platforms |
+| `outer-hull` | 1.000 | always | **perfect circle** | armoured shell |
+| *void* | `gapBelow` 0.026–0.046 | — | — | **hollow, pillared** — the hull has its own void |
+| `surface-systems` | 0.900–0.935 | always | perfect circle | radiator hall |
+| *void* | `gapBelow` 0.026–0.046 | — | — | **hollow, pillared** |
+| `habitation` | 0.740–0.815 | 93% | perfect circle | where anyone lives |
+| *void* | `gapBelow` 0.028–0.050 | — | — | **hollow, pillared** |
+| `machinery` | 0.585–0.665; 0.680–0.730 with no habitation | always | perfect circle | the bulk — plant, engines, fabrication |
+| *void* | `gapBelow` 0.030–0.055 | — | — | **hollow, pillared**, bridged by the board's conduits |
+| `computation` | 0.300–0.400 | 67% | perfect circle | the circuit board, solid |
+| `power-core` | 0.110–0.190; 0.230–0.290 with no computation | always | perfect circle | the reactor, solid |
+
+`frac_when` moves the stack when an optional layer is absent (D250), so a missing habitation or computation core does not leave one plain band where the spec has two. "Present" is the roll, scaled by Optional layers.
 
 **Every boundary is a perfect circle.** Built things don't wobble.
 
@@ -218,75 +223,67 @@ solid. The body reads as a series of nested shells around a solid heart.
 been rebuilt as hollowed nested shells with access points down to deeper
 levels.*
 
-Formalized as a per-layer property rather than prose:
+Formalized as general layer properties (**as built, Session Z, D248**; the original `shell` + `gap` above-and-below double-counted wherever two shells met). Four layers carry a void: the outer hull, surface-systems, habitation and machinery; the board and the reactor are solid:
 
 ```js
 {
   role: "habitation",
-  frac: [0.70, 0.87],
-  shell: true,           // hollow, not filled — draw as a band with a void inside
-  gap: [0.015, 0.045],   // void thickness above AND below, as a frac of body radius
-  pillars: [40, 160]     // radial supports spanning each gap
+  frac: [0.740, 0.815],
+  gapBelow: [0.028, 0.050], // a true void under this layer, as a frac of body radius
+  pillars: [80, 200],       // supports across it, at Detail density 0 and 1
+  shafted: true             // the archetype's access shafts cut through it
 }
 ```
 
-**`shell`** — the layer is a band, not a filled disc. Its details draw within
-the band only.
+**`gapBelow`** — the void is raised out of the bottom of the layer, after renormalization, and rolled from the layer's own stream, so spacing varies between worlds while each gap stays uniform. A layer with a void under it is drawn as a ring: the background shows through, which is what makes the pillars read.
 
-**`gap`** — void thickness placed above *and* below the shell, rolled
-independently per layer per body, so the spacing is irregular between worlds
-while every individual gap stays uniform in width. Gaps are true voids: the
-background shows through, which is what makes the pillars read.
+**`pillars`** — radial `truss` struts across the void at **even angular spacing with near-zero jitter**, in two tiers (every fourth a braced girder). Count rides Detail density and scales with radius so every void keeps the same spacing.
 
-**`pillars`** — radial `truss` lines spanning each gap at **even angular
-spacing with near-zero jitter**. Count rides the Density slider. These are the
-single strongest artificial cue in the archetype — hundreds of identical
-radial supports is the density thesis and the regularity signal at once.
+**Access shafts** — `shafts: { count: [2, 6], width }` on the archetype: shared bearings cut as slots through every `shafted` layer, outer hull included, so each reads as one route from space down to the solid heart. No pillars stand in a shaft. The user wants doors and shutters on them later, as traits, and the shaft's own back wall lit with signal lights.
 
-**Access shafts:** 2–6 wider gaps in the pillar ring, aligned across multiple
-shells, read as routes to the deeper levels. Cheap to draw — omit pillars at
-those angles and widen the gap — and directly evokes the inspiration.
-
-> **Gaps interact with Hull integrity.** A breach exposes the hollow structure,
-> so a damaged machine world shows cut-through shells and snapped pillars —
-> a much better cutaway image than a breach into solid material.
+> **Gaps interact with Hull integrity** (built, D267–D269). A wound cuts
+> through the shells and their voids alike, and its torn edge shows snapped
+> pillar stubs hanging from each void's ceiling and standing on the ledge of
+> floor the next step leaves.
 
 ### Colour
 
 Metallic and cool, with a contrasting accent for active systems.
 
-| Layer | Saturation | Lightness |
-|---|---|---|
-| defense-grid | 0.10–0.30 | 0.35–0.60 |
-| outer-hull | 0.05–0.25 | 0.25–0.50 |
-| surface-systems | 0.15–0.40 | 0.35–0.60 |
-| habitation | 0.20–0.45 | 0.40–0.65 |
-| machinery | 0.10–0.35 | 0.30–0.55 |
-| computation | 0.35–0.70 | 0.55–0.80 |
-| power-core | 0.45–0.80 | 0.85–1.00 |
+*As built (D252, D254): metallic, low chroma on every built layer.*
 
-The **accent hue** (for lights, active systems, the power core) should be a
-strong complement to the hull hue. Grey-blue hull with amber lights, or
-gunmetal with cyan — that two-tone industrial look.
+| Layer | Saturation | Lightness | Also |
+|---|---|---|---|
+| defense-grid | 0.06–0.20 | 0.35–0.55 | |
+| outer-hull | 0.03–0.10 | 0.34–0.48 | |
+| surface-systems | 0.06–0.16 | 0.44–0.58 | |
+| habitation | 0.08–0.20 | 0.60–0.76 | `sheen` 1.0 |
+| machinery | 0.05–0.14 | 0.30–0.44 | `sheen` 0.35 |
+| computation | 0.22–0.42 | 0.40–0.56 | self-lit, `accentHue` 0.85, `heatValue` [0.45, 1.0, 0.45] |
+| power-core | 0.55–0.85 | 0.90–1.00 | self-lit, `accentHue` 1.0, `heatValue` [0.28, 1.0, 0.50] |
+
+Every layer above the board is `heatDriven: false`, so Operational status cannot creep colour into the metal. The hull hue is rolled from four families with one draw: steel 198–228° (45%), teal-steel 168–198° (15%), bronze 24–46° (25%), violet-steel 232–262° (15%).
+
+The **accent hue** (`accent`, js/gen/accent.js) sits 150–210° from the hull hue, saturated and bright: every light on the body, the board and the reactor. Lights come in three colours from one rule (`CC.ShellWallDraw.lightHsv`): mostly the accent, some cold white, a few warning amber (red where the accent is near amber), plus the emergency red of a body on emergency power.
 
 ### Layer details (always drawn)
 
-| Layer | Elements | Count |
-|---|---|---|
-| defense-grid | `glyph` platforms, even spacing | 12–40 |
-| outer-hull | **panel seams** (regular grid), plating, hull lights | 60–200 / 100–300 |
-| surface-systems | radiator fins, sensor arrays, docking ports | 30–80 |
-| habitation | **window-light grids**, module blocks | 200–600 |
-| machinery | `truss` lattice, gear/rotor shapes, conduits | 80–250 |
-| computation | **regular lattice grid**, data-flow pulses | 150–400 |
-| power-core | glow stipple, containment rings | 200–350 / 4–8 |
+*As built (D251–D263); the recipes are `js/data/elements/machine.js`, the counts there.*
 
-**Panel seams and window grids are the workhorses.** Hundreds of small regular
-rectangles is exactly the "cheap elements used numerously" thesis, and regularity
-is what makes it read as constructed.
+| Layer | Elements |
+|---|---|
+| defense-grid | `glyph` weapon platforms, one design per body, even spacing, 12–40 |
+| outer-hull | `rough` armour texture; **panel seams** in a brick bond with running lights (`cellgrid`); docking ports cut into the outer face, 8–18 even; sensor arrays standing out from it into space, 30–70 |
+| surface-systems | brushed `metal`; radiator banks in two mirrored rows, one on the floor and one hung from the ceiling, 70–160 a row |
+| habitation | `sleek` polished metal; quiet hex panelling |
+| machinery | `plant` concrete with radial pipe bundles; tall lit chips among the pipes; rotors, gear trains and trusses in what the pipes leave (`CC.Claims`) |
+| computation | `circuit` board; data pulses along its own traces, 120–360; bold conduits lying across it and bridging the void above into the machinery; capacitors |
+| power-core | **window blocks** round a bright bare heart; containment rings, 4–8; glow stipple, 500–1200; feeds down the gaps between the blocks, 6–18 |
+| every void and shaft | lit back walls: ribs, deck lines, facility lights; shafts with rails, rungs and signal lights |
 
-**Conduits** running between layers — straight lines crossing boundaries at
-right angles — are a strong artificial cue and worth doing.
+**Panel seams, window grids and chips are the workhorses.** Hundreds of small regular rectangles is exactly the "cheap elements used numerously" thesis, and regularity is what makes it read as constructed.
+
+**Conduits** were first built across every boundary and rejected as spam (D262): a strong cue earns its strength by being rare and placed. They are the reactor's feeds and the board's runs and bridges alone.
 
 ### Exclusive traits
 
@@ -313,35 +310,35 @@ They became two sliders:
 **Operational status** (0–100%) — *replaces `dormant`, `hive-populated`,
 `automated`*
 
+*As built (D264–D266): Interior heat, relabelled by a `dials` entry, driving the general `activity` / `lit` properties (js/gen/activity.js).*
+
 | Value | Reads as | Drives |
 |---|---|---|
-| 0 | Derelict | Lights dark, power core cold and desaturated, no habitation glints, hull scarred |
-| 35 | Automated | Power core lit, machinery active, **habitation layer absent or dark** — nobody home |
-| 70 | Crewed | Window grids lit in patches, moderate activity |
-| 100 | Hive | Habitation density maxed, window grids fully lit, swarming glyph traffic |
+| 0 | Fully offline | Every light dark, the emergency red too; the board and reactor dimmed (`heatValue`); a wound cold, no sparks |
+| 1–12 | Emergency power | A few lights burn the emergency red, rising across 0–4% and handing over to normal lighting across 7–12% |
+| ~10–40 | Automated | The reactor, machinery and board wake first; habitation dark — nobody home |
+| 40–95 | Crewed | Habitation lights come on; at the default 55% the approved look |
+| 55–100 | Hive | `busy` rises to 1.7: more lit windows and chips, more pulses, more docked craft, extra facility rows |
 
-This is the machine world's most characterful parameter — it drives the accent
-hue's brightness across every layer at once, which is exactly what makes a
-derelict read as dead rather than merely dim.
+Each layer's `lit: [wake, full]` sets when its lights come on, so the dial reads as a sequence rather than one dimmer. **Which** light is on is a stable hash of its position, so lights switch on in place as the dial is dragged. A dark light is dropped, a dark unit's lights go out, a pulse is not sent; sparks and fire on a wound's torn edge follow the same gate. The accent's own brightness is left alone: dark and red lights are what read as derelict. Habitation's presence stays with Optional layers.
 
 **Hull integrity** (0–100%) — *replaces `damaged`, `partial-construction`*
 
-Both removed an angular section of the outer layers; they differ only in
-*why*. One parameter for how much is missing, plus a flag for the reason:
+*As built (D267–D269): Cohesion, relabelled by a `dials` entry, driving the general `rupture` structure feature (js/gen/rupture.js). The zone `remove: true` it was meant to reuse was never built.*
 
 | Value | Reads as |
 |---|---|
-| 100 | Intact — unbroken hull |
-| 60 | A breach exposing two or three interior layers |
-| 20 | Major structural loss, most of the interior visible |
+| 92–100 | Intact — unbroken hull |
+| 85 | A hull breach |
+| 60 | Two or three shells cut through |
+| 45 (default) | Into the machinery |
+| 0 | Down to the reactor's rim |
 
-`construction: true` swaps torn edges for clean ones with scaffolding `truss`
-work — an unfinished world rather than a wrecked one. Same geometry, different
-edge treatment and a different stats line.
+1–5 wounds a body, the first the main one at full size and opening first; each other 35–80% of its size, on bearings spread round the body, opening at its own point as the dial falls. Each wound is a **stepped funnel**: every layer it passes through torn back to its own edge, wider toward the surface, the edges serrated and the floor ragged. Inside it, space shows through, as through the voids. Everything is rolled up front, so the same wounds grow in place as the dial moves.
 
-Both use the **zone primitive with `remove: true`** — the same machinery as
-`shattered`, not a new exception. See
-[TRAIT-SYSTEM.md](TRAIT-SYSTEM.md#angular-zones).
+**The torn edge** (`edge: "torn"`, js/gen/woundedge.js and js/gen/wounddebris.js, drawn by the matching js/draw/ files): a scorched rim inside the remaining metal; plating peeled and bent outward, biggest at the surface lips; snapped pillar stubs; severed pipe ends on the faces of the layers in `pipes` and on every conduit run the wound cuts; a debris field pouring out of the mouth in three size tiers, mostly small; sparks, fire and embers in the warning colour, gated by Operational status, so a derelict wound is cold and dark.
+
+**Under construction** (stage d) is an exclusive trait rather than the spec's `construction: true` flag (D249): it registers an `edge: "clean"` style plus scaffolding `truss` work — an unfinished world rather than a wrecked one. Same geometry, a different edge treatment and a different stats line.
 
 ### Stats template
 

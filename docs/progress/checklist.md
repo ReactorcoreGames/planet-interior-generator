@@ -186,6 +186,36 @@ assumed.
 - [x] **the `nebula` card** — crossed, not reached; every figure computed and checked (D238); a navigational **hazard rating** calibrated against the frequency contract (D239)
 - [x] **flavour pool and seven presets**, each checked against its blurb (D240)
 
+### Phase 9a — the `machine-world` archetype 🟡 (Session Z, stage d next)
+
+[session-z-machine-world.md](session-z-machine-world.md) — D248–D271 so far. **No archetype branch in `js/draw/`**; `npm test` passes.
+
+- [x] **the stack**: four hollow shells round a solid heart, re-cut so every band holds at all extremes (D250); `frac_when` lifts the machinery and the reactor when an optional layer is absent
+- [x] **`gapBelow`, `pillars`, `shafted`, `shafts`** (D248): true voids, two-tier pillars, 2-6 access shafts through every shell to space (`js/gen/shells.js`, `js/draw/shells.js`)
+- [x] **the `truss` primitive** (`js/draw/primitives/built.js`)
+- [x] **void and shaft back walls** (D251): decks, ribs, facility lights, signal columns (`js/gen/shellwalls.js`, `js/draw/shellwalls.js`)
+- [x] **accent hue and hue families** (D252): `accent`, `tone: "accent"`, `accentHue`, `hue` as weighted families (`js/gen/accent.js`)
+- [x] **the `texture` element** (D253): rough, metal, sleek, plant, circuit, plus concrete and industrial (`js/gen/materials.js`, `js/draw/primitives/materials.js`, `js/data/elements/machine.js`)
+- [x] **metallic colour and `sheen`** (D254) (`js/draw/sheen.js`)
+- [x] stage (b) sub-step 4: `cellgrid`, `glyph`, even spacing for layer details, the spec's always-drawn details, conduits, capacitors (D255–D263)
+- [x] stage (c1): **Operational status** — `activity` / `lit`, emergency power, 0% offline, the hive (D264–D266) (`js/gen/activity.js`)
+- [x] stage (c2): **Hull integrity** — `rupture`, 1–5 stepped, serrated wounds clipped out of the body (D267–D268) (`js/gen/rupture.js`, `js/draw/rupture.js`)
+- [x] stage (c3): **the torn edge** — `edge: "torn"` style registry, scorched rim, peeled plating, snapped pillars, severed pipe (D269); the debris field (D270); sparks, fire and embers by Operational status (D271) (`js/gen/woundedge.js`, `js/gen/wounddebris.js`, `js/draw/woundedge.js`, `js/draw/wounddebris.js`)
+- [x] stage (c) docs: MACHINE-WORLDS.md and PARAMETERS.md brought up to the code; ARCHITECTURE.md gains the archetype-property and colour-entry tables
+- [ ] stage (d): exclusive traits, stat card, flavour, presets
+
+### Phase 7 review ✅ (Session Y)
+
+[session-y-compact-review.md](session-y-compact-review.md) — D241–D247.
+
+- [x] **the nebula signed off**; Session X's open list closed as it stands
+- [x] **chunked speckle filling for every body** (D241), ~25% off a full sweep of renders
+- [x] **the blackbody ramp** (D242): `colorProfile.dial` takes `hue.curve`; Surface heat runs ember, amber, white, blue-white on the neutron star and pulsar, beams and glow following
+- [x] **`light-cylinder` replaced by `pulsar-wind`** (D243): shocked wisps in an equatorial torus, starting at the light-cylinder radius
+- [x] **polar caps and hot patches** (D244): `polar-cap` on the pulsar, `hot-spot` on the neutron star, each switched off on the other by `elementScale`
+- [x] **limb darkening on the superfluid** (D245), not the crust
+- [x] **the remaining phases reordered** (D246): 9a machine-world archetype, 8 polish, 9b megastructures (audit first), 9c clean-up, 10 release
+
 ### Phase 7 — the compact group ✅ (Session V)
 
 [session-v-compact.md](session-v-compact.md) — D205–D216. `neutron-star`, `pulsar`, `black-hole`. **No existing body changed** (27 renders hash identically to `3045346`), and **no archetype branch in `js/draw/`**.

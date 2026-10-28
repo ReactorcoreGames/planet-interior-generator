@@ -64,7 +64,7 @@ whatever wobble the boundary value gives — so a layer can be `near-perfect`
 
 Full layer-property list in
 [ARCHITECTURE.md](ARCHITECTURE.md#layer-properties) — including `opacity`,
-`shell`, `gap`, `pillars`, `outward` and `luminous`.
+`gapBelow`, `pillars`, `shafted`, `conduits`, `outward` and `luminous`.
 
 > ⚠️ **Check the numbers compose before writing code.** At every combination of
 > range extremes, radii must stay ordered and no layer may collapse to nothing.

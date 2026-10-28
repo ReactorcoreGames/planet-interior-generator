@@ -126,21 +126,21 @@ var CC = CC || {};
     tags: ["compact"]
   };
 
-  /* THE LIGHT CYLINDER — where a field co-rotating with the star would have
-   * to outrun light. A cylinder about the SPIN axis, cut through that axis,
-   * is two parallel lines; its radius is Spin rate (`poles.lightCylinder`,
-   * js/gen/compact.js). The primitive ignores the placement and draws from
-   * the poles, as the accretion stream does.
+  /* THE PULSAR WIND — the field opening past the light cylinder and
+   * streaming away along the spin equator, shocked into wisps where it meets
+   * its surroundings (the Crab's ripples). Starts at the light-cylinder
+   * radius, which is Spin rate (`poles.lightCylinder`, js/gen/compact.js);
+   * the primitive ignores the placement and draws from the poles, as the
+   * accretion stream does.
    *
-   * A TRAIT, NOT AN OPTIONAL EXTRA (Session W). It used to roll by itself
-   * under Optional layers, drawn as two dashed lines the height of the
-   * frame — with the body's Rotation, a pair of diagonal dashes crossing the
-   * whole picture, which read as a forgotten marquee and as the app's own
-   * dashed framing guides. Now a faint solid line with ticks, a band around
-   * the star rather than across the frame, and switchable like any mark. */
-  var LIGHT_CYLINDER = {
-    id: "light-cylinder",
-    label: "Light Cylinder",
+   * WAS THE LIGHT CYLINDER ITSELF (Session W), drawn as a ruled, ticked
+   * pair of lines — the vocabulary of a dimension line, which the user
+   * found read as a HUD element rather than as anything at the star
+   * (Session Y). A trait has to be a THING; the wind is what the light
+   * cylinder does, made visible. */
+  var PULSAR_WIND = {
+    id: "pulsar-wind",
+    label: "Pulsar Wind",
     anchor: "plasma-skin",
     reach: "spanning",
     escapes: true,
@@ -151,7 +151,7 @@ var CC = CC || {};
     jitter: 1,
     mirror: false,
     offset: [0, 360],
-    element: "light-cylinder",
+    element: "pulsar-wind",
     tiers: 1,
     named: true,
     size: [0.05, 0.05],
@@ -295,7 +295,7 @@ var CC = CC || {};
     STARQUAKE_SCARS,
     GLITCHING,
     ACCRETION_STREAM,
-    LIGHT_CYLINDER,
+    PULSAR_WIND,
     NAVIGATION_BEACON,
     RESEARCH_STATION,
     HOLE_STATION,

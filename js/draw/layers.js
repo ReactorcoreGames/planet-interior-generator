@@ -308,6 +308,8 @@ CC.Layers = (function () {
    * The caller is responsible for ctx.save()/restore() around this. */
   function clipToLayer(ctx, view, layer, seed, outerFn) {
     var outerWob = outerFn || boundaryFn(layer, seed);
+    /* A hollow or slotted layer is exactly its own band (draw/shells.js). */
+    if (CC.ShellDraw.isShell(layer)) { CC.ShellDraw.clip(ctx, view, layer, outerWob); return; }
 
     ctx.beginPath();
     traceBoundary(ctx, view, layer.outer, outerWob, false);
@@ -334,6 +336,11 @@ CC.Layers = (function () {
       CC.Feather.fill(ctx, view, layer, style, wob);
       return;
     }
+    /* A hollow layer is a ring, so the void under it stays empty. */
+    if (CC.ShellDraw.isShell(layer) && !(style && style.warped)) {
+      CC.ShellDraw.fill(ctx, view, layer, style, wob);
+      return;
+    }
 
     ctx.save();
     ctx.beginPath();
@@ -349,6 +356,10 @@ CC.Layers = (function () {
   function strokeBoundary(ctx, view, layer, style, width, seed, outerFn) {
     if (layer.boundary === "soft-gradient" || layer.feather) return;
     var wob = outerFn === undefined ? boundaryFn(layer, seed) : outerFn;
+    if (CC.ShellDraw.isShell(layer)) {
+      CC.ShellDraw.stroke(ctx, view, layer, style, width, wob);
+      return;
+    }
 
     ctx.save();
     ctx.beginPath();

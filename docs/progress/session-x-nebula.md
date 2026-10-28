@@ -268,7 +268,9 @@ Held. `grep` for the archetype id, any nebula role or any form name in `js/draw/
 
 ---
 
-## Still open, for the user's eye
+## Still open, for the user's eye — CLOSED (Session Y)
+
+The user reviewed stage 4 in Session Y and closed every item below as it stands. The chunked speckle filling was made global (D241). Kept for the reasoning.
 
 - **Pillars** read as columns at app scale, but as somewhat uniform "fingers" with rounded heads rather than the ragged, tapering spires of the real Pillars. One primitive (`pillar` in `draw/primitives/diffuse-marks.js`); a judgement call.
 - **The filament web on a remnant** reads as a tangle, but the remnant's shell is already woven of filaments, so the trait is subtler there than on a cloud.

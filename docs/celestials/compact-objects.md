@@ -4,7 +4,9 @@
 >
 > - **Roles are renamed** (element tables are keyed by role across families): `plasma-skin`, `iron-lattice`, `nuclear-pasta`, `superfluid`, `quark-core`, `magnetosphere`; on the black hole `photon-sphere`, `infall`, `cauchy-shell`, `inner-region`. `frac` was re-cut to the THICKNESSES the tables meant (D118/D163).
 > - **The superfluid is a step dimmer** than the spec's near-white, so the core stays the white-hot band.
-> - **The light cylinder** is a trait (`light-cylinder`, D217), drawn as two faint ticked lines parallel to the spin axis — a cylinder cut through that axis — in a band round the star, not across the frame.
+> - **The light cylinder is not drawn.** It was a ticked-line trait (D217) until the user found it read as a HUD element (Session Y, D243). It is now where the **`pulsar-wind`** trait starts: shocked wisps in an equatorial torus.
+> - **Colour is a blackbody ramp on Surface heat** (D242): ember, amber, white, blue-white. The hue is no longer free. The tables below give saturation and lightness before the ramp.
+> - **The two bodies differ at the surface** (D244): a pulsar has two hot polar caps at the roots of its beams; a quiet neutron star has a mottled rim of hot patches.
 > - **The black hole's interior is NOT empty on a spinning hole** (the user's call): Spin rate opens the Kerr structure — ergosphere outside the horizon, a blue-shifted inner horizon, a ring singularity seen as two points. At Spin rate 0 it is exactly the void described below.
 > - **The disc is drawn sliced** (the cross-section approach), and the photon sphere is glow-only.
 > - Controls: Field strength, Surface heat, Beam tilt and Mass class are relabels of existing controls; Spin rate and Accretion rate are new. Traits: see `js/data/traits/compact.js`.

@@ -15,6 +15,9 @@ var CC = CC || {};
 CC.DrawDetails = (function () {
   "use strict";
 
+  /* Dots per fill in a speckle batch — see drawSpeckleBatch (D225). */
+  var SPECKLE_CHUNK = 24;
+
   var TAU = CC.Math.TAU;
   var clamp = CC.Math.clamp;
 
@@ -57,7 +60,7 @@ CC.DrawDetails = (function () {
 
     /* Returned as a colour-shaped object rather than mutating the palette
      * entry, which is shared across every element in the layer. */
-    return { h: h, s: s, v: v, emissive: colour.emissive };
+    return { h: h, s: s, v: v, emissive: colour.emissive, accent: colour.accent };
   }
 
   /* Move an element's base colour along its layer's THERMAL GRADIENT, by how
@@ -102,7 +105,7 @@ CC.DrawDetails = (function () {
         h: colour.h,
         s: clamp(colour.s * (1 + cool * 0.2), 0, 1),
         v: clamp(colour.v * (1 - cool * 0.65), 0.02, 1),
-        emissive: colour.emissive
+        emissive: colour.emissive, accent: colour.accent
       };
     }
 
@@ -111,7 +114,7 @@ CC.DrawDetails = (function () {
       h: CC.Palette.mixHue(colour.h, hot.h, u),
       s: clamp(colour.s + (hot.s - colour.s) * u, 0, 1),
       v: clamp(colour.v + (hot.v - colour.v) * u, 0.02, 1),
-      emissive: colour.emissive
+      emissive: colour.emissive, accent: colour.accent
     };
   }
 
@@ -207,6 +210,16 @@ CC.DrawDetails = (function () {
         return CC.Color.hsva(colour.h + 3,
                              clamp(s * 0.94, 0, 1),
                              clamp(v + LIFT, 0, 1), alpha);
+
+      /* THE BODY'S ACCENT HUE (js/gen/accent.js) — lights and active
+       * systems, a colour that does not belong to the material. Falls back
+       * to `glow` on a body whose profile declares no accent. */
+      case "accent":
+        if (colour.accent) {
+          return CC.Color.hsva(colour.accent.h, colour.accent.s,
+                               colour.accent.v, alpha);
+        }
+        return toneColour(colour, "glow", alpha, weight);
 
       case "glow":
         /* Self-lit layers: push brightness hard and pull saturation, so the
@@ -921,7 +934,9 @@ CC.DrawDetails = (function () {
       /* Same machined material as a pressure hull, cut into a different
        * object — a cylinder with a cone pointing at the star. */
       case "coned-cylinder":  return hullFill(colour, el, alpha);
-      default:        return null;
+      /* A style a primitive file registered (CC.Primitives.registerStyle). */
+      default:
+        return CC.Primitives.STYLES[kind] ? CC.Primitives.STYLES[kind](colour, el, alpha) : null;
     }
   }
 
@@ -1111,10 +1126,13 @@ CC.DrawDetails = (function () {
       /* `chunk`: flush the path every N dots. FILLING ONE PATH COSTS
        * SUPERLINEARLY IN ITS CONTOUR COUNT — measured, 7,000 dots took
        * 4,040 ms as one path, 94 ms in hundreds and 34 ms one by one (D201's
-       * 900 circles at 70 ms was the same effect). Opt-in per element so no
-       * existing body's pixels move: separate fills compound alpha where two
-       * dots overlap, and one path does not. */
-      var chunk = group[0].chunk || group.length;
+       * 900 circles at 70 ms was the same effect). Opt-in on the nebula
+       * first (D225), then made the DEFAULT for every body by the user's
+       * call (Session Y): separate fills compound alpha where two dots
+       * overlap and one path does not, so every grainy body's pixels moved
+       * slightly, for a render several times cheaper. An element may still
+       * name its own `chunk`. */
+      var chunk = group[0].chunk || SPECKLE_CHUNK;
       ctx.beginPath();
       for (i = 0; i < group.length; i++) {
         CC.Primitives.speckle(ctx, view, group[i]);

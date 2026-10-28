@@ -211,6 +211,9 @@ CC.Details = (function () {
       archetype.colorProfile.layers.film);
 
     var byRole = {};
+    /* Layer details whose recipe declares `seat`: drawn on the body's real
+     * surface in the unclipped pass, as a seated trait is (draw/scene.js). */
+    var seated = [];
     var terrain = {};
     var film = {};
     var seaLevel = {};
@@ -410,6 +413,8 @@ CC.Details = (function () {
       var eAbsorbed = absorbedScale(layer, traits, body).elements;
 
       var list = [];
+      /* Each layer's claims start clean (gen/claims.js). */
+      CC.Claims.reset(layer);
 
       for (var e = 0; e < recipes.length; e++) {
         var recipe = recipes[e];
@@ -517,6 +522,11 @@ CC.Details = (function () {
           if (body.poles) made[m].poles = body.poles;
         }
 
+        if (recipe.seat !== undefined) {
+          for (var sd = 0; sd < made.length; sd++) made[sd].seat = recipe.seat;
+          seated = seated.concat(made);
+          continue;
+        }
         list = list.concat(made);
       }
 
@@ -646,6 +656,7 @@ CC.Details = (function () {
      * body with no layers of its own to sink into — a nebula's. A cavity is
      * the ground its contents sit on; drawn after them it blotted them out.
      * No spanning trait declared `under` before, so nothing else moves. */
+    placed.spanning = placed.spanning.concat(seated);
     var spBelow = [], spAbove = [];
     for (var si0 = 0; si0 < placed.spanning.length; si0++) {
       (placed.spanning[si0].under ? spBelow : spAbove).push(placed.spanning[si0]);
@@ -798,9 +809,27 @@ CC.Details = (function () {
      * every archetype that declares no `caves`. */
     var caves = CC.Caves.build(archetype, body, params, seed, formFn,
                                placed.spanning);
+    var conduits = CC.Conduits.build(body, params, seed);
+    var pillars = CC.Shells.pillars(body, params, seed);
 
     return {
       caves: caves,
+      /* Supports spanning the voids under hollow layers (gen/shells.js).
+       * Empty on every body without a `gapBelow`. */
+      pillars: pillars,
+      /* Feeds through a layer's outer face, in the gaps its claims leave
+       * (gen/conduits.js). Empty on every body declaring no `conduits`. */
+      conduits: conduits,
+      /* Cans on a board, clear of those runs (gen/capacitors.js). Empty on
+       * every body declaring no `capacitors`. */
+      capacitors: CC.Capacitors.build(body, params, seed, conduits),
+      /* The lit back walls seen through those voids and down the shafts
+       * (gen/shellwalls.js). Null on every body without either. */
+      walls: CC.ShellWalls.build(body, params, seed),
+      /* A wedge torn out of the outer layers (gen/rupture.js). Null on every
+       * body declaring no `rupture`. */
+      rupture: CC.Rupture.build(archetype, body, params, seed,
+                                { pillars: pillars, conduits: conduits }),
       byRole: byRole,
       terrain: terrain,
       /* Per-role surface-film masks, keyed the same way as `terrain`. */

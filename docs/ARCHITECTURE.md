@@ -81,9 +81,12 @@ renderer consumes them and knows nothing about what kind of body it's drawing.
 | `boundary` | enum | `perfect` · `near-perfect` · `slight` · `irregular` · `heavy` · `extreme` · `soft-gradient` |
 | `outward` | bool | Drawn as a falloff beyond the surface rather than a filled band (atmosphere, corona) |
 | `opacity` | `[min, max]` | Below 1.0 the layer is translucent and inner layers show through (nebulae) |
-| `shell` | bool | Hollow band rather than filled disc (machine worlds) |
-| `gap` | `[min, max]` | Void thickness above and below a `shell` layer |
-| `pillars` | `[min, max]` | Radial supports spanning a gap |
+| `gapBelow` | `[min, max]` | A true void under the layer, raised out of its own bottom after renormalization; the layer is then drawn as a ring (D248, `js/gen/shells.js`) |
+| `pillars` | `[min, max]` | Evenly spaced radial supports across that void, at Detail density 0 and 1, scaled by radius |
+| `shafted` | bool | The archetype's `shafts` (access routes, shared bearings) cut through this layer |
+| `conduits` | `{ count, depth, bridge, within, length }` or a list | Feeds entering through the layer's outer face from the layer above, each ending at its own depth within `depth` and plugged into the layer above at its inner edge (across any void between). Without `bridge`: one down the middle of each open gap its claims leave, widest first; with `bridge: [lo, hi]`: between the pillars of the void above, reaching that share up into the layer above, clear of its claims; with `within: true`: lying wholly inside the layer, `length` a share of the `depth` span. Rings passed through are sleeved (D262, `js/gen/conduits.js`) |
+| `capacitors` | `{ count, size, depth, blend, opacity }` | Electrolytic cans on the layer, three size tiers, clear of its conduits, claims and shafts (D263, `js/gen/capacitors.js`) |
+| `lit` | `[wake, full]` | With the archetype's `activity`: the level at which the layer's first lights come on and the level by which all are on. Stamps `live`, `emergency`, `busy` and `activity` onto the layer (D264, `js/gen/activity.js`) |
 | `luminous` | bool | Ignores any global shading pass (stars, compact objects) |
 
 #### Presence — one property, three forms
@@ -99,8 +102,8 @@ layers from becoming special cases in the stack builder.
 | Parameter | `presence: {param, above, fade}` | Present only while that parameter exceeds a threshold; `fade` gives a soft entry |
 
 Ocean depth and Interior heat were the first two users of the parameter form.
-Cohesion, Operational status and Hull integrity all use the same mechanism, so
-each is a data edit rather than new logic.
+(Operational status and Hull integrity, planned to use it, were built instead
+as `dials` relabels driving the archetype properties below.)
 
 **The roll is consumed whether or not the layer survives.** Otherwise removing
 a layer reshuffles every layer below it and the same seed stops producing the
@@ -126,8 +129,19 @@ since adding an ocean on top of the crust would otherwise make an ocean world
 render fractionally larger than a desert one. Everything downstream can rely on
 "1.0 means the surface".
 
-`shell`, `gap` and `pillars` are **generic properties, not machine-world
-special-casing.** Only machine worlds use them today, but the renderer
+#### Archetype properties for built bodies
+
+Declared on the archetype, beside `stack` and `colorProfile`. Each is general: a body declaring none is untouched.
+
+| Property | Type | Meaning |
+|---|---|---|
+| `shafts` | `{ count, width }` | Access routes: bearings shared by every `shafted` layer, width in body radius (D248, `js/gen/shells.js`) |
+| `activity` | `{ param }` | The named parameter is how alive the body is; with each layer's `lit`, it decides which lights are on, dark or on emergency power (D264–D266, `js/gen/activity.js`). Which light is a stable hash of its position (`CC.Activity.gate`), never a stream draw |
+| `rupture` | `{ param, start, depth, width, count, edge, pipes }` | Wounds torn out of the outer layers as the named parameter falls below `start`: `depth` and `width` from the onset to 0, 1–`count` wounds, each a stepped funnel clipped out of the body's draw (D267–D268, `js/gen/rupture.js`). `edge` names the cut faces' style, registered in `js/gen/woundedge.js` (`"torn"`, default); `pipes` lists the layers whose faces show severed pipe (D269) |
+| `dials` | `{ param: { label, ... } }` | Relabels an existing control for this archetype (Interior heat → Operational status, Cohesion → Hull integrity) |
+
+`gapBelow`, `pillars`, `shafted`, `conduits`, `capacitors`, `lit`, `activity` and `rupture` are **generic properties, not machine-world
+special-casing.** (They replace the spec's `shell` + `gap` above-and-below, D248.) Only machine worlds use them today, but the renderer
 implements them as ordinary layer geometry — which is what keeps the "body types
 never get their own drawing code" rule intact.
 
@@ -279,6 +293,17 @@ Examples of the principle:
 
 Colours derive from 2–3 anchors (primary = surface, secondary = core, tertiary
 = atmosphere), so output is always harmonious but never repetitive.
+
+Optional properties on a profile or a layer's colour entry, all general:
+
+| Property | Where | Meaning |
+|---|---|---|
+| `hue: [[lo, hi, weight], ...]` | profile | Hue families, rolled with one draw, so every other profile keeps its colours (D252) |
+| `accent: { rel, sat, val }` | profile | An accent hue offset from the host layer's; rides on every layer colour as `colour.accent`, asked for by an element with `tone: "accent"` (D252, `js/gen/accent.js`) |
+| `accentHue: k` | layer | Re-tints the layer k of the way to the accent |
+| `heatDriven: false` | layer | Interior heat does not move this layer's colour |
+| `heatValue: [atCold, atHot, full]` | layer | The layer's lightness is its heat: lightness scaled from `atCold` to `atHot` as Interior heat rises. The optional third figure is the heat at which it reaches `atHot` (default 1), so a dial can dim a layer at its low end only (D264) |
+| `sheen: k` | layer | Shades the band as polished bar: specular band, dark falls, lit rim (D254, `js/draw/sheen.js`) |
 
 **User control:** seed + hue-nudge sliders. No manual colour picker.
 

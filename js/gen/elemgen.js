@@ -239,8 +239,10 @@ CC.ElemGen = (function () {
          * handful of individually meaningful instances that is just a random
          * dimming: gas-miner platforms authored at alpha 0.85-1.0 were drawn
          * at 0.34-0.59 and vanished into the layer. There is no field here
-         * for the variation to structure. */
-        var clump = (recipe && recipe.named) ? 1
+         * for the variation to structure. Nor is there on an EVENLY SPACED
+         * set: a regular row is not a field, and dimming its members at
+         * random breaks the regularity that is its whole point. */
+        var clump = (recipe && (recipe.named || recipe.spacing === "even")) ? 1
           : 0.62 + 0.38 * (0.5 + 0.5 * Math.sin(
               angle * 2.3 + t * 5.1 + (opts && opts.phase ? opts.phase : 0)));
 
@@ -1081,6 +1083,13 @@ CC.ElemGen = (function () {
    * primitive list small and reusable. */
   function build(recipe, layer, plan, count, rng, opts) {
     opts = opts || {};
+    /* A LAYER DETAIL MAY BE SPACED EVENLY, as a trait may: one even ring,
+     * interleaved across the tiers (gen/evenspacing.js). A trait arrives
+     * with its own angles, which win. */
+    if (recipe.spacing === "even" && !(opts.angles && opts.angles.length)) {
+      opts = withOpts(opts, {}, function (o) { return o; });
+      opts.angles = CC.EvenSpacing.angles(plan, recipe.jitter || 0, rng);
+    }
     switch (recipe.kind) {
       case "gradient-band": return buildBands(recipe, layer, count, rng);
       case "ring-band":     return buildRings(recipe, layer, count, rng, opts);

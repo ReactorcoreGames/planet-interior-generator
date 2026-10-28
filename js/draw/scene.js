@@ -79,6 +79,8 @@ CC.Scene = (function () {
     if (r1 - r0 < 2) return colour.hex;
 
     var g = CC.FormFill.bandGradient(ctx, view, r0, r1);
+    /* Machined metal: a specular band and a lit rim (draw/sheen.js). */
+    if (colour.sheen) return CC.Sheen.stops(g, colour);
 
     /* THE GRADIENT BRANCH COMES FIRST, INCLUDING FOR EMISSIVE LAYERS.
      *
@@ -477,7 +479,7 @@ CC.Scene = (function () {
      * draw/emissive.js — including why it is excluded from the extent sweep
      * while the coronal wobble is included in it. */
     CC.Emissive.drawEmissiveGlow(ctx, view, body, palette, settings);
-    /* And light along the body's axis — beams, jets, the light cylinder.
+    /* And light along the body's axis — beams and jets.
      * A no-op on every body that declares no `beams` or `poles`. */
     CC.Emissive.drawAxial(ctx, view, body, palette, settings);
 
@@ -628,12 +630,24 @@ CC.Scene = (function () {
 
     function isDeferred(idx) { return deferred.indexOf(idx) >= 0; }
 
+    /* A wound torn out of the outer layers: everything the body draws from
+     * here to the front outward traits is clipped clear of it, so space
+     * shows through (draw/rupture.js). */
+    var ruptured = CC.RuptureDraw.begin(ctx, view, details.rupture);
+
+    /* The lit back walls of voids and shafts, under every band, so a hollow
+     * layer's ring trims them to the gaps (draw/shellwalls.js). */
+    CC.ShellWallDraw.draw(ctx, view, details.walls, palette, elementOpacity);
+
     for (i = 0; i < layers.length; i++) {
       if (isDeferred(i)) continue;
       var layer = layers[i];
       var colour = palette.get(layer.role);
 
       if (layer.outward) {
+        /* An outward layer is space round the body, not body, so a wound
+         * does not cut it: the clip is lifted while it draws. */
+        CC.RuptureDraw.end(ctx, ruptured);
         /* Atmosphere and friends: a falloff outward from whatever is beneath.
          * The curve lives in draw/layers.js; this only supplies the colour. */
         var inner = (i + 1 < layers.length) ? layers[i + 1].outer : body.surface;
@@ -901,6 +915,7 @@ CC.Scene = (function () {
          * eye sees, so leaving it uniform washes a flat film over both faces
          * and cancels the terminator underneath it. */
         CC.ZonePaint.paintZoneBand(ctx, view, layer, colour, details.zones, inner);
+        ruptured = CC.RuptureDraw.begin(ctx, view, details.rupture);
         continue;
       }
 
@@ -972,6 +987,16 @@ CC.Scene = (function () {
                       colour.v * 0.42, 0.55),
         1, settings.seed, bounds[i]);
     }
+
+    /* --- 3d. pillars across the voids under hollow layers ---
+     * Nothing paints a void, so they can go in after the bands. See
+     * draw/shells.js. */
+    CC.ShellDraw.drawPillars(ctx, view, details.pillars, palette, elementOpacity);
+    /* Conduits across the boundaries, over pillars and bands alike
+     * (draw/conduits.js). */
+    CC.ConduitDraw.draw(ctx, view, details.conduits, palette, elementOpacity);
+    /* Cans on the board, among the runs (draw/capacitors.js). */
+    CC.CapacitorDraw.draw(ctx, view, details.capacitors, palette, elementOpacity);
 
     /* --- 3e. deferred fluid layers ---
      *
@@ -1344,6 +1369,12 @@ CC.Scene = (function () {
           || CC.DrawDetails.toneColour(xCol, xe.tone, xAlpha));
       }
     }
+
+    CC.RuptureDraw.end(ctx, ruptured);
+    /* The torn faces of those wounds — scorched rim, peeled plating, snapped
+     * pillars, severed pipe — standing in the gap the cut left
+     * (draw/woundedge.js). */
+    CC.WoundEdgeDraw.draw(ctx, view, body, details.rupture, palette, elementOpacity);
 
     /* --- 5. outward traits, front half --- */
     CC.ZonePaint.drawOutward(ctx, view, details, palette, elementOpacity, "front", sky);

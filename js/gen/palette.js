@@ -279,7 +279,7 @@ CC.Palette = (function () {
      * within whatever range the archetype allows. */
     var hueRange = profile.hue || [0, 360];
     var primary = (params.primaryHue === undefined || params.primaryHue === null)
-      ? wrapHue(lerp(hueRange[0], hueRange[1], rng()))
+      ? wrapHue(CC.Accent.rollHue(hueRange, rng))   /* families allowed: gen/accent.js */
       : wrapHue(params.primaryHue);
 
     var relName = params.hueRelationship && params.hueRelationship !== "auto"
@@ -662,8 +662,12 @@ CC.Palette = (function () {
        * makes it glow, and the spec's cooling crust is a whole step dimmer.
        * A multiplier on value between the two ends of the dial, independent
        * of depth. Absent on every layer that does not declare it. */
+      /* An optional third figure is the heat at which the layer reaches
+       * full lightness, so a dial can dim a layer at its low end only (the
+       * machine world's heart, under Operational status). */
       if (spec.heatValue) {
-        v = clamp(v * lerp(spec.heatValue[0], spec.heatValue[1], heat), 0.03, 1);
+        var hvAt = spec.heatValue[2] || 1;
+        v = clamp(v * lerp(spec.heatValue[0], spec.heatValue[1], Math.min(1, heat / hvAt)), 0.03, 1);
       }
 
       /* Contrast between layers: push each layer's value away from the mean
@@ -752,12 +756,21 @@ CC.Palette = (function () {
        * toward blue, emission is vivid. A profile-level declaration, so it
        * applies to every layer the profile colours; absent on every other
        * archetype. Applied before the user's own Saturation and Brightness,
-       * so those keep meaning what they mean. */
+       * so those keep meaning what they mean.
+       *
+       * `hue.curve` in place of `hue.to` makes the destination itself a curve
+       * over the dial — a BLACKBODY RAMP: the compact family's Surface heat
+       * runs ember, amber, white, blue-white, which is the colour sequence
+       * everyone reads as "how hot a star is". The step from amber to blue is
+       * authored where `sat` has dipped to near-white, so it never shows. */
       if (profile.dial) {
         var pd = profile.dial;
         var pdv = params[pd.param];
         pdv = clamp(pdv === undefined ? (pd.dflt === undefined ? 0.5 : pd.dflt) : pdv, 0, 1);
-        if (pd.hue) h = mixHue(h, pd.hue.to, clamp(M.curve(pd.hue.amount, pdv), 0, 1));
+        if (pd.hue) {
+          var pdTo = pd.hue.curve ? M.curve(pd.hue.curve, pdv) : pd.hue.to;
+          h = mixHue(h, pdTo, clamp(M.curve(pd.hue.amount, pdv), 0, 1));
+        }
         if (pd.sat) s = clamp(s * M.curve(pd.sat, pdv), 0, 1);
         if (pd.val) v = clamp(v * M.curve(pd.val, pdv), 0.03, 1);
       }
@@ -850,6 +863,8 @@ CC.Palette = (function () {
          * adjacency pass below can rebuild it from the moved value. */
         hotEdge: hotEdge,
         heatSpec: spec,
+        /* Machined metal's band shading, 0..1, or 0 (draw/sheen.js). */
+        sheen: spec.sheen || 0,
         /* Painted as one flat colour, no band shading (draw/scene.js). */
         flat: !!spec.void,
         /* A self-lit centre, brightest in the middle (draw/scene.js). */
@@ -966,6 +981,9 @@ CC.Palette = (function () {
       sea.rgba = makeRgba(sea.h, sea.s, sea.v);
       sea.hotEdge = makeHotEdge(sea.heatSpec, heat, sea.h, sea.s, sea.v);
     }
+
+    /* The accent hue, against the settled hull colour (js/gen/accent.js). */
+    var accent = CC.Accent ? CC.Accent.build(profile, out, order, seed) : null;
 
     /* The surface frosting is a pseudo-role, resolved after the layers so it
      * cannot disturb their RNG streams or the adjacency pass. It lives in
@@ -1178,6 +1196,8 @@ CC.Palette = (function () {
       layers: out,
       anchors: { primary: primary, secondary: secondary, tertiary: tertiary },
       relation: relName,
+      /* Lights and active systems, or null (js/gen/accent.js). */
+      accent: accent,
       /* The outermost self-lit layer's colour, or null. See above. */
       emitted: emitted,
       /* The hot interior's colour, for marks that must read as belonging to a
@@ -1202,6 +1222,8 @@ CC.Palette = (function () {
     RELATIONS: RELATIONS,
     RELATION_NAMES: RELATION_NAMES,
     mixHue: mixHue,
+    /* The colour factories, for gen/accent.js to re-tint a layer. */
+    factories: { lighter: makeLighter, darker: makeDarker, rgba: makeRgba },
     wrapHue: wrapHue
   };
 })();

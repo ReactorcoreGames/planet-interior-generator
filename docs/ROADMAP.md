@@ -27,10 +27,14 @@ The architecture is designed so later phases slot in without rework: archetypes 
 | 🎯 MVP | ✅ | [roadmap/mvp.md](roadmap/mvp.md) |
 | 5 — Second family: gaseous | ✅ (Sessions K–L) | [roadmap/phase-5-gaseous.md](roadmap/phase-5-gaseous.md) |
 | 6 — Stars | ✅ (Sessions M–R) | [roadmap/phase-6-stars.md](roadmap/phase-6-stars.md) |
-| 7 — Remaining families | ✅ (Sessions S–X) | [roadmap/phase-7-remaining-families.md](roadmap/phase-7-remaining-families.md) |
-| 8 — Overlay, scale, polish | ⬜ framing built early (Session I) | [roadmap/phase-8-polish.md](roadmap/phase-8-polish.md) |
-| 9 — Machine worlds | ⬜ | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
+| 7 — Remaining families | ✅ (Sessions S–X, reviewed in Y) | [roadmap/phase-7-remaining-families.md](roadmap/phase-7-remaining-families.md) |
+| **9a — The `machine-world` archetype** | 🟡 **in progress** — stage (a) of four done (Session Z) | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
+| 8 — Overlay, scale, polish | ⬜ after 9a; framing built early (Session I) | [roadmap/phase-8-polish.md](roadmap/phase-8-polish.md) |
+| 9b — Megastructure traits: audit, then build | ⬜ | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
+| 9c — Final clean-up pass | ⬜ | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
 | 10 — Release | ⬜ | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
+
+**The rows are in build order, not number order** (D246). The phase numbers are kept so existing references stay valid.
 | Out of scope, risk notes, session boundaries | | [roadmap/scope-and-risk.md](roadmap/scope-and-risk.md) |
 
 ---
@@ -46,6 +50,12 @@ The architecture is designed so later phases slot in without rework: archetypes 
 - ✅ **compact group** (neutron star, pulsar, black hole) — Session V, reviewed and tuned in Session W
 - ✅ **nebula** — Session X: extreme wobble with drifting regions, translucency, a per-body density field, Luminosity source, a second stack (the hollow shell of a planetary nebula or supernova remnant, with a pulsar's beams), fifteen traits placed by the gas, its own card and seven presets. Spec: [celestials/diffuse-bodies.md](celestials/diffuse-bodies.md)
 
-**After Phase 7:** Phase 8 (layer-name overlay, scale bar — which the compact family's spec calls essential — and polish), Phase 9 (machine worlds), Phase 10 (release). The user's release-prep prompt for Phase 10 is [RC prompt to make releases easier.md](RC%20prompt%20to%20make%20releases%20easier.md).
+**Session Y reviewed Phase 7** (the nebula signed off; the neutron star and pulsar reworked) and **reordered what remains** (D246, [session-y-compact-review.md](progress/session-y-compact-review.md)):
+
+1. **9a — the `machine-world` archetype first**, so the polish pass covers every body type that will ship.
+2. **8 — overlay, scale bar, polish**, including the per-type stat templates, over the full set of archetypes.
+3. **9b — megastructure traits.** Audit MACHINE-WORLDS.md's per-body lists against the artificial and natural traits that already exist, settle a cleaned list with the user, then build it.
+4. **9c — a final clean-up pass**, so everything lands together.
+5. **10 — release.** The user's release-prep prompt is [RC prompt to make releases easier.md](RC%20prompt%20to%20make%20releases%20easier.md). Releasing later is fine: machine worlds and megastructures are intended parts of the generator, not extras.
 
 Finished planning docs (the Phase 6 polish docs, the Phase 7 prompt, the asteroid overhaul, the climate plan) are in [archive/](archive/). They are records of design reasoning, not open work.

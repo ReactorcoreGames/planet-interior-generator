@@ -86,9 +86,9 @@ var CC = CC || {};
       add(facts.beamed,
         "Stay out of the beam plane. Approach along the spin axis, where the " +
         "beams never point.");
-      add(facts.lightCylinder,
-        "Do not cross the light cylinder. Past it, the field is moving faster " +
-        "than anything should.");
+      add(facts.wind,
+        "Stay out of the equatorial wind. Past the light cylinder the field " +
+        "is moving faster than anything should, and it takes the plasma with it.");
       add(facts.magnetar,
         "Unmanned probes only, and expect to lose them.");
     }

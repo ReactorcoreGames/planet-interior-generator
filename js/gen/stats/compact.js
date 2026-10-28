@@ -157,7 +157,7 @@ var CC = CC || {};
         tempMin: surfC, tempMax: surfC,
         beamed: beamed,
         tiltDeg: P.tiltDeg || 0,
-        lightCylinder: traits.indexOf("light-cylinder") >= 0,
+        wind: traits.indexOf("pulsar-wind") >= 0,
         quarkCore: core,
         heat: heat,
         spin: spin,

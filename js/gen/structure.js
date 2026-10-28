@@ -715,6 +715,16 @@ CC.Structure = (function () {
       layers[i].wobbleFrac = frac;
     }
 
+    /* HOLLOW LAYERS — voids raised under any layer declaring `gapBelow`, and
+     * the access shafts cut through `shafted` ones (js/gen/shells.js). After
+     * renormalization, because a gap is a body-space width. */
+    var specByRole = {};
+    for (i = 0; i < archetype.stack.length; i++) specByRole[archetype.stack[i].role] = archetype.stack[i];
+    var shafts = CC.Shells.apply(layers, specByRole, archetype, params, seed);
+    for (i = 0; i < layers.length; i++) {
+      layers[i].slots = CC.Shells.slotsFor(layers[i], shafts);
+    }
+
     /* How far out the picture reaches, so the view can leave room. */
     var extent = 1.0;
     for (i = 0; i < layers.length; i++) extent = Math.max(extent, layers[i].outer);
@@ -755,6 +765,8 @@ CC.Structure = (function () {
        * whose surroundings ARE the picture — a black hole's disc and jets —
        * declares less, so they fit. Read by draw/scene.js. */
       frame: archetype.frame || 1,
+      /* The access shafts, [{angle, half}], or null. See js/gen/shells.js. */
+      shafts: shafts,
       layers: layers,
       surface: surface,
       extent: extent,

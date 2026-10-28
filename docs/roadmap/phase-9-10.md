@@ -2,16 +2,27 @@
 
 *Part of [ROADMAP.md](../ROADMAP.md).*
 
-## Phase 9 — Machine worlds
+## Phase 9 — Machine worlds, in three parts (D246)
 
-*Deliberately last — the most speculative and least essential.*
+*Originally "deliberately last — the most speculative and least essential". The natural bodies have since been built and reviewed (Phase 7, Session Y), which is what that placement was waiting for. The user split the phase so the archetype comes before polish.*
 
-- Megastructure traits on natural bodies
-- `machine-world` archetype and its exclusive traits
-- Accent colour system for artificial elements
+### 9a — the `machine-world` archetype (next, before Phase 8)
 
-Placed here because natural bodies must look right first. Megastructures are
-additive delight, not foundation.
+- The archetype: its standard stack, shell gaps, colour (including the accent colour system for artificial elements), always-drawn layer details, its two axes, stat template and flavour, presets. Spec: [MACHINE-WORLDS.md](../MACHINE-WORLDS.md) § "The `machine-world` archetype".
+- Its **exclusive** traits, the ones that only make sense on a body that is artificial all the way down.
+- **Why first:** Phase 8's overlay, scale bar and stat-template pass should see every body type that will ship, so it is done once.
+
+### 9b — megastructure traits on natural bodies (after Phase 8)
+
+**Audit before building.** MACHINE-WORLDS.md's per-body lists (stars, planets and moons, giants, asteroids, compact objects, nebulae) were written before most of the generator existed. Several families have since grown artificial traits of their own: stations, beacons, collectors, borers, mirrors, gas miners. So:
+
+1. For each body, set the spec's list beside the traits that body already offers, artificial and natural (`js/data/traits/*.js`).
+2. Mark each spec entry: already exists, duplicate of something that exists, conflicts with a natural trait, still wanted, or drop.
+3. Agree the cleaned list with the user, then build it.
+
+### 9c — final clean-up pass (after 9b)
+
+A last pass over the whole generator once the megastructures are in: does everything land together, on every family, with every trait, in the composed export? The user's eye leads; the open "for the user's eye" lists in the session write-ups are its agenda.
 
 > **Frosting: default to none.** "Purely machine, no dirt" is the stronger
 > aesthetic position and should be the starting point. The one legitimate use

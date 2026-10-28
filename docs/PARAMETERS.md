@@ -104,7 +104,7 @@ Archetype dropdown contents:
 | **Optional layers** | slider | 0–100% | Chance that optional layers (atmosphere, ocean, ice-shell) are present |
 | **Core size bias** | slider | −100…+100 | Push the core smaller or larger within its range. Affects derived stats |
 | **Ocean depth** | slider | 0–100% | 0 = no ocean (desert/airless). Low = seas. High = global ocean. Max = the crust is barely a floor. Solid bodies only |
-| **Interior heat** | slider | 0–100% | 0 = dead (solid core, static mantle, thick crust, grey palette). 100 = molten (liquid core, fully convecting mantle, thin fractured crust, magma reaching the surface). Solid bodies only |
+| **Interior heat** | slider | 0–100% | 0 = dead (solid core, static mantle, thick crust, grey palette). 100 = molten (liquid core, fully convecting mantle, thin fractured crust, magma reaching the surface). Solid bodies only. **The machine world relabels it Operational status** (below) |
 | **Tidal locking** *(a star relabels this to* **Binary companion**) | slider | 0–100% | **One slider, two causes — and the label follows the archetype.** On a solid body: 0 = an ordinary rotating world; as it rises one face bakes and the other freezes, the ocean boils off the hot side and pools frozen on the cold side, an ice cap spreads down from the night face, terrain flattens where it is baked, and the atmosphere thins at both extremes. Sits beside Ocean depth because the two are coupled. **On a star it drives a close companion's pull instead:** the outer envelope bulges toward it and the facing hemisphere runs hotter and more agitated, while the body itself stays round — a tidal bulge on a star is a bulge in the thin outer layers, not a deformation of the interior. Both are the same quantity (how hard the asymmetry is driven) aimed at different things, which is why they share one control rather than growing a second (D27). The label and tooltip come from the archetype's own `axes` declaration; see D132. **Inert on the two gaseous archetypes**, which declare no angular axis |
 | **Lock facing** *(a star relabels this to* **Companion bearing**) | slider | 0–360° | Where the interesting face points — the dayside on a planet, the companion on a star. Rolled per body; set deliberately to aim it at the viewer |
 | **Starlight** | slider | 0–100% | **How much light and heat reaches this body.** 100% is seared like Mercury or Venus; around half is temperate like Earth; low values give a frozen outer-system world. **0% means there is no star at all** — a rogue planet drifting unlit, warmed only by its own Interior heat. Feeds the climate baseline, and gently biases how much atmosphere survives (both extremes thin it) |
@@ -120,19 +120,19 @@ as Ocean depth and Interior heat: an axis, not two checkboxes.
 
 | Control | Archetypes | Range | Replaces | Drives |
 |---|---|---|---|---|
-| **Cohesion** | asteroid | 0–100% | `rubble-pile` / `void-riddled` | Voronoi cell count and size, void frequency, outer-shell integrity |
+| **Cohesion** | asteroid | 0–100% | `rubble-pile` / `void-riddled` | Voronoi cell count and size, void frequency, outer-shell integrity. The machine world relabels it Hull integrity (below) |
 | **Caverns** | asteroid | 0–100% (default 30) | `hollowed-out` | Caves cut through the interior: natural winding tunnels and clustered chambers through the low and middle range, bored tunnels and mined halls added at the top, some opening to space. Capped by Cohesion: nothing below ~6%, the full amount from ~62%. Measured into the card's Inside row and the density. See `js/gen/caves.js` |
 | *Interior heat → **Radioactivity*** | asteroid | 0–100% | — | The same control, relabelled by the archetype's `dials`. Above about a third, a share of the mosaic's fragments (up to a tenth) turn hot material, sickly green or cold blue-white, and glow near the top. Composition only; moves no structure |
 | **Luminosity source** | nebula | 0–100% | `dark` / `reflection` / `emission` | Layer opacity, lightness, hue bias, whether protostars light their surroundings |
 | ~~**Stellar activity**~~ | all stars | — | — | **SUPERSEDED by the universal Star activity axis — do not build this.** See the note below |
 | *Star activity → **Field strength*** | neutron star, pulsar | 0–100% | `magnetar` | **Built as a `dials` relabel (D210)** — on a star Star activity is already the magnetic violence axis. Magnetosphere reach, field-loop count and twist, particle glints, beam strength, starquake frequency |
 | *Interior heat → **Surface heat*** | neutron star, pulsar | 0–100% | `cooling-crust` | **A `dials` relabel.** Crust lightness (`heatValue`), the temperature stat |
-| **Spin rate** | neutron star, pulsar, black hole | 0–100% (default 50) | `millisecond-spin`, `rapid-spin` | **A new slider.** Vortex density in the superfluid; on a pulsar beam width and light-cylinder radius; on a black hole the whole interior (ergosphere, inner horizon, ring singularity) and the disc's inner edge. See `js/gen/compact.js` |
+| **Spin rate** | neutron star, pulsar, black hole | 0–100% (default 50) | `millisecond-spin`, `rapid-spin` | **A new slider.** Vortex density in the superfluid; on a pulsar beam width and the light-cylinder radius (where the `pulsar-wind` trait starts); on a black hole the whole interior (ergosphere, inner horizon, ring singularity) and the disc's inner edge. See `js/gen/compact.js` |
 | *Axial tilt → **Beam tilt*** | pulsar | 0–100% = 15–60° | — | **A `dials` relabel.** The magnetic axis — beams, field lines, accretion stream; the card states the degrees |
 | **Accretion rate** | black hole | 0–100% (default 60) | `feeding` / `dormant` | **A new slider.** Disc presence (none below ~4%), brightness, density, the hot inner torus, jets (from about a quarter up) |
 | *Core size bias → **Mass class*** | black hole | −100…+100 | `supermassive` / `stellar-mass` | **A `dials` relabel**, log-scaled: ~5 suns at the bottom, ~10⁵ in the middle, ~10⁹ at the top. Horizon size and every derived stat; the picture is a diagram and keeps its scale |
-| **Operational status** | machine world | 0–100% | `dormant` / `automated` / `hive-populated` | Light and window-grid density, power-core brightness, accent-hue intensity across every layer, habitation presence |
-| **Hull integrity** | machine world | 0–100% | `damaged` / `partial-construction` | How much of the outer hull is missing (zone `remove: true`); the `construction` flag swaps torn edges for scaffolded ones |
+| *Interior heat → **Operational status*** | machine world | 0–100% (default 55) | `dormant` / `automated` / `hive-populated` | **A `dials` relabel** driving the archetype's `activity` (D264–D266): which lights are on, layer by layer (the plant wakes first, habitation last), emergency red near the bottom, fully dark at 0, the board and reactor dimmed at the low end, busier than the default above 55%, and the sparks and fire on a wound's torn edge |
+| *Cohesion → **Hull integrity*** | machine world | 0–100% (default 45) | `damaged` / `partial-construction` | **A `dials` relabel** driving the archetype's `rupture` (D267–D269): 1–5 wounds torn out of the outer layers from 92% down, to the reactor's rim at 0, with a torn edge, debris and sparks. Stage (d)'s Under construction trait swaps the torn edge for a clean one with scaffolding |
 | **Enclosure** | dyson-structure trait | 0–100% | `dyson-swarm` / `dyson-sphere` | Collector spacing, jitter and arc — scattered swarm → half-built shell → full sphere |
 
 **Core size bias** (above) also absorbs the gas giant's `oversized-core` /
@@ -217,7 +217,7 @@ Legend: **✅** consume it · **◐** consume it partially, see the note ·
 | **neutron star / pulsar** | ✖ | ✖ | ◐ own field, not a star's | ✖ | ✖ |
 | **black hole** | ✖ | ✖ | ✖ | ✖ | ✖ |
 | **nebula** | ◐ embedded stars light it | ✅ **strongly** | ◐ | ✖ | ✖ |
-| **machine world** | ✅ **heat management** | ✅ | ✅ **shielding** | ◐ engineered | ◐ |
+| **machine world** | ✖ `starlit: false` | ✖ | ◐ not yet reviewed (stage d) | ✖ `latitude: 0` | ✖ no sea |
 
 **How an archetype declares each answer:**
 
@@ -565,7 +565,7 @@ Built in Session V — `js/data/presets-compact.js`.
 | **Derelict Machine World** | Operational status 0, Hull integrity ~50 — dark, breached, cold core |
 | **Hive World** | Operational status 100 — every window lit, habitation maxed |
 | **Automated Factory** | Operational status ~35, no habitation layer — running, nobody home |
-| **Unfinished World** | Hull integrity ~40 with `construction: true` — scaffolding, clean edges |
+| **Unfinished World** | Hull integrity ~40 with the Under construction trait — scaffolding, clean edges |
 | **Worldship** | Machine world + worldship — engine cluster on one side |
 | **Planet-Cracker** | Machine world wrapped around a captured natural core |
 | **Half-Built Dyson** | Main star + dyson-structure, Enclosure ~50 |

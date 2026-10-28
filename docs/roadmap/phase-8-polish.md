@@ -2,6 +2,8 @@
 
 *Part of [ROADMAP.md](../ROADMAP.md).*
 
+> **Runs after Phase 9a** (the `machine-world` archetype), so this pass covers every body type that will ship (D246). "Per-type stat templates finalised" includes the machine world's.
+
 - Layer-name overlay (underline + 1px leader, names only)
 - Scale bar with optional silhouette
 - Full keyboard shortcuts

@@ -111,6 +111,9 @@
               <optgroup label="Diffuse">
                 <option value="nebula">Nebula</option>
               </optgroup>
+              <optgroup label="Artificial">
+                <option value="machine-world">Machine world</option>
+              </optgroup>
             </select>
             <label class="lock" title="Lock: Randomize will not change the archetype.">
               <input type="checkbox" id="lock-archetype"><span class="lock-icon">&#128274;</span>
@@ -787,6 +790,7 @@
 <script src="js/data/archetypes/compact-neutron.js"></script>
 <script src="js/data/archetypes/compact-blackhole.js"></script>
 <script src="js/data/archetypes/diffuse-nebula.js"></script>
+<script src="js/data/archetypes/machine-world.js"></script>
 <script src="js/data/elements/registry.js"></script>
 <script src="js/data/elements/solid.js"></script>
 <script src="js/data/elements/solid-moon.js"></script>
@@ -797,6 +801,7 @@
 <script src="js/data/elements/stellar-interior.js"></script>
 <script src="js/data/elements/compact.js"></script>
 <script src="js/data/elements/diffuse.js"></script>
+<script src="js/data/elements/machine.js"></script>
 <script src="js/data/traits/registry.js"></script>
 <script src="js/data/traits/orbital.js"></script>
 <script src="js/data/traits/solid.js"></script>
@@ -824,8 +829,15 @@
 <!-- generation -->
 <script src="js/gen/form.js"></script>
 <script src="js/gen/caves.js"></script>
+<script src="js/gen/activity.js"></script>
+<script src="js/gen/shells.js"></script>
+<script src="js/gen/shellwalls.js"></script>
+<script src="js/gen/rupture.js"></script>
+<script src="js/gen/woundedge.js"></script>
+<script src="js/gen/wounddebris.js"></script>
 <script src="js/gen/structure.js"></script>
 <script src="js/gen/frosting.js"></script>
+<script src="js/gen/accent.js"></script>
 <script src="js/gen/palette.js"></script>
 <script src="js/gen/terrain.js"></script>
 <script src="js/gen/zonegeom.js"></script>
@@ -833,10 +845,20 @@
 <script src="js/gen/zones.js"></script>
 <script src="js/gen/climate.js"></script>
 <script src="js/gen/climatesummary.js"></script>
+<script src="js/gen/evenspacing.js"></script>
 <script src="js/gen/elemgen.js"></script>
 <script src="js/gen/compact.js"></script>
 <script src="js/gen/diffuse.js"></script>
 <script src="js/gen/diffuse-pockets.js"></script>
+<script src="js/gen/claims.js"></script>
+<script src="js/gen/materials.js"></script>
+<script src="js/gen/cellgrid.js"></script>
+<script src="js/gen/glyph.js"></script>
+<script src="js/gen/fixtures.js"></script>
+<script src="js/gen/pulses.js"></script>
+<script src="js/gen/containment.js"></script>
+<script src="js/gen/conduits.js"></script>
+<script src="js/gen/capacitors.js"></script>
 <script src="js/gen/traitroll.js"></script>
 <script src="js/gen/details.js"></script>
 <script src="js/gen/climatetext.js"></script>
@@ -854,13 +876,29 @@
 <!-- drawing -->
 <script src="js/draw/canvas.js"></script>
 <script src="js/draw/layers.js"></script>
+<script src="js/draw/shells.js"></script>
+<script src="js/draw/shellwalls.js"></script>
+<script src="js/draw/rupture.js"></script>
 <script src="js/draw/formfill.js"></script>
+<script src="js/draw/sheen.js"></script>
 <script src="js/draw/feather.js"></script>
 <script src="js/draw/primitives.js"></script>
 <script src="js/draw/primitives/orbital.js"></script>
 <script src="js/draw/rocktexture.js"></script>
 <script src="js/draw/primitives/mosaic.js"></script>
 <script src="js/draw/primitives/machines.js"></script>
+<script src="js/draw/primitives/built.js"></script>
+<script src="js/draw/primitives/materials.js"></script>
+<script src="js/draw/primitives/cellgrid.js"></script>
+<script src="js/draw/primitives/glyph.js"></script>
+<script src="js/draw/primitives/fixtures.js"></script>
+<script src="js/draw/primitives/machinery.js"></script>
+<script src="js/draw/primitives/pulses.js"></script>
+<script src="js/draw/primitives/containment.js"></script>
+<script src="js/draw/conduits.js"></script>
+<script src="js/draw/capacitors.js"></script>
+<script src="js/draw/wounddebris.js"></script>
+<script src="js/draw/woundedge.js"></script>
 <script src="js/draw/caves.js"></script>
 <script src="js/draw/primitives/stellar.js"></script>
 <script src="js/draw/primitives/stellar-foreign.js"></script>

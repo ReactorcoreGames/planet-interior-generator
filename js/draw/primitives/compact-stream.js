@@ -1,5 +1,5 @@
 /* Matter falling onto a compact object — two streams, two different stories
- * — and the one ruled annotation a pulsar's field carries.
+ * — and what a pulsar's spin and field do to its surface and surroundings.
  *
  *   matter-stream  gas from a companion, CHANNELLED BY THE FIELD: it arrives
  *                  from the companion's bearing and runs down a real dipole
@@ -10,10 +10,12 @@
  *   tidal-stream   a star torn apart by a black hole: a stretched, bright
  *                  body with half of itself spiralling in round the hole and
  *                  the other half flung back out as a fainter tail.
- *   light-cylinder two lines parallel to the spin axis at `poles.
- *                  lightCylinder`, solid and ticked like a dimension line.
+ *   pulsar-wind    the wind a pulsar blows along its spin equator, starting
+ *                  at `poles.lightCylinder`: shocked wisps in a soft torus.
+ *   polar-cap      a pulsar's two hot caps, at the ends of its magnetic axis.
+ *   hot-spot       a quiet neutron star's surface patch, at its own bearing.
  *
- * Both are drawn in BODY coordinates via CC.CompactDraw (primitives/
+ * All are drawn in BODY coordinates via CC.CompactDraw (primitives/
  * compact.js), name no role and no archetype, and fade to nothing at their
  * open ends (D156). Load order: after draw/primitives/compact.js. */
 
@@ -178,71 +180,145 @@ var CC = CC || {};
     ctx.restore();
   }
 
-  /* ---- light-cylinder --------------------------------------------------
+  /* ---- pulsar-wind -----------------------------------------------------
    *
-   * Two lines at x = +/- the light-cylinder radius, parallel to the spin axis
-   * (body-space vertical; the scene's Rotation turns them with the body).
+   * THE WIND A PULSAR BLOWS, where the light cylinder used to be drawn as a
+   * ruled annotation (Session Y: "more like a HUD element than a trait").
+   * Past the light cylinder the field can no longer co-rotate, so it opens
+   * and streams away along the spin equator as a relativistic wind; where
+   * that wind meets its surroundings it shocks into bright WISPS — the
+   * ripples photographed round the Crab pulsar. Cut through the spin axis,
+   * the equatorial torus is two lobes, one each side, each a set of nested
+   * arcs bowing outward, broken into knots, inside a soft glow.
    *
-   * A BAND ROUND THE STAR, NOT A CAGE ROUND THE FRAME: full strength across
-   * the middle, fading to nothing by HALF_LEN, which sits inside the frame
-   * at the pulsar's framing. Lines running off-canvas at full strength were
-   * what made the old dashed version read as a selection marquee.
-   *
-   * SOLID, WITH TICKS POINTING IN TOWARD THE AXIS — the vocabulary of a
-   * dimension line on a technical drawing. Dashes were the app's own framing
-   * guides' vocabulary, and the two were indistinguishable. The tick at the
-   * equator is longer: it is where the radius is measured. */
-  var HALF_LEN = 1.45, TICK_STEP = 0.145;
-  function lightCylinder(ctx, view, el, style) {
+   * The light-cylinder radius (`poles.lightCylinder`, Spin rate) is still
+   * where it starts, so a faster pulsar's wind starts closer in. Body space:
+   * the spin axis is vertical, and the scene's Rotation turns it. */
+  function pulsarWind(ctx, view, el, style) {
     var P = el.poles;
     if (!P || !P.lightCylinder) return;
     var D = CC.CompactDraw, lc = P.lightCylinder;
-    var fade = function (y) {
-      var t = Math.abs(y) / HALF_LEN;
-      if (t <= 0.4) return 1;
-      var u = Math.max(0, 1 - (t - 0.4) / 0.6);
-      return u * u;
-    };
+    var R = view.px(1);
     var base = ctx.globalAlpha;
+    var seed = (el.seed || 0) * 1000;
+    var h = function (n) {
+      var x = Math.sin((seed + n) * 127.1 + 311.7) * 43758.5453;
+      return x - Math.floor(x);
+    };
     ctx.save();
-    ctx.strokeStyle = style;
-    ctx.lineCap = "butt";
-    var N = 34;
+    ctx.globalCompositeOperation = "lighter";
     for (var sd = -1; sd <= 1; sd += 2) {
-      var x = sd * lc;
-      ctx.lineWidth = view.lw(1.0);
+      /* The torus glow: an ellipse, flattened along the spin axis. */
+      var c = D.xy(view, sd * (lc + 0.42), 0);
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.scale(1, 0.50);
+      var g = ctx.createRadialGradient(0, 0, 0, 0, 0, R * 0.85);
+      g.addColorStop(0, style);
+      g.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.globalAlpha = base * 0.50;
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(0, 0, R * 0.85, 0, TAU);
+      ctx.fill();
+      ctx.restore();
+
+      /* The wisps: nested arcs, spacing and height growing outward, each
+       * broken into knots so they read as shocked gas, not as rings. */
+      ctx.strokeStyle = style;
+      ctx.lineCap = "round";
+      var N = 7;
       for (var i = 0; i < N; i++) {
-        var y0 = -HALF_LEN + 2 * HALF_LEN * i / N;
-        var y1 = -HALF_LEN + 2 * HALF_LEN * (i + 1) / N;
-        var f = fade((y0 + y1) / 2);
-        if (f <= 0.01) continue;
-        var p0 = D.xy(view, x, y0), p1 = D.xy(view, x, y1);
-        ctx.globalAlpha = base * f;
-        ctx.beginPath();
-        ctx.moveTo(p0.x, p0.y);
-        ctx.lineTo(p1.x, p1.y);
-        ctx.stroke();
+        var k = sd * 10 + i;
+        var x = lc + 0.04 + i * 0.11 * (1 + 0.10 * i) + (h(k) - 0.5) * 0.04;
+        var hh = 0.16 + 0.085 * i + h(k + 0.3) * 0.05;
+        var bow = 0.06 + 0.028 * i;
+        var fall = Math.pow(1 - i / N, 0.9);
+        ctx.lineWidth = view.lw(2.2 - i * 0.2);
+        var segs = 9;
+        for (var j = 0; j < segs; j++) {
+          if (h(k * 31 + j) < 0.14) continue;
+          var t0 = j / segs, t1 = (j + 0.92) / segs;
+          ctx.globalAlpha = base * fall * (0.55 + 0.45 * h(k * 7 + j));
+          ctx.beginPath();
+          for (var q = 0; q <= 5; q++) {
+            var t = t0 + (t1 - t0) * q / 5;
+            var y = (t * 2 - 1) * hh;
+            var px = x + bow * (1 - (y / hh) * (y / hh));
+            var p = D.xy(view, sd * px, y);
+            if (q === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+          }
+          ctx.stroke();
+        }
       }
-      ctx.lineWidth = view.lw(0.9);
-      var steps = Math.floor(HALF_LEN / TICK_STEP);
-      for (var k = -steps; k <= steps; k++) {
-        var y = k * TICK_STEP;
-        var ft = fade(y);
-        if (ft <= 0.01) continue;
-        var len = k === 0 ? 0.16 : (k % 3 === 0 ? 0.09 : 0.05);
-        var a = D.xy(view, x, y), b = D.xy(view, x - sd * len, y);
-        ctx.globalAlpha = base * ft * (k === 0 ? 1 : 0.8);
+
+      /* Streaks along the equator: the wind itself, leaving. */
+      ctx.lineWidth = view.lw(0.8);
+      for (var m = 0; m < 14; m++) {
+        var u = h(sd * 50 + m);
+        var r0 = lc + u * 1.3, len = 0.05 + h(sd * 70 + m) * 0.14;
+        var yy = (h(sd * 90 + m) - 0.5) * (0.10 + u * 0.5);
+        ctx.globalAlpha = base * 0.35 * (1 - u);
+        var s0 = D.xy(view, sd * r0, yy), s1 = D.xy(view, sd * (r0 + len), yy * 1.08);
         ctx.beginPath();
-        ctx.moveTo(a.x, a.y);
-        ctx.lineTo(b.x, b.y);
+        ctx.moveTo(s0.x, s0.y);
+        ctx.lineTo(s1.x, s1.y);
         ctx.stroke();
       }
     }
     ctx.restore();
   }
 
+  /* ---- polar-cap -------------------------------------------------------
+   *
+   * A pulsar's HOT POLAR CAPS, at both ends of the magnetic axis — where
+   * the beams are rooted and the return current strikes the surface, the
+   * hottest ground on the star. A bright gradient centred on the surface at
+   * each pole; the layer's own clip decides what part of it shows, so the
+   * same mark on the field, the crust and the pasta reads as one hot spot
+   * burning down through them. */
+  /* One white-cored glow centred on the surface at bearing `t`. */
+  function surfaceGlow(ctx, view, t, size, alpha, style) {
+    var rp = Math.max(2, view.px(size));
+    var c = CC.CompactDraw.xy(view, Math.sin(t), Math.cos(t));
+    var g = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, rp);
+    g.addColorStop(0, "rgba(255,255,255," + (0.95 * alpha).toFixed(3) + ")");
+    g.addColorStop(0.12, "rgba(255,255,255," + (0.45 * alpha).toFixed(3) + ")");
+    g.addColorStop(0.40, style);
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, rp, 0, TAU);
+    ctx.fill();
+  }
+
+  function polarCap(ctx, view, el, style) {
+    var P = el.poles;
+    if (!P) return;
+    var a = el.alpha === undefined ? 1 : el.alpha;
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    surfaceGlow(ctx, view, P.tilt || 0, el.size, a, style);
+    surfaceGlow(ctx, view, (P.tilt || 0) + Math.PI, el.size, a, style);
+    ctx.restore();
+  }
+
+  /* ---- hot-spot --------------------------------------------------------
+   *
+   * A neutron star's surface hot patch: the same glow as a cap, at its own
+   * bearing (`el.angle`, shared by every layer that draws it). */
+  function hotSpot(ctx, view, el, style) {
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    surfaceGlow(ctx, view, el.angle, el.size,
+                el.alpha === undefined ? 1 : el.alpha, style);
+    ctx.restore();
+  }
+
   CC.Primitives.register({
-    "light-cylinder": lightCylinder,
+    "pulsar-wind": pulsarWind,
+    "polar-cap": polarCap,
+    "hot-spot": hotSpot,
     "matter-stream": matterStream,
     "tidal-stream": tidalStream
   });

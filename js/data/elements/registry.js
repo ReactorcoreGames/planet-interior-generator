@@ -38,6 +38,11 @@
  *   arc       [min, max] angular extent in degrees, for band-like elements
  *   tone      how the element's colour derives from its layer's band colour:
  *             "lighter" | "darker" | "shift" | "glow"
+ *   spacing   "even" lays every instance on one even ring, interleaved across
+ *             the tiers (gen/evenspacing.js), exempt from alpha clumping.
+ *             Absent, angles are random
+ *   jitter    with `spacing: "even"`, the share of one slot an instance may
+ *             wander; built marks want 0-0.2. Defaults to 0
  *
  * BAND FIELDS — for `gradient-band`, the concentric-shell primitive
  *

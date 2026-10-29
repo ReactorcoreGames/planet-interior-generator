@@ -148,6 +148,24 @@ CC.Hazard = (function () {
       return { rating: RATINGS[Math.min(ni, 4)], score: nb, radiation: 0 };
     }
 
+    /* A MACHINE WORLD'S DANGERS ARE WHAT IT DOES, not its weather: it was
+     * built to a temperature and carries no air outside. Each term is a
+     * line on its card — vacuum on the hull, platforms with their lights
+     * on, a charged cannon, a drive firing, burning breaches, a dark world
+     * nobody can read, a hive's traffic. Capped at Lethal. */
+    if (facts.family === "machine") {
+      var m = 2;
+      if (facts.armed > 0) m += 1;
+      if (facts.bore === 1) m += 2; else if (facts.bore === 2) m += 1;
+      if (facts.engines === 1) m += 1;
+      if (facts.wounds && facts.torn) m += facts.deep ? 2 : 1;
+      if (facts.dark) m += 1;
+      if (facts.status === "hive") m += 1;
+      var mi = 0;
+      while (mi < CUTS.length && m >= CUTS[mi]) mi++;
+      return { rating: RATINGS[Math.min(mi, 4)], score: m, radiation: 0 };
+    }
+
     if (facts.family === "stellar") {
       /* Activity is the ONE thing that still separates one star from another
        * here, and it separates Severe from Lethal rather than deciding whether

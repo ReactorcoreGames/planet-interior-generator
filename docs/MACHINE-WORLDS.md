@@ -344,6 +344,8 @@ Each layer's `lit: [wake, full]` sets when its lights come on, so the dial reads
 
 Machine worlds need their own template entirely.
 
+*As built (D278): `js/gen/stats/machine.js`, every row read from the render — power from the reactor's drawn size × the share running, population from habitation's drawn band × its lit windows, status from the layers' lights, hull integrity as `1 − rupture.amount` with the wounds cut and the deepest layer reached, docking from shafts, doors, covers, ports and platforms. Weaponized and Worldship add a Weapon and a Drive row; Under construction relabels Hull integrity as Completion; the cut ancient-precursor lives in the Construction row.*
+
 ```
 Size                  {km} across — {comparison}
 Construction          {estimated age / who built it, if known}

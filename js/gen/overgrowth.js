@@ -40,7 +40,7 @@
  * grows the same mats in place rather than rolling new ones.
  *
  * Output, in body polar coordinates:
- *   { hue: [h, s, v], wither: 0 lush .. 1 dead,
+ *   { hue: [h, s, v], wither: 0 lush .. 1 dead, moss: true moss / false rust,
  *     mats:     [{ pts: [[a, rOut, rIn], ...] }],
  *     tendrils: [{ pts: [[r, a, w], ...] }],
  *     pools:    [{ poly, pts: [[a, rTop], ...], base, dots }],
@@ -241,7 +241,7 @@ CC.Overgrowth = (function () {
     /* After every draw, so the dial never moves a roll. */
     var wt = wither(spec, archetype, params);
     hue = [lerp(hue[0], STRAW, wt), hue[1] * lerp(1, STRAW_SAT, wt), hue[2] * lerp(1, STRAW_VAL, wt)];
-    var out = { hue: hue, wither: wt, mats: mats(spec, hull, F, lump, finger, thr, ph),
+    var out = { hue: hue, wither: wt, moss: K === HUES[0], mats: mats(spec, hull, F, lump, finger, thr, ph),
                 tendrils: [], pools: pools(spec, rupture, cover), dots: [] };
 
     /* Leaves over every mat and mound, counted by area, never by pixels. */

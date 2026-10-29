@@ -370,14 +370,32 @@ Open, the user's call if they bother them: the frame's lattice is akin to Under 
 
 The user: "Looks absolutely amazing, I'm impressed."
 
+### D278 — the stat card: `statTemplate: "machine"`
+
+`js/gen/stats/machine.js`, with a `machine` branch in `js/gen/hazard.js` and a danger pool in `js/data/flavour/machine.js` (the other three pools are sub-step 6). The mindset is a building you have found: who made it, is anyone home, is the power on, how badly is it broken, how do you get in, what will stop you. Every row reads what the detail stage built, never a dial where the picture has an answer:
+
+- **Size**: the rolled diameter, a comparison (Ceres, Pluto, the Moon, Mercury), and the count of hollow shells drawn (layers with a `gap`).
+- **Construction**: from what is drawn. The cut ancient-precursor lives here: Overgrown and dark or withered reads "Ancient. The builders are long gone"; Overgrown and lit "older than anyone can say … under a skin of moss nobody clears away" (`details.growth.moss`, a new output field). Under construction: "Still being built" or, dark, "Never finished". Dark and wounded: "Old, by the scars"; dark and intact: "Unknown". Running: built and kept by its crew or by machines, with "every seam was true until something tore it open" when there are wounds.
+- **Power output**: the reactor's drawn volume (power-core `outer` × radius) × 3e8 W/km³ (calibration) × the share running, `live × (0.55 + 0.45 × hive share)`, so the default runs at 55% and a hive at 100%. Comparison first, figure in brackets: big power stations, everything humanity uses (20 TW), all the sunlight on Earth (1.7e17 W). Cold or emergency: what it was built to make.
+- **Population**: habitation's drawn band × 30 people/km³ × its `live` × `busy`, as a multiple of Earth's 8 billion, with the lit share of windows in words. No habitation: "nowhere to live"; dark: "Nobody, by the lights".
+- **Status**: offline, emergency, automated, unmanned (no habitation), crewed, hive (`busy` > 1.35), from the layers' own `live` / `emergency`; Under construction has its own line per band.
+- **Hull integrity** (Completion under construction): the percentage is `1 − rupture.amount`, the renderer's own quantity (so the dial's 45% reads 49%), then the wounds cut and the deepest layer reached, by its cut list.
+- **Docking**: shafts and how many are open past their doors and covers; docking ports and the craft drawn in them; the breach as a way in; the defense-grid platforms, armed (lit) or dark.
+- **Weapon** (`details.bore`): length with a distance comparison, charged / dim red on emergency / cold, coil stages burning, muzzle shot away when the crown is gone. **Drive** (`details.engines`): bells firing and the plume's length, or a red glow in the throats, or cold.
+- **Hazard**: 2 for vacuum on the hull, +1 armed platforms, +2 / +1 a charged / emergency cannon, +1 a firing drive, +1 / +2 torn breaches / deep ones, +1 a dark world, +1 a hive; capped at Lethal. The spread runs Mild to Severe.
+- **Levels**: compact size, status, power, population, hull, danger; standard adds construction, docking, weapon, drive.
+
+Scratch tool: `test/_tmp/_zcard.mjs` (12 bodies, each beside its card). Noted to the user, not raised as problems: about 30 armed platforms appear on most lit bodies, so that line repeats; blast doors rarely leave every door on a shaft open, so a running world with doors usually reads "all sealed".
+
+The user: "The cards look good, I saw the renders. I approve."
+
 ## Next session: stage (d) continued
 
-Stages (a)–(c) and stage (d) sub-steps 1–4 are built and approved (D248–D277: Under construction, Blast doors, Shaft covers, Overgrown, Weaponized, Worldship). All six exclusive traits are done. `npm test` passes. Remaining, in order, rendering for the user between each:
+Stages (a)–(c) and stage (d) sub-steps 1–5 are built and approved (D248–D278: the six exclusive traits and the stat card). `npm test` passes. Remaining, in order, rendering for the user between each:
 
-5. **The stat card**: `js/gen/stats/machine.js` (the archetype already says `statTemplate: "machine"` and falls back to the planet's); MACHINE-WORLDS.md § "Stats template". Every figure measures the render: Power from the reactor's drawn radius × Operational status; Population from habitation's presence and volume × its lit share; Status from the Operational status bands (and Under construction); Hull integrity from the wounds actually cut (how many, how deep, which shell); Docking from shafts, doors, covers and docks; Construction from what is drawn (ancient-precursor's home); Biggest danger from drawn hazards; Weaponized and Worldship each owe the card a line read from `details.bore` / `details.engines` (charged or cold, how many bells firing). Laypeople's wording, metric with a comparison.
-6. **Flavour pool** (`js/data/flavour/`), including the cut precursor's story.
+6. **Flavour pool** (`js/data/flavour/machine.js`): the danger pool exists (D278); add `notable`, `resource` and `approach`, each line guarded by a fact the card shows (`facts` in `js/gen/stats/machine.js`), including the cut precursor's story and the spec's four lines (MACHINE-WORLDS.md § "Flavour"), and add Notable / Resources / Approach rows to the card's full level as the nebula's card has them.
 7. **Presets** (PARAMETERS.md § Artificial): Derelict Machine World, Hive World, Automated Factory, Unfinished World, Worldship. **Planet-Cracker is removed** (strike it from PARAMETERS.md). Render each against its blurb.
-8. **Star activity** against the machine world, and fill the climate table's open cell (likely ✖ for the render, ◐ only if the card carries a radiation line).
-9. **Close Phase 9a**: decisions here; MACHINE-WORLDS.md (exclusive traits table: the six built with their structure features — `rupture.edge: "clean"`, `shafts.doors` / `covers`, `overgrowth`, `bore`, `engines` — ancient-precursor cut, planet-cracker removed; `sets`; stats; flavour), ARCHITECTURE.md's archetype-property table (`bore`, `engines`, `overgrowth`) and PARAMETERS.md to the code; PROGRESS.md and checklist.md; `npm test`.
+8. **Star activity** against the machine world, and fill the climate table's open cell (likely ✖ for the render; ◐ only if the card carried a radiation line, and it does not).
+9. **Close Phase 9a**: decisions here; MACHINE-WORLDS.md (exclusive traits table: the six built with their structure features — `rupture.edge: "clean"`, `shafts.doors` / `covers`, `overgrowth`, `bore`, `engines` — ancient-precursor cut, planet-cracker removed; `sets`; flavour), ARCHITECTURE.md's archetype-property table (`bore`, `engines`, `overgrowth`) and PARAMETERS.md to the code; PROGRESS.md and checklist.md; `npm test`.
 
-Same rules: no archetype branch in `js/draw/`, ≤500 lines per file with hooks only in `scene.js` / `details.js` / `elemgen.js` / `palette.js`, no new tests unless asked. Scratch tools: `_zgrid.mjs` (sheets), `_zwound.mjs` / `_zcrop.mjs` / `_zzoom.mjs` / `_zlayer.mjs` (close-ups), `_zrow.mjs` (compare; it rescales, so read crop coordinates at the source size), `_zpools.mjs`, `_zbore.mjs`.
+Same rules: no archetype branch in `js/draw/`, ≤500 lines per file with hooks only in `scene.js` / `details.js` / `elemgen.js` / `palette.js`, no new tests unless asked. Scratch tools: `_zgrid.mjs` (sheets), `_zcard.mjs` (cards beside bodies), `_zwound.mjs` / `_zcrop.mjs` / `_zzoom.mjs` / `_zlayer.mjs` (close-ups), `_zrow.mjs` (compare; it rescales, so read crop coordinates at the source size), `_zpools.mjs`, `_zbore.mjs`.

@@ -188,7 +188,7 @@ assumed.
 
 ### Phase 9a — the `machine-world` archetype 🟡 (Session Z, stage d under way)
 
-[session-z-machine-world.md](session-z-machine-world.md) — D248–D277 so far. **No archetype branch in `js/draw/`**; `npm test` passes.
+[session-z-machine-world.md](session-z-machine-world.md) — D248–D278 so far. **No archetype branch in `js/draw/`**; `npm test` passes.
 
 - [x] **the stack**: four hollow shells round a solid heart, re-cut so every band holds at all extremes (D250); `frac_when` lifts the machinery and the reactor when an optional layer is absent
 - [x] **`gapBelow`, `pillars`, `shafted`, `shafts`** (D248): true voids, two-tier pillars, 2-6 access shafts through every shell to space (`js/gen/shells.js`, `js/draw/shells.js`)
@@ -204,7 +204,8 @@ assumed.
 - [x] stage (c) docs: MACHINE-WORLDS.md and PARAMETERS.md brought up to the code; ARCHITECTURE.md gains the archetype-property and colour-entry tables
 - [x] stage (d): the trait audit; `sets`, a trait switching structure data (D272, `js/gen/traitsets.js`)
 - [x] stage (d): **the six exclusive traits** — Under construction, the `clean` edge style (D273); Blast doors and Shaft covers (D274); Overgrown, `overgrowth` (D275); Weaponized, `bore` (D276); Worldship, `engines` (D277)
-- [ ] stage (d): stat card, flavour, presets, Star activity, close-out docs
+- [x] stage (d): **the stat card** — `statTemplate: "machine"`, every row read from the render, a `machine` hazard branch, the danger pool (D278) (`js/gen/stats/machine.js`)
+- [ ] stage (d): flavour, presets, Star activity, close-out docs
 
 ### Phase 7 review ✅ (Session Y)
 

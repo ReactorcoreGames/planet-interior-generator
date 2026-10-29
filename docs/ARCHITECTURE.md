@@ -572,7 +572,7 @@ Single Canvas 2D context. Draw order, back to front:
 5. Outward traits      rings (front half), flares, megastructures
 6. (rotation undone)
 7. Overlay labels      if enabled (draw/overlay.js)
-8. Scale bar + silhouette, lower-left, if enabled (draw/scalebar.js)
+8. Scale bar + silhouette, lower-left, if enabled (draw/scalebar.js). In a framed preview, the overlay and bar lay out inside the export guide's rectangle (`settings.chromeBox`)
 ```
 
 Everything is deterministic from the seed. Same seed + same settings = same

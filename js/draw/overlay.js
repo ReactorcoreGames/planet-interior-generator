@@ -87,7 +87,7 @@ CC.OverlayDraw = (function () {
     return CC.Color.mixHex(hex, "#ffffff", t);
   }
 
-  function drawSide(ctx, view, rows, side, k, fontPx) {
+  function drawSide(ctx, view, box, rows, side, k, fontPx) {
     if (!rows.length) return;
     var margin = 12 * k;
     var lift = 3 * k;            // underline sits this far under the baseline
@@ -107,9 +107,9 @@ CC.OverlayDraw = (function () {
       var w = ctx.measureText(row.name).width + tail;
       var x0;
       if (side > 0) {
-        x0 = Math.min(view.cx + reach, view.width - margin - w);
+        x0 = Math.min(view.cx + reach, box.x + box.w - margin - w);
       } else {
-        x0 = Math.max(view.cx - reach, margin + w);
+        x0 = Math.max(view.cx - reach, box.x + margin + w);
       }
       var x1 = x0 + side * w;
       var y = Math.round(row.y) + 0.5;
@@ -161,7 +161,10 @@ CC.OverlayDraw = (function () {
   function draw(ctx, view, body, palette, settings) {
     if (!settings || !settings.showLabels || !body || !body.layers) return;
 
-    var k = Math.min(view.width, view.height) / 1000;
+    /* The frame: the export guide's rectangle while the preview is framed,
+     * else the whole canvas. */
+    var box = settings.chromeBox || { x: 0, y: 0, w: view.width, h: view.height };
+    var k = Math.min(box.w, box.h) / 1000;
     var size = settings.labelSize === undefined ? 1 : settings.labelSize;
     var fontPx = Math.max(9, FONT_PX * k * size);
     var sideMode = settings.labelSide || "both";
@@ -179,7 +182,7 @@ CC.OverlayDraw = (function () {
       dealt++;
 
       var a = anchorAt(view, anchorRadius(layer), side * ray, rot);
-      if (a.x < 0 || a.x > view.width || a.y < 0 || a.y > view.height) continue;
+      if (a.x < box.x || a.x > box.x + box.w || a.y < box.y || a.y > box.y + box.h) continue;
 
       var col = palette && palette.get ? palette.get(layer.role) : null;
       sides[String(side)].push({
@@ -195,13 +198,13 @@ CC.OverlayDraw = (function () {
     ctx.lineJoin = "round";
 
     var gap = fontPx * ROW_GAP;
-    var lo = fontPx * 1.6, hi = view.height - fontPx * 0.8;
+    var lo = box.y + fontPx * 1.6, hi = box.y + box.h - fontPx * 0.8;
     for (var s in sides) {
       if (!sides.hasOwnProperty(s)) continue;
       var rows = sides[s];
       rows.sort(function (p, q) { return p.ay - q.ay; });
       spread(rows, gap, lo, hi);
-      drawSide(ctx, view, rows, +s, Math.max(k, 0.5), fontPx);
+      drawSide(ctx, view, box, rows, +s, Math.max(k, 0.5), fontPx);
     }
     ctx.restore();
   }

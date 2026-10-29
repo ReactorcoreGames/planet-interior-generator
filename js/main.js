@@ -301,8 +301,12 @@ var CC = CC || {};
       if (offsetX > cap) offsetX = cap;
     }
 
+    /* While framed, the labels and scale bar lay out inside the guide's
+     * rectangle, which is where the export's own corners are. */
+    var chromeBox = CC.Framing ? CC.Framing.frameRect(fit.width, fit.height, settings.aspect) : null;
+
     var rendered = CC.Scene.render(ctx, fit.width, fit.height, current,
-                    CC.Math.merge(settings, { offsetX: offsetX }),
+                    CC.Math.merge(settings, { offsetX: offsetX, chromeBox: chromeBox }),
                     currentPalette, currentDetails);
 
     /* THE FRAMING GESTURES READ THE VIEW THE RENDER ACTUALLY USED, rather than

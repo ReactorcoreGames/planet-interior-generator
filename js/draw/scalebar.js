@@ -21,7 +21,9 @@
  * THE FRAME, like the overlay: text, strokes and margins scale with the
  * canvas's shorter axis and the Label text size control, never with the body.
  * The bar aims at a fifth of that axis and takes the largest round length
- * under it, so it always lands between ~9% and 22%.
+ * under it, so it always lands between ~9% and 22%. "The frame" is
+ * `settings.chromeBox` when the preview is framed (the export guide's
+ * rectangle), else the whole canvas.
  *
  * Drawn unrotated, after the scene's rotation is undone. Knows no archetype:
  * every per-body fact arrives as a radius in km. Loaded before
@@ -241,7 +243,8 @@ CC.ScaleBarDraw = (function () {
     if (!(radiusKm > 0)) return;
     var kmPerPx = radiusKm / view.R;
 
-    var S = Math.min(view.width, view.height);
+    var box = settings.chromeBox || { x: 0, y: 0, w: view.width, h: view.height };
+    var S = Math.min(box.w, box.h);
     var k = Math.max(S / 1000, 0.5);
     var size = settings.labelSize === undefined ? 1 : settings.labelSize;
     var fontPx = Math.max(9, FONT_PX * k * size);
@@ -250,8 +253,8 @@ CC.ScaleBarDraw = (function () {
     var len = roundLength(BAR_MAX * S * kmPerPx);
     var barW = len.km / kmPerPx;
     var barH = Math.max(3, 4 * k);
-    var x0 = Math.round(margin) + 0.5;
-    var barTop = Math.round(view.height - margin - barH) + 0.5;
+    var x0 = Math.round(box.x + margin) + 0.5;
+    var barTop = Math.round(box.y + box.h - margin - barH) + 0.5;
 
     ctx.save();
     ctx.font = "600 " + Math.round(fontPx) + "px 'Segoe UI', system-ui, sans-serif";

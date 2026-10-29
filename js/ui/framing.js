@@ -184,9 +184,13 @@ CC.Framing = (function () {
    * Drawn only while framed, because at 1x centred it would be permanent
    * furniture marking a crop nobody has asked for. That doubles as the UI's
    * answer to "am I framed or not?", which is the one thing an explicit
-   * on/off toggle would have bought and this gets for nothing. */
-  function drawGuide(ctx, width, height, aspectName) {
-    if (!isFramed()) return;
+   * on/off toggle would have bought and this gets for nothing.
+   *
+   * `frameRect` is that rectangle, or null when not framed. The preview also
+   * hands it to the overlay and scale bar, so they sit inside the guide where
+   * the export will put them rather than in the dimmed margin. */
+  function frameRect(width, height, aspectName) {
+    if (!isFramed()) return null;
 
     var aspectRatio = ASPECT_RATIOS[aspectName] || (16 / 9);
 
@@ -197,8 +201,13 @@ CC.Framing = (function () {
     if (width / height > aspectRatio) w = height * aspectRatio;
     else h = width / aspectRatio;
 
-    var x = (width - w) / 2;
-    var y = (height - h) / 2;
+    return { x: (width - w) / 2, y: (height - h) / 2, w: w, h: h };
+  }
+
+  function drawGuide(ctx, width, height, aspectName) {
+    var f = frameRect(width, height, aspectName);
+    if (!f) return;
+    var x = f.x, y = f.y, w = f.w, h = f.h;
 
     ctx.save();
     ctx.setLineDash([6, 5]);
@@ -302,6 +311,7 @@ CC.Framing = (function () {
     setView: setView,
     reset: reset,
     isFramed: isFramed,
+    frameRect: frameRect,
     drawGuide: drawGuide,
     clampPan: clampPan
   };

@@ -4,12 +4,14 @@
 
 > **Runs after Phase 9a** (the `machine-world` archetype), so this pass covers every body type that will ship (D246). "Per-type stat templates finalised" includes the machine world's.
 
-- Layer-name overlay (underline + 1px leader, names only)
-- Scale bar with optional silhouette
-- Full keyboard shortcuts
-- Settings persistence
-- "Copy seed + settings" shareable string
-- Per-type stat templates finalised
+Run one item per session, in this order (D282). Write-up: [session-aa-polish.md](../progress/session-aa-polish.md).
+
+- ✅ Layer-name overlay (underline + 1px leader, names only) — Session AA (D283, D284)
+- ⬜ Scale bar with an automatic silhouette (D282)
+- ⬜ Per-type stat templates finalised — an inconsistency check; the audit's list is in the write-up
+- ⬜ Settings persistence + Reset to defaults
+- ⬜ Full keyboard shortcuts (← / → seed, `L`, `?`, the Help list)
+- ✅ "Copy seed + settings" shareable string — **already built** (D57, D73); nothing to do
 - ~~Framing & crop~~ — **built early, in Session I.** It was filed here as
   polish because it was conceived as a *crop*, and a crop is polish. Two things
   moved it: it turned out to be the answer to a live annoyance in the Randomize

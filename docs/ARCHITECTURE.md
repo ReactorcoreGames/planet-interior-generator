@@ -510,13 +510,14 @@ identical canvas size.
 **Decision:** a **toggle**, not a separate export. Scope reduced drastically —
 its one job is naming the layers.
 
-- Render body only (optional background), **or** body + info sidebar + optional
-  layer labels
-- One label per layer. No feature callouts, no stat nuggets, no legend.
-- Each label has an **underline**; a 1px line runs from the underline's inner
-  end (right end for left-side labels, left end for right-side labels) to the
-  vertical centre of the nearest point on that layer's band
-- Labels stack in a column per side, sorted by depth so lines never cross
+**Built: `js/draw/overlay.js` (D284).**
+
+- A render setting, like framing: when on, it is drawn into the preview and every body export
+- One label per layer. No feature callouts, no stat nuggets, no legend
+- Each label has an **underline**; a 1px leader runs from the underline's inner end to a dot inside that layer's band
+- The dots sit on **one ray per side**, 55° from straight up, so walking the ray outward meets the bands in depth order and the leaders cannot cross. Labels start level with their dots and are pushed apart only as far as they must be. "Both" deals the bands out alternately
+- **Sized from the frame, not the body**: a 20x close-up does not print 20x names. Drawn after the scene's rotation is undone, so the text reads level
+- The name is `layer.name`, resolved in `js/gen/structure.js` from the layer spec's `name` or `js/data/layernames.js` by role (D283). No role reaches `js/draw/`
 - Everything else lives in the sidebar — **never** over the illustration
 
 ---
@@ -565,7 +566,7 @@ Single Canvas 2D context. Draw order, back to front:
 4. Surface-attached    ice caps, ocean bands
 5. Outward traits      rings (front half), flares, megastructures
 6. Scale bar + silhouette (lower-left)
-7. Overlay labels      if enabled
+7. Overlay labels      if enabled (draw/overlay.js)
 ```
 
 Everything is deterministic from the seed. Same seed + same settings = same
@@ -639,7 +640,7 @@ js/
             ⬜ stats.js  text.js (MVP)
   draw/     ✅ canvas.js  ✅ layers.js  ✅ scene.js
             ✅ primitives.js  ✅ details.js  ✅ film.js
-            ⬜ overlay.js  scale.js  panel.js (P8)
+            ✅ overlay.js  ⬜ scale.js (P8)
   ui/       ✅ accordion.js  ✅ controls.js  ✅ traitpicker.js
             ⬜ export.js (MVP)
   ✅ main.js

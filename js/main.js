@@ -116,6 +116,11 @@ var CC = CC || {};
 
       showInfo: c.get("show-info") === undefined ? true : !!c.get("show-info"),
       infoDetail: c.get("info-detail") || "standard",
+      /* The layer-name overlay (draw/overlay.js). Output stage: it draws over
+       * the render and never touches what is generated. */
+      showLabels: !!c.get("show-labels"),
+      labelSide: c.get("label-side") || "both",
+      labelSize: (c.get("label-size") === undefined ? 100 : c.get("label-size")) / 100,
 
       /* THE BACKGROUND IS A STACK: a base colour, an optional field, and an
        * optional star overlay. `background` names only the FIELD now — stars
@@ -456,6 +461,9 @@ var CC = CC || {};
      * re-roll a single element. */
     { id: "show-info", stage: "output" },
     { id: "info-detail", stage: "output" },
+    { id: "show-labels", stage: "output" },
+    { id: "label-side", stage: "output" },
+    { id: "label-size", stage: "output", format: pct },
     { id: "background", stage: "output" },
     { id: "background-color", stage: "output" },
     { id: "background-color2", stage: "output" },

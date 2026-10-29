@@ -376,18 +376,18 @@ The section that carries the aesthetic thesis.
 |---|---|---|
 | **Show info panel** | checkbox | ✅ The stat card over the preview. Also `I` |
 | **Info detail level** | dropdown | ✅ Compact / Standard / Full — how many stat lines |
-| **Show layer labels** | checkbox | ⬜ P8. The overlay: layer names with underline + 1px leader |
-| **Label side** | dropdown | ⬜ P8. Both / Left only / Right only |
-| **Label text size** | slider | ⬜ P8. 75–150% |
+| **Show layer labels** | checkbox | ✅ Default off. The overlay: each layer's name over an underline, a 1px leader to a dot inside the band (D284). Names come from `js/data/layernames.js` by role, or a layer spec's own `name` (D283). Drawn into every body export |
+| **Label side** | dropdown | ✅ Both / Left only / Right only. Both deals the layers out alternately, outermost to the right |
+| **Label text size** | slider | ✅ 75–150%. Sized from the frame, not the body, so zoom never enlarges the names |
 | **Show scale bar** | checkbox | ⬜ P8. Lower-left measurement line |
-| **Scale comparison** | dropdown | ⬜ P8. None / Earth / Sun / Human / Ship — silhouette beside the scale bar |
-| **Show body name** | checkbox | ⬜ P8. The card already shows it; this is the title in the *composed render* |
+| **Scale comparison** | — | ⬜ P8. A silhouette beside the scale bar, **chosen automatically** (D282): the nearest comparison object visible at true scale, or none. Replaces the fixed None / Earth / Sun / Human / Ship list, most of which is sub-pixel against most bodies |
 
 **The info panel is DOM, not canvas** (PROGRESS.md D53). On screen the card is
 real text a user can select and copy. Drawing it *into* an exported PNG is what
-the **Composition** dropdown below is for, and that lands with Phase 8 — it
-will draw the same `stats.lines` through the canvas rather than computing
-anything of its own.
+the export menu's *body + info card* item is for: it draws the same
+`stats.lines` through the canvas rather than computing anything of its own.
+
+**Layer labels and the scale bar are render settings, like framing** (D282): whatever is switched on is drawn into every body export, so there is no Composition dropdown and no Show body name checkbox. Both were specced and struck.
 
 **Every figure on the card is read off the render**, never rolled beside it —
 HAZARDS.md holds the contract and `test/stats.mjs` asserts it across 576
@@ -405,7 +405,6 @@ legend — that was v2's mistake.
 | **Background** | dropdown | Transparent / Solid colour / Starfield / Gradient |
 | **Background colour** | colour picker | Active when Solid or Gradient is selected |
 | **Starfield density** | slider | Active when Starfield is selected |
-| **Composition** | dropdown | Body only / Body + info panel / Body + labels / Full (panel + labels) |
 | **Aspect ratio** | dropdown | 16:9 / 1:1 / 4:3 / 3:2 / Custom |
 | **Resolution** | number + presets | 240–4320 px vertical. Presets: 720 / 1080 / 1440 / 2160 |
 | **Body size in frame** | slider | 40–95% | How much of the frame the body occupies. Largely superseded by Zoom, which does the same job better; kept because shipped presets and settings strings carry it |
@@ -606,7 +605,7 @@ Lives inside a section; the **button stays pinned**.
 | `Ctrl+S` | Export with current settings |
 | `Ctrl+C` | Copy image to clipboard |
 | `←` / `→` | Previous / next seed (increment the numeric part) |
-| `1`–`6` | Toggle accordion sections |
+| `1`–`8` | Toggle accordion sections |
 | `L` | Toggle layer labels |
 | `I` | Toggle info panel |
 | `?` | Show shortcut list |

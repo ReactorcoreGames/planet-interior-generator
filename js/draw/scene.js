@@ -10,7 +10,7 @@
  *   4. surface-attached               [Phase 4]
  *   5. outward traits (front)         [Phase 4]
  *   6. scale bar                      [Phase 8]
- *   7. overlay labels                 [Phase 8]
+ *   7. overlay labels                 draw/overlay.js
  *
  * The later steps are absent rather than stubbed — an empty function that gets
  * called is a lie about what the pipeline does. They slot in here when built.
@@ -1394,6 +1394,10 @@ CC.Scene = (function () {
     CC.ZonePaint.drawOutward(ctx, view, details, palette, elementOpacity, "front", sky);
 
     ctx.restore();
+
+    /* --- 7. overlay labels --- after the rotation is undone, so the names
+     * read level (draw/overlay.js). */
+    CC.OverlayDraw.draw(ctx, view, body, palette, settings);
 
     /* `extent` is reported because the caller cannot recompute it: it folds in
      * the atmosphere bulge and the outward traits measured above, and the pan

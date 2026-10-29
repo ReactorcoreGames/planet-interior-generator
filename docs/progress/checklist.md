@@ -186,6 +186,18 @@ assumed.
 - [x] **the `nebula` card** — crossed, not reached; every figure computed and checked (D238); a navigational **hazard rating** calibrated against the frequency contract (D239)
 - [x] **flavour pool and seven presets**, each checked against its blurb (D240)
 
+### Phase 8 — overlay, scale bar, polish (Session AA, in progress)
+
+[session-aa-polish.md](session-aa-polish.md) — D282–. One item per session (D282).
+
+- [x] the audit: every item checked against the code and PARAMETERS.md; "Copy seed + settings" found already built; Composition and Show body name struck (D282)
+- [x] **layer names** — `js/data/layernames.js` by role, a spec's `name` overriding, resolved in `js/gen/structure.js` (D283)
+- [x] **the layer-name overlay** — `js/draw/overlay.js`: one ray per side, sized from the frame, drawn level; Show layer labels, Label side, Label text size (D284)
+- [ ] scale bar with an automatic silhouette
+- [ ] stat-template inconsistency pass
+- [ ] settings persistence + Reset to defaults
+- [ ] keyboard shortcuts
+
 ### Phase 9a — the `machine-world` archetype ✅ (Session Z)
 
 [session-z-machine-world.md](session-z-machine-world.md) — D248–D281. **No archetype branch in `js/draw/`**; `npm test` passes.

@@ -306,6 +306,9 @@ CC.Structure = (function () {
 
       var layer = {
         role: spec.role,
+        /* What the overlay prints (js/data/layernames.js): the spec's own
+         * name if the archetype gave one, else the shared table's. */
+        name: spec.name || CC.LayerNames.of(spec.role),
         outer: outer,
         inner: 0,
         strength: pres.strength,

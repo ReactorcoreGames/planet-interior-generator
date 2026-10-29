@@ -507,7 +507,27 @@
             </select>
           </div>
 
-          <p class="phase-note">Layer labels and the scale bar arrive in Phase 8.</p>
+          <div class="control-row" title="Name every layer of the cut: a leader from inside each band to its name. Names only - the card is where a layer gets explained. Carried into every body export.">
+            <label for="show-labels">Show layer labels</label>
+            <input type="checkbox" id="show-labels">
+          </div>
+
+          <div class="control-row" title="Which side of the body the names sit on. Both deals the layers out alternately, so neighbouring thin bands get room.">
+            <label for="label-side">Label side</label>
+            <select id="label-side">
+              <option value="both" selected>Both</option>
+              <option value="left">Left only</option>
+              <option value="right">Right only</option>
+            </select>
+          </div>
+
+          <div class="control-row" title="How big the layer names are. Sized from the frame, not the body, so zooming in does not enlarge them.">
+            <label for="label-size">Label text size</label>
+            <input type="range" id="label-size" min="75" max="150" value="100">
+            <output data-readout="label-size"></output>
+          </div>
+
+          <p class="phase-note">The scale bar arrives later in Phase 8.</p>
         </div>
       </section>
 
@@ -791,6 +811,7 @@
 <script src="js/data/archetypes/compact-blackhole.js"></script>
 <script src="js/data/archetypes/diffuse-nebula.js"></script>
 <script src="js/data/archetypes/machine-world.js"></script>
+<script src="js/data/layernames.js"></script>
 <script src="js/data/elements/registry.js"></script>
 <script src="js/data/elements/solid.js"></script>
 <script src="js/data/elements/solid-moon.js"></script>
@@ -932,6 +953,7 @@
 <script src="js/draw/zonepaint.js"></script>
 <script src="js/draw/zonepaint/sea.js"></script>
 <script src="js/draw/emissive.js"></script>
+<script src="js/draw/overlay.js"></script>
 <script src="js/draw/scene.js"></script>
 <script src="js/draw/card.js"></script>
 

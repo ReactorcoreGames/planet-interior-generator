@@ -379,8 +379,8 @@ The section that carries the aesthetic thesis.
 | **Show layer labels** | checkbox | ✅ Default off. The overlay: each layer's name over an underline, a 1px leader to a dot inside the band (D284). Names come from `js/data/layernames.js` by role, or a layer spec's own `name` (D283). Drawn into every body export |
 | **Label side** | dropdown | ✅ Both / Left only / Right only. Both deals the layers out alternately, outermost to the right |
 | **Label text size** | slider | ✅ 75–150%. Sized from the frame, not the body, so zoom never enlarges the names |
-| **Show scale bar** | checkbox | ⬜ P8. Lower-left measurement line |
-| **Scale comparison** | — | ⬜ P8. A silhouette beside the scale bar, **chosen automatically** (D282): the nearest comparison object visible at true scale, or none. Replaces the fixed None / Earth / Sun / Human / Ship list, most of which is sub-pixel against most bodies |
+| **Show scale bar** | checkbox | ✅ Default off. Lower-left map-style bar, a round 1-2-5 length in units that switch with the body (m → km → million km → AU → light-years), measuring the radius the card's Size line states (D285). Sized from the frame, so zoom changes its length, not its text; its text follows Label text size. Drawn into every body export |
+| **Size comparison** | checkbox | ✅ Default on; only matters with the bar shown. A silhouette above the bar, **chosen automatically** (D282, D285): the largest object in `js/data/scaleladder.js` — person, jumbo jet, skyscraper, town, Everest, city, Ceres, Moon, Earth, Jupiter, Sun, Arcturus, Earth's orbit, Neptune's orbit, the Oort cloud's inner edge, the Oort cloud — whose true-scale size is 5px–25% of the frame, or none. Replaces the fixed None / Earth / Sun / Human / Ship list, most of which is sub-pixel against most bodies |
 
 **The info panel is DOM, not canvas** (PROGRESS.md D53). On screen the card is
 real text a user can select and copy. Drawing it *into* an exported PNG is what

@@ -527,7 +527,15 @@
             <output data-readout="label-size"></output>
           </div>
 
-          <p class="phase-note">The scale bar arrives later in Phase 8.</p>
+          <div class="control-row" title="A map-style bar in the lower-left corner with its real length, in units that change with the body - from metres to light-years. Measures the same radius the card's Size line states. Carried into every body export.">
+            <label for="show-scale-bar">Show scale bar</label>
+            <input type="checkbox" id="show-scale-bar">
+          </div>
+
+          <div class="control-row" title="Beside the scale bar, the largest familiar thing that is visible at true scale - a person, a city, Earth, the Sun, Earth's orbit - chosen automatically. Zooming in can swap it for something smaller. Off draws the bar alone.">
+            <label for="scale-silhouette">Size comparison</label>
+            <input type="checkbox" id="scale-silhouette" checked>
+          </div>
         </div>
       </section>
 
@@ -812,6 +820,7 @@
 <script src="js/data/archetypes/diffuse-nebula.js"></script>
 <script src="js/data/archetypes/machine-world.js"></script>
 <script src="js/data/layernames.js"></script>
+<script src="js/data/scaleladder.js"></script>
 <script src="js/data/elements/registry.js"></script>
 <script src="js/data/elements/solid.js"></script>
 <script src="js/data/elements/solid-moon.js"></script>
@@ -954,6 +963,7 @@
 <script src="js/draw/zonepaint/sea.js"></script>
 <script src="js/draw/emissive.js"></script>
 <script src="js/draw/overlay.js"></script>
+<script src="js/draw/scalebar.js"></script>
 <script src="js/draw/scene.js"></script>
 <script src="js/draw/card.js"></script>
 

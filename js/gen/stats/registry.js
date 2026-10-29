@@ -287,6 +287,11 @@ CC.Stats = (function () {
        * simply makes the card identifiably this world. */
       fingerprint: fingerprintOf(body, palette, archetype),
       seed: settings.seed,
+      /* The body's real radius in km — the one the Size line states — for
+       * anything that has to measure the picture in real units (the scale
+       * bar, draw/scalebar.js). Every family's `facts.radius` is km except
+       * one whose own unit is not, which sets `radiusKm` itself. */
+      radiusKm: built.facts.radiusKm !== undefined ? built.facts.radiusKm : built.facts.radius,
       /* The raw figures, so a probe can assert the card against the render
        * without parsing English. */
       facts: built.facts

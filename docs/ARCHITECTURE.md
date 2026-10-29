@@ -497,11 +497,16 @@ Hazard and flavour pools live in [HAZARDS.md](HAZARDS.md).
 **Decision:** a map-style scale bar in the **lower-left corner** of the render —
 a measurement line with its real-world length labelled.
 
-Optionally accompanied by a silhouette for comparison: a circle for a
-sun/planet, a rectangle for a human/ship. Same corner.
-
 This solves the problem that a moon and a giant star otherwise render at
 identical canvas size.
+
+**Built: `js/draw/scalebar.js` (D285).**
+
+- A render setting, like framing and the overlay: drawn into the preview and every body export, step 8 of the draw order, after the scene's rotation is undone
+- **Measures the radius the card states.** `CC.Stats.build` returns `radiusKm`, the figure behind the Size line (each template's `facts.radius`, or its own `facts.radiusKm` where its unit is not km — the nebula's light-years). That radius is `view.R` pixels, so the bar cannot disagree with the card
+- **A round 1-2-5 length**, the largest under 22% of the frame's shorter axis, in a unit chosen from that length: m → km → million km → AU → light-years
+- **Sized from the frame, not the body**: text, strokes and margins scale with the shorter axis and Label text size, so zoom changes the bar's length and never its text
+- **The silhouette is automatic** (D282): the largest rung of `js/data/scaleladder.js` whose true-scale size is 5px–25% of the frame, standing above the bar with its name, or none. Sixteen rungs from a person to the Oort cloud, spaced so no body falls between two; zoom can step the choice down. Per-object data lives in `js/data/`; `js/draw/` knows no archetype
 
 ---
 
@@ -565,8 +570,9 @@ Single Canvas 2D context. Draw order, back to front:
        d. boundary line
 4. Surface-attached    ice caps, ocean bands
 5. Outward traits      rings (front half), flares, megastructures
-6. Scale bar + silhouette (lower-left)
+6. (rotation undone)
 7. Overlay labels      if enabled (draw/overlay.js)
+8. Scale bar + silhouette, lower-left, if enabled (draw/scalebar.js)
 ```
 
 Everything is deterministic from the seed. Same seed + same settings = same
@@ -640,7 +646,7 @@ js/
             ⬜ stats.js  text.js (MVP)
   draw/     ✅ canvas.js  ✅ layers.js  ✅ scene.js
             ✅ primitives.js  ✅ details.js  ✅ film.js
-            ✅ overlay.js  ⬜ scale.js (P8)
+            ✅ overlay.js  ✅ scalebar.js
   ui/       ✅ accordion.js  ✅ controls.js  ✅ traitpicker.js
             ⬜ export.js (MVP)
   ✅ main.js

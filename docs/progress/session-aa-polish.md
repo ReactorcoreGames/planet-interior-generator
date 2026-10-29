@@ -1,8 +1,8 @@
 # Session AA — Phase 8, overlay, scale bar and polish
 
-*D282–D284 so far. Phase 8 runs over several sessions, one item each, with the user looking between them (D282). This session: the audit, then item 1, the layer-name overlay.*
+*D282–D285 so far. Phase 8 runs over several sessions, one item each, with the user looking between them (D282). Item 1, the layer-name overlay, and item 2, the scale bar, are done.*
 
-Scratch tools: `test/_tmp/_aacards.mjs` (one card per archetype as text, with each line's Compact/Standard membership), `test/_tmp/_aastack.mjs` (each archetype's drawn stack), `test/_tmp/_aaoverlay.mjs` (the overlay sheet across every archetype plus edge cases, to `shots/aa/`), `test/_tmp/_aacrop.mjs` (pulls cells out of a sheet at full size).
+Scratch tools: `test/_tmp/_aacards.mjs` (one card per archetype as text, with each line's Compact/Standard membership), `test/_tmp/_aastack.mjs` (each archetype's drawn stack), `test/_tmp/_aaoverlay.mjs` (the overlay sheet across every archetype plus edge cases, to `shots/aa/`), `test/_tmp/_aacrop.mjs` (pulls cells out of a sheet at full size), `test/_tmp/_aascale.mjs` (the scale-bar sheet, printing each case's bar, rung and card Size line), `test/_tmp/_aasplit.mjs` (splits a tall sheet into 1920x1080 pages).
 
 ---
 
@@ -53,4 +53,20 @@ Checked on the sheet across all fourteen archetypes plus right-only, left-only a
 
 **Known and accepted:** the black hole is drawn small in its frame, so its column sits over the inner accretion disc. A label column clear of an outward *trait* would need the trait's reach, which the overlay does not know about, and the disc is part of the picture there.
 
-**Waiting for the user's eye**, names and layout both.
+**Approved**: asked before item 2, the user had no corrections to the names or the layout.
+
+## D285 — The scale bar: the card's radius, a 1-2-5 length, the largest silhouette that fits
+
+`js/draw/scalebar.js`, step 8 of the draw order, after the overlay and with the rotation undone. Ladder data in `js/data/scaleladder.js`. Approved by the user on the sheet ("Looks really good").
+
+- **It measures the radius the card states.** `CC.Stats.build` now returns `radiusKm`: each template's `facts.radius`, or `facts.radiusKm` where a template's own unit is not km (the nebula sets it from its light-years across). The bar builds the stats over the same body, details and settings, so its number is the Size line's number by construction; that radius is `view.R` pixels. The black hole's is the horizon from its mass, a few km to ~60 AU; the nebula's runs 0.2–55 light-years.
+- **A round length, a unit from that length.** The bar takes the largest 1, 2 or 5 × 10ⁿ under 22% of the frame's shorter axis, so it lands between ~9% and 22%. The unit is picked from the longest bar that would fit, so the number is always at least 1 of it: m below 1 km, km below a million, million km below 1 AU, AU below 0.1 light-years, then light-years.
+- **Sized from the frame**, like the overlay: text, strokes and margins scale with the shorter axis, and the text follows Label text size. Zoom changes the bar's length, never its text.
+- **The silhouette is the largest ladder rung whose true-scale size is 5px–25% of the frame**, standing above the bar with its name, or none. Zoom moves the pixels, so zoom moves the choice: a gas giant shows Earth at 1x and the Moon at 8x.
+- **The ladder as built**, sixteen rungs: a person, a jumbo jet, a skyscraper, a town, Mount Everest, a large city, Ceres, the Moon, Earth, Jupiter, the Sun, Arcturus, Earth's orbit, Neptune's orbit, the inner edge of the Oort cloud, the Oort cloud. The user approved ten and asked for the gaps filled. Checking the ladder against every body showed more gaps than the proposal named: under the first 18% cap no disc fit a planet, a moon or a machine world at all. The window was widened to 5px–25% (50x) and the rungs spaced at most ~50x apart wherever a body can be; the jet, Ceres, Arcturus and the inner Oort cloud fill the gaps. The one wider step, Neptune's orbit to the inner Oort cloud, spans sizes no archetype reaches.
+- **A town, not a city, beside a neutron star.** At true scale a 40 km city is larger than a 24 km neutron star, so it can never sit in the corner beside it; the town rung (5 km) was added for that.
+- **Drawn as semi-technical marks**: small things (person, jet, tower, peak, skylines) as pale filled figures in a dark halo; discs as a faint veil in an ink ring, so a silhouette never reads as a second body; Jupiter with two belts; orbits as an empty ring round a Sun dot; the Oort cloud's ring broken, since it has no edge. The bar is four alternating segments in an ink outline, readable over sky or a bright surface.
+
+Two controls in Labels & Info, output stage: **Show scale bar** (default off, the user's call) and **Size comparison** (default on). The "scale bar arrives later" phase-note is gone.
+
+Checked on the sheet across all fourteen archetypes, the black hole at mass class −1, +0.6 and +1, zoomed cases (planet 4x, gas giant 8x, asteroid 20x, giant star 3x, nebula 6x), the planetary nebula, the moon with the silhouette off at 150% text, and a 1920x1080 gas giant at 1:1. `npm test` passes.

@@ -121,6 +121,9 @@ var CC = CC || {};
       showLabels: !!c.get("show-labels"),
       labelSide: c.get("label-side") || "both",
       labelSize: (c.get("label-size") === undefined ? 100 : c.get("label-size")) / 100,
+      /* The scale bar and its silhouette (draw/scalebar.js), likewise. */
+      showScaleBar: !!c.get("show-scale-bar"),
+      scaleSilhouette: c.get("scale-silhouette") === undefined ? true : !!c.get("scale-silhouette"),
 
       /* THE BACKGROUND IS A STACK: a base colour, an optional field, and an
        * optional star overlay. `background` names only the FIELD now — stars
@@ -464,6 +467,8 @@ var CC = CC || {};
     { id: "show-labels", stage: "output" },
     { id: "label-side", stage: "output" },
     { id: "label-size", stage: "output", format: pct },
+    { id: "show-scale-bar", stage: "output" },
+    { id: "scale-silhouette", stage: "output" },
     { id: "background", stage: "output" },
     { id: "background-color", stage: "output" },
     { id: "background-color2", stage: "output" },

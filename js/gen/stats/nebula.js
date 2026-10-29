@@ -188,6 +188,8 @@ var CC = CC || {};
         thinnerThanLab: n < LAB_VACUUM,
         materials: traits.filter(function (t) { return MATERIALS[t]; }),
         radius: ly, tempMin: -260, tempMax: -260,
+        /* `ly` is the width across; the scale bar wants the radius in km. */
+        radiusKm: ly / 2 * LY_KM,
         /* Under the universal pool's 0.62, whose line blames stellar flares
          * (D212): a remnant's danger is its pulsar, and its own pool says so. */
         radiation: 0, sunless: false, locked: false, gravity: 0,

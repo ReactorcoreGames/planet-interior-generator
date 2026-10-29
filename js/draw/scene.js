@@ -1399,6 +1399,10 @@ CC.Scene = (function () {
      * read level (draw/overlay.js). */
     CC.OverlayDraw.draw(ctx, view, body, palette, settings);
 
+    /* --- 8. scale bar --- lower-left, with its automatic silhouette
+     * (draw/scalebar.js). */
+    CC.ScaleBarDraw.draw(ctx, view, body, details, palette, settings);
+
     /* `extent` is reported because the caller cannot recompute it: it folds in
      * the atmosphere bulge and the outward traits measured above, and the pan
      * clamp needs the same number the render actually used. */

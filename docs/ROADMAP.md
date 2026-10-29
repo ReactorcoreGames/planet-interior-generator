@@ -28,9 +28,9 @@ The architecture is designed so later phases slot in without rework: archetypes 
 | 5 — Second family: gaseous | ✅ (Sessions K–L) | [roadmap/phase-5-gaseous.md](roadmap/phase-5-gaseous.md) |
 | 6 — Stars | ✅ (Sessions M–R) | [roadmap/phase-6-stars.md](roadmap/phase-6-stars.md) |
 | 7 — Remaining families | ✅ (Sessions S–X, reviewed in Y) | [roadmap/phase-7-remaining-families.md](roadmap/phase-7-remaining-families.md) |
-| **9a — The `machine-world` archetype** | 🟡 **in progress** — stage (a) of four done (Session Z) | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
-| 8 — Overlay, scale, polish | ⬜ after 9a; framing built early (Session I) | [roadmap/phase-8-polish.md](roadmap/phase-8-polish.md) |
-| 9b — Megastructure traits: audit, then build | ⬜ | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
+| 9a — The `machine-world` archetype | ✅ (Session Z) | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
+| 8 — Overlay, scale, polish | ✅ (Session AA; framing built early, Session I) | [roadmap/phase-8-polish.md](roadmap/phase-8-polish.md) |
+| **9b — Megastructure traits: audit, then build** | ⬜ **next** | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
 | 9c — Final clean-up pass | ⬜ | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
 | 10 — Release | ⬜ | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
 
@@ -41,7 +41,7 @@ The architecture is designed so later phases slot in without rework: archetypes 
 
 ## Current status
 
-**Phases 0–6 are complete**, along with the climate system (Session F) and framing (Session I, pulled forward from Phase 8).
+**Phases 0–8 and 9a are complete**, along with the climate system (Session F) and framing (Session I, pulled forward from Phase 8). **Next: 9b, megastructure traits.**
 
 **Phase 7 is complete:**
 
@@ -53,7 +53,7 @@ The architecture is designed so later phases slot in without rework: archetypes 
 **Session Y reviewed Phase 7** (the nebula signed off; the neutron star and pulsar reworked) and **reordered what remains** (D246, [session-y-compact-review.md](progress/session-y-compact-review.md)):
 
 1. ✅ **9a — the `machine-world` archetype first**, so the polish pass covers every body type that will ship. Done in Session Z (D248–D281, [session-z-machine-world.md](progress/session-z-machine-world.md)).
-2. **8 — overlay, scale bar, polish**, including the per-type stat templates, over the full set of archetypes.
+2. ✅ **8 — overlay, scale bar, polish**, including the per-type stat templates, over the full set of archetypes. Done in Session AA (D282–D288, [session-aa-polish.md](progress/session-aa-polish.md)): the layer-name overlay, the scale bar, the stat-template pass, persistence and Reset to defaults, the full keyboard map.
 3. **9b — megastructure traits.** Audit MACHINE-WORLDS.md's per-body lists against the artificial and natural traits that already exist, settle a cleaned list with the user, then build it.
 4. **9c — a final clean-up pass**, so everything lands together.
 5. **10 — release.** The user's release-prep prompt is [RC prompt to make releases easier.md](RC%20prompt%20to%20make%20releases%20easier.md). Releasing later is fine: machine worlds and megastructures are intended parts of the generator, not extras.

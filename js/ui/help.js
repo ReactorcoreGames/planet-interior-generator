@@ -40,7 +40,7 @@ CC.Help = (function () {
     });
 
     /* Escape is bound on the overlay's own keydown rather than on the
-     * document, so it cannot compete with the panel's number-key shortcuts —
+     * document, so it cannot compete with the keyboard map (js/ui/keys.js) —
      * the modal takes focus when it opens, so the event arrives here. */
     overlay.addEventListener("keydown", function (e) {
       if (e.key === "Escape" || e.key === "Esc") {
@@ -77,13 +77,40 @@ CC.Help = (function () {
     )).filter(function (el) { return el.offsetParent !== null || el === document.activeElement; });
   }
 
-  function open(from) {
+  /* The shortcut list is BUILT FROM THE KEYBOARD MAP's own table (D288), so
+   * it cannot drift from the bindings: there is no second copy to forget.
+   * Rebuilt on every open, which costs nothing and needs no load order. */
+  function renderKeys() {
+    var ul = document.getElementById("help-keys");
+    if (!ul || !CC.Keys) return;
+    ul.textContent = "";
+    CC.Keys.list().forEach(function (row) {
+      var li = document.createElement("li");
+      row.show.forEach(function (k, i) {
+        if (i > 0 && row.join) li.appendChild(document.createTextNode(row.join));
+        var kbd = document.createElement("kbd");
+        kbd.textContent = k;
+        li.appendChild(kbd);
+      });
+      var span = document.createElement("span");
+      span.textContent = row.label;
+      li.appendChild(span);
+      ul.appendChild(li);
+    });
+  }
+
+  /* `section` "keys" is the ? key: the same modal, scrolled to the list.
+   * Focus still goes to the close button, so Tab and Esc behave as ever. */
+  function open(from, section) {
     if (!overlay) return;
     opener = from || document.activeElement;
+    renderKeys();
     overlay.hidden = false;
     document.body.classList.add("modal-open");
     var closeBtn = document.getElementById("help-close");
     if (closeBtn && closeBtn.focus) closeBtn.focus();
+    var title = section === "keys" && document.getElementById("help-keys-title");
+    if (title && title.scrollIntoView) title.scrollIntoView({ block: "nearest" });
   }
 
   function close() {

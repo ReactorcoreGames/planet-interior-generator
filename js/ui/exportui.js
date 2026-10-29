@@ -1,4 +1,4 @@
-/* Wiring for the export menu, its feedback, and the keyboard map.
+/* Wiring for the export menu, its feedback, and the settings paste.
  *
  * Split out of js/main.js, which passed the 500-line rule once the composed
  * export and the settings import landed. main.js keeps what only it can own —
@@ -6,7 +6,10 @@
  * interface around exporting, which is a different concern that merely happened
  * to be wired from the same place.
  *
- * ALL FOUR PIECES HERE EXIST BECAUSE AN EXPORT IS INVISIBLE FROM INSIDE THE
+ * The keyboard map began here and moved to js/ui/keys.js (D288); its Ctrl+S
+ * and Ctrl+C call `runExport` below.
+ *
+ * ALL THREE PIECES HERE EXIST BECAUSE AN EXPORT IS INVISIBLE FROM INSIDE THE
  * PAGE. A file lands in the downloads folder, a clipboard changes, a pasted
  * string rewrites forty controls at once — and none of that produces anything
  * the user can see in the window they are looking at. Without a confirmation
@@ -212,57 +215,12 @@ CC.ExportUI = (function () {
     return result;
   }
 
-  function setupKeyboard() {
-    document.addEventListener("keydown", function (e) {
-      /* A MODAL OWNS THE KEYBOARD WHILE IT IS UP. Without this, Space would
-       * randomize behind the backdrop and the number keys would toggle
-       * sections the user cannot see — actions with no visible cause. The
-       * modal handles its own Escape and Tab. */
-      if (CC.Help && CC.Help.isOpen()) return;
-
-      var t = e.target;
-      var inField = t && (t.tagName === "INPUT" || t.tagName === "SELECT" ||
-                          t.tagName === "TEXTAREA");
-
-      /* Ctrl+S and Ctrl+C work even from inside a control, because they are
-       * about the render rather than about the field that happens to have
-       * focus — and Ctrl+S in particular has a browser default worth
-       * intercepting wherever the user is. Ctrl+C does NOT fire while text is
-       * selected in a field, since copying that text is what they meant. */
-      if ((e.ctrlKey || e.metaKey) && !e.altKey) {
-        if (e.key === "s" || e.key === "S") {
-          e.preventDefault();
-          runExport("current");
-          return;
-        }
-        if ((e.key === "c" || e.key === "C") && !inField) {
-          e.preventDefault();
-          runExport("clipboard");
-          return;
-        }
-        return;
-      }
-
-      if (inField) return;
-      if (e.altKey) return;
-
-      if (e.key === " " || e.key === "Spacebar") { e.preventDefault(); CC.Randomize.run(); return; }
-      if (e.key === "i" || e.key === "I") {
-        CC.Controls.set("show-info", !CC.Controls.get("show-info"));
-        requestDraw();
-        return;
-      }
-      if (e.key >= "1" && e.key <= "8") { CC.Accordion.toggleByIndex(parseInt(e.key, 10)); }
-    });
-  }
-
   function init(opts) {
     requestDraw = opts.requestDraw;
     syncRotationEnabled = opts.syncRotationEnabled;
     syncBackgroundColour = opts.syncBackgroundColour;
     setupSettingsPaste();
     setupExportMenu(opts.exportInit);
-    setupKeyboard();
   }
 
   return { init: init, flashExport: flashExport, toast: toast,

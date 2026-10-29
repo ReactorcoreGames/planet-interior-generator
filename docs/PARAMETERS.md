@@ -603,16 +603,21 @@ Lives inside a section; the **button stays pinned**. The section holds the bulk 
 
 ## Keyboard shortcuts
 
+Built in `js/ui/keys.js` (D288). Its one table is both what the handler walks and what Help prints as its Keyboard list, so the list below and the app's own cannot drift.
+
 | Key | Action |
 |---|---|
 | `Space` | Randomize |
-| `Ctrl+S` | Export with current settings |
-| `Ctrl+C` | Copy image to clipboard |
-| `←` / `→` | Previous / next seed (increment the numeric part) |
-| `1`–`8` | Toggle accordion sections |
-| `L` | Toggle layer labels |
-| `I` | Toggle info panel |
-| `?` | Show shortcut list |
+| `←` / `→` | Previous / next seed: steps the seed's last run of digits (`zarvo-4821` → `zarvo-4822`), keeping zero-padding where it had it (`x-009` → `x-010`). A seed with no number: `→` appends `-1`, `←` does nothing; `←` at zero does nothing. Ignores the seed lock, which guards Randomize only |
+| `L` | Toggle Show layer labels |
+| `I` | Toggle the info panel |
+| `1`–`8` | Toggle accordion sections by position |
+| `Ctrl+S` | Export with current settings (works from inside any control) |
+| `Ctrl+C` | Copy image to clipboard, unless text is selected or a text field has focus |
+| `?` | Open Help at the shortcut list |
+| `Esc` | Close Help; in a text field, leave the field |
+
+**Rules.** While Help is open it owns the keyboard (Esc and Tab only). Alt combinations and every other Ctrl/Cmd combination pass through to the browser, so Alt+← / → stays back / forward. A focused control keeps only the keys it uses: a text field, number field or dropdown keeps all of them; a slider keeps the arrows, Home, End and the Page keys; a checkbox or colour swatch keeps Space. Everything else still fires, so Space randomizes straight after a slider is dragged. A focused button keeps nothing, so Space randomizes rather than pressing it again. The scale bar has no key. Every key changes controls through `CC.Controls.set` and a redraw, so persistence saves it.
 
 ---
 

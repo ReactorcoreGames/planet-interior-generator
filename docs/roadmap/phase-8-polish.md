@@ -4,13 +4,13 @@
 
 > **Runs after Phase 9a** (the `machine-world` archetype), so this pass covers every body type that will ship (D246). "Per-type stat templates finalised" includes the machine world's.
 
-Run one item per session, in this order (D282). Write-up: [session-aa-polish.md](../progress/session-aa-polish.md).
+**Phase 8 is complete** (Session AA, D282–D288). It ran one item per session, in this order (D282). Write-up: [session-aa-polish.md](../progress/session-aa-polish.md).
 
 - ✅ Layer-name overlay (underline + 1px leader, names only) — Session AA (D283, D284)
 - ✅ Scale bar with an automatic silhouette — Session AA (D285)
 - ✅ Per-type stat templates finalised — an inconsistency check — Session AA (D286)
 - ✅ Settings persistence + Reset to defaults — Session AA (D287)
-- ⬜ Full keyboard shortcuts (← / → seed, `L`, `?`, the Help list)
+- ✅ Full keyboard shortcuts (← / → seed, `L`, `?`, the Help list) — Session AA (D288)
 - ✅ "Copy seed + settings" shareable string — **already built** (D57, D73); nothing to do
 - ~~Framing & crop~~ — **built early, in Session I.** It was filed here as
   polish because it was conceived as a *crop*, and a crop is polish. Two things

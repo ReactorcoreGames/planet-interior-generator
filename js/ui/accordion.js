@@ -65,7 +65,8 @@ CC.Accordion = (function () {
     return open;
   }
 
-  /* Keyboard shortcut target: keys 1-6 toggle sections by position. */
+  /* Keyboard shortcut target: keys 1-8 toggle sections by position
+   * (js/ui/keys.js). */
   function toggleByIndex(n) {
     var s = sections[n - 1];
     if (s) toggle(s);

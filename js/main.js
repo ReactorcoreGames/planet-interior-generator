@@ -592,8 +592,8 @@ var CC = CC || {};
     on("unlock-all", "click", CC.Controls.unlockAll);
     on("invert-locks", "click", CC.Controls.invertLocks);
 
-    /* The export menu, its feedback, the settings-paste import and the
-     * keyboard map all live in ui/exportui.js. It is handed the four accessors
+    /* The export menu, its feedback and the settings-paste import live in
+     * ui/exportui.js; the keyboard map, initialised after it, in ui/keys.js. It is handed the four accessors
      * CC.Export needs — all of them closures over the pipeline and the current
      * body, which only main.js has — plus the render request and the two sync
      * helpers a settings import has to call, since a paste can change controls
@@ -617,6 +617,7 @@ var CC = CC || {};
         setTraitSalt: function (n) { traitSalt = n; }
       }
     });
+    CC.Keys.init({ requestDraw: requestDraw });
 
     if (typeof window !== "undefined" && window.addEventListener) {
       /* THE PREVIEW'S OWN BOX IS WHAT THE CANVAS IS MEASURED INTO, so that is

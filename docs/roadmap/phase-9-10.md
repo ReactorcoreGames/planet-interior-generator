@@ -6,13 +6,13 @@
 
 *Originally "deliberately last — the most speculative and least essential". The natural bodies have since been built and reviewed (Phase 7, Session Y), which is what that placement was waiting for. The user split the phase so the archetype comes before polish.*
 
-### 9a — the `machine-world` archetype (next, before Phase 8)
+### 9a — the `machine-world` archetype ✅ (Session Z, before Phase 8)
 
 - The archetype: its standard stack, shell gaps, colour (including the accent colour system for artificial elements), always-drawn layer details, its two axes, stat template and flavour, presets. Spec: [MACHINE-WORLDS.md](../MACHINE-WORLDS.md) § "The `machine-world` archetype".
 - Its **exclusive** traits, the ones that only make sense on a body that is artificial all the way down.
 - **Why first:** Phase 8's overlay, scale bar and stat-template pass should see every body type that will ship, so it is done once.
 
-### 9b — megastructure traits on natural bodies (after Phase 8)
+### 9b — megastructure traits on natural bodies (next; Phase 8 is complete)
 
 **Audit before building.** MACHINE-WORLDS.md's per-body lists (stars, planets and moons, giants, asteroids, compact objects, nebulae) were written before most of the generator existed. Several families have since grown artificial traits of their own: stations, beacons, collectors, borers, mirrors, gas miners. So:
 

@@ -1,8 +1,8 @@
 # Session AA — Phase 8, overlay, scale bar and polish
 
-*D282–D287 so far. Phase 8 runs over several sessions, one item each, with the user looking between them (D282). Item 1, the layer-name overlay, item 2, the scale bar, item 3, the stat-template inconsistency pass, and item 4, settings persistence + Reset to defaults, are done.*
+*D282–D288. Phase 8 ran over several sessions, one item each, with the user looking between them (D282). All five items are done — the layer-name overlay, the scale bar, the stat-template inconsistency pass, settings persistence + Reset to defaults, and the full keyboard map — and **Phase 8 is complete**.*
 
-Scratch tools: `test/_tmp/_aacards.mjs` (one card per archetype as text, with each line's Compact/Standard membership), `test/_tmp/_aastack.mjs` (each archetype's drawn stack), `test/_tmp/_aaoverlay.mjs` (the overlay sheet across every archetype plus edge cases, to `shots/aa/`), `test/_tmp/_aacrop.mjs` (pulls cells out of a sheet at full size), `test/_tmp/_aascale.mjs` (the scale-bar sheet, printing each case's bar, rung and card Size line), `test/_tmp/_aasplit.mjs` (splits a tall sheet into 1920x1080 pages), `test/_tmp/_aasweep.mjs` (the giants' cloud-top temperature and the stars' Activity across their controls), `test/_tmp/_aamoon*.mjs` (the moon's rows, stack and renders across seeds and Starlight), `test/_tmp/_aabefore.mjs` (the affected cards; before and after in `shots/aa/cards-*.txt`). `test/_tmp/_aapersist.mjs` (boots the app with real storage: save and reload, Reset, stale and junk stores).
+Scratch tools: `test/_tmp/_aacards.mjs` (one card per archetype as text, with each line's Compact/Standard membership), `test/_tmp/_aastack.mjs` (each archetype's drawn stack), `test/_tmp/_aaoverlay.mjs` (the overlay sheet across every archetype plus edge cases, to `shots/aa/`), `test/_tmp/_aacrop.mjs` (pulls cells out of a sheet at full size), `test/_tmp/_aascale.mjs` (the scale-bar sheet, printing each case's bar, rung and card Size line), `test/_tmp/_aasplit.mjs` (splits a tall sheet into 1920x1080 pages), `test/_tmp/_aasweep.mjs` (the giants' cloud-top temperature and the stars' Activity across their controls), `test/_tmp/_aamoon*.mjs` (the moon's rows, stack and renders across seeds and Starlight), `test/_tmp/_aabefore.mjs` (the affected cards; before and after in `shots/aa/cards-*.txt`). `test/_tmp/_aapersist.mjs` (boots the app with real storage: save and reload, Reset, stale and junk stores), `test/_tmp/_aakeys.mjs` (the seed step's cases, and every key driven through the real `index.html` with each kind of control focused).
 
 ---
 
@@ -147,3 +147,34 @@ Proposed to the user before building; they approved the design with four answers
 **Tests: none added.** domtest's settings round-trip covers the serialiser, and jsdom without an origin makes `localStorage` throw, so every `npm test` boots the app with storage blocked. The restore path itself was checked with `test/_tmp/_aapersist.mjs` (save and reload of archetype, seed, labels, zoom, a lock and re-rolled traits; Reset's two presses; a stale store with an unknown archetype, key and locks; five junk stores), all passing. The user tried it in the real app: "looks good". `npm test` passes.
 
 **Listed, not fixed:** PARAMETERS.md's Randomize settings section specifies four controls that were never built (Randomize scope, Archetype pool, Respect locks, Auto-randomize on load); it now says so. Auto-randomize on load, if it is ever built, would have to decide whether it overrides the restored body.
+
+## D288 — The full keyboard map: one table, keys a control keeps, the seed step
+
+Proposed to the user before building; they took every recommendation and invited existing rules to give way where something better was available. Two did (below).
+
+**Checked against the code first.** The audit held: Space, I, 1–8, Ctrl+S and Ctrl+C were bound in `js/ui/exportui.js`; ← / →, `L` and `?` were missing; Help's list was a hand-written copy of six keys in `index.html`. PARAMETERS.md already said 1–8; the stale "1-6" was in `js/ui/accordion.js`'s `toggleByIndex` comment, now fixed. domtest does not touch the keyboard at all (no `keydown` anywhere in `test/` outside `_tmp`).
+
+**`js/ui/keys.js` (`CC.Keys`), split out of exportui.js.** Not for size (exportui.js would have been ~330 lines) but because most of the map is not about exporting. Loaded after exportui.js, whose `runExport` Ctrl+S and Ctrl+C call; initialised from `main.js` with the render request.
+
+- **One table both read.** Each row is `{ show, join, label, match, run }`. The keydown handler walks it; `CC.Help` builds its Keyboard list from `CC.Keys.list()` on every open, so a key cannot be bound without being listed or listed without being bound. Esc is a listed row with no `run`, since the modal binds it itself.
+- **← / → step the seed's last run of digits**, as a digit string so a long pasted number steps exactly. Zero-padding is kept only where the number had it (`x-009` → `x-010`, `zarvo-1000` ← `zarvo-999`). No number at all, or a pasted word: → appends `-1`, ← does nothing. ← at zero does nothing, since `-` is the separator, not a sign. **The seed lock is not consulted**: it means "Randomize will keep this seed", and the dice button and typing already ignore it.
+- **`L` toggles Show layer labels**, like `I` the info card. **The scale bar gets no key**: it is set once per export, not flicked while browsing.
+- **`?` opens the Help modal** scrolled to its Keyboard list, with focus on the close button as before. No second overlay.
+- **Persistence needs no code.** Every key writes through `CC.Controls.set` and a redraw (or the accordion's own toggle and store), and `draw()` schedules the save (D287).
+
+**The rules, two of them changed:**
+
+1. A modal owns the keyboard while it is up (unchanged).
+2. Alt combinations pass through, so Alt+← / → stay the browser's back and forward; Ctrl/Cmd combinations pass through except Ctrl+S (anywhere) and Ctrl+C (unchanged).
+3. **Changed: a focused control keeps only the keys it uses.** The old rule gave every `INPUT` the whole keyboard, and focus stays on a slider after it is dragged, so Space, L and I went dead until a click elsewhere. Now a text field, number field or dropdown keeps everything (typing, type-ahead), a slider keeps the arrows, Home, End and the Page keys, a checkbox or colour swatch keeps Space. A focused button keeps nothing, as before, so Space-Space-Space works after a click on Randomize.
+4. **New: Esc in a text field leaves the field**, so the shortcuts work again at once. **Changed: Ctrl+C gives way to a text selection** anywhere on the page, not only inside a field.
+
+**Browser and OS clashes:** Ctrl+S replaces the browser's Save page, deliberately. Space and the arrows would scroll the page and are prevented only when they fire. `?`, `L`, `I` and the digits have no default in Chrome, Edge or Firefox (Firefox's quick-find keys are `/` and `'`). Nothing clashes at OS level.
+
+**Tests: none added.** `test/_tmp/_aakeys.mjs` checked seventeen seed-step cases and every key through the real `index.html` with a slider, a checkbox, the seed field and a dropdown focused, Help open and closed, and Help's list against the table: 41 checks, all passing. The user tried it in the real app: "Tested and approved, works beautifully." `npm test` passes.
+
+## Phase 8 closed
+
+All five items are built and approved (D283–D288); "Copy seed + settings" was already built (D57, D73), and framing was built early in Session I. PARAMETERS.md, PROGRESS.md, the checklist and `docs/roadmap/phase-8-polish.md` are up to the code, and ROADMAP.md marks Phase 8 complete. Still open from this session, for 9c: the stale comments and card notes listed under D286, PARAMETERS.md's four unbuilt Randomize settings (D287), and the fifteen files over 500 lines.
+
+**Next: Phase 9b, megastructure traits** — audit MACHINE-WORLDS.md's per-body lists against the existing traits, settle a cleaned list with the user, then build.

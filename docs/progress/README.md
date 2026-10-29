@@ -30,8 +30,8 @@
 
 | [session-z-machine-world.md](session-z-machine-world.md) | D248– — Phase 9a, the machine-world archetype, in four stages: hollow shells with true voids, pillars and access shafts as general layer properties; the stack moving when an optional layer is absent; the two dials as relabels; lit void and shaft walls, the accent hue, per-layer materials, metallic colour and sheen; Operational status lighting the whole body; hull wounds with a torn edge, debris and sparks; trait `sets` and the six exclusive traits (Session Z) |
 
-| [session-aa-polish.md](session-aa-polish.md) | D282– — Phase 8, one item per session: the audit and the order settled; layer names by role with a spec override; the layer-name overlay on one ray per side, sized from the frame; the scale bar with an automatic silhouette; the stat-template inconsistency pass; settings persistence and Reset to defaults (Session AA, in progress) |
+| [session-aa-polish.md](session-aa-polish.md) | D282–D288 — Phase 8, one item per session: the audit and the order settled; layer names by role with a spec override; the layer-name overlay on one ray per side, sized from the frame; the scale bar with an automatic silhouette; the stat-template inconsistency pass; settings persistence and Reset to defaults; the full keyboard map, one table for the bindings and Help's list (Session AA, Phase 8 complete) |
 
 Sessions are listed oldest first. `session-f.md` is a stub left where Session F used to be; it points at the three F files above.
 
-Decision numbers (`D#`) are referenced from code comments and other docs. To find a specific one, `grep -rn "D42" docs/progress/` is faster than opening each file. The next free number is **D287**.
+Decision numbers (`D#`) are referenced from code comments and other docs. To find a specific one, `grep -rn "D42" docs/progress/` is faster than opening each file. The next free number is **D289**.

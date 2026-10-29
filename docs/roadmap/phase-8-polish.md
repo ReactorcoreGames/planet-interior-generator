@@ -8,7 +8,7 @@ Run one item per session, in this order (D282). Write-up: [session-aa-polish.md]
 
 - ✅ Layer-name overlay (underline + 1px leader, names only) — Session AA (D283, D284)
 - ✅ Scale bar with an automatic silhouette — Session AA (D285)
-- ⬜ Per-type stat templates finalised — an inconsistency check; the audit's list is in the write-up
+- ✅ Per-type stat templates finalised — an inconsistency check — Session AA (D286)
 - ⬜ Settings persistence + Reset to defaults
 - ⬜ Full keyboard shortcuts (← / → seed, `L`, `?`, the Help list)
 - ✅ "Copy seed + settings" shareable string — **already built** (D57, D73); nothing to do

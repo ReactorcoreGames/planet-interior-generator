@@ -375,7 +375,7 @@ The section that carries the aesthetic thesis.
 | Control | Type | Notes |
 |---|---|---|
 | **Show info panel** | checkbox | ✅ The stat card over the preview. Also `I` |
-| **Info detail level** | dropdown | ✅ Compact / Standard / Full — how many stat lines |
+| **Info detail level** | dropdown | ✅ Compact / Standard / Full — how many stat lines. Each family's template owns its sets (`levels` in `js/gen/stats/<family>.js`). Compact is Size, the family's headline facts and Biggest danger last, at most six lines: six on the solid bodies, giants and machine world, five on the rest (D286) |
 | **Show layer labels** | checkbox | ✅ Default off. The overlay: each layer's name over an underline, a 1px leader to a dot inside the band (D284). Names come from `js/data/layernames.js` by role, or a layer spec's own `name` (D283). Drawn into every body export |
 | **Label side** | dropdown | ✅ Both / Left only / Right only. Both deals the layers out alternately, outermost to the right |
 | **Label text size** | slider | ✅ 75–150%. Sized from the frame, not the body, so zoom never enlarges the names |

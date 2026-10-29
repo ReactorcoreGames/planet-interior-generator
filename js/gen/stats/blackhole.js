@@ -140,6 +140,7 @@ var CC = CC || {};
           value: "Runs slower near the horizon. Hover just above it and every " +
                  "hour you spend is ten for everyone else" },
         { key: "notable", label: "Notable", value: CC.Flavour.notableOf(facts, rng) },
+        { key: "resources", label: "Resources", value: CC.Flavour.resourceOf(facts, rng) },
         { key: "approach", label: "Approach", value: CC.Flavour.approachOf(facts, rng) },
         { key: "danger", label: "Biggest danger", value: CC.Flavour.dangerOf(facts, rng) }
       ];

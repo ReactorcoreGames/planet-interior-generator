@@ -199,10 +199,35 @@ var CC = CC || {};
     return land / n;
   }
 
+  /* A SEA WITH A LID ON IT. When a relief layer sits directly on top of the
+   * sea, the sea has no shore: the lid is the ground all the way round and
+   * the water is sealed under it. `landFractionOf` is right that nothing is
+   * exposed, but "dry rock" is the wrong picture of an ice shell over an
+   * ocean (D286). Read off the stack's shape, so no archetype is named;
+   * returns the lid layer, or null. */
+  function lidOverSea(body) {
+    var sea = null, lid = null;
+    for (var i = 0; i < body.layers.length; i++) {
+      if (body.layers[i].role === "ocean") sea = body.layers[i];
+    }
+    if (!sea || sea.strength <= 0.01) return null;
+    for (var j = 0; j < body.layers.length; j++) {
+      var l = body.layers[j];
+      if (l.relief && l !== sea && !l.outward &&
+          Math.abs(l.inner - sea.outer) < 0.002) lid = l;
+    }
+    return lid;
+  }
+
   /* WHAT IS UNDERFOOT is the outermost layer that is not the atmosphere,
    * qualified by what the climate is doing to it. Ocean depth removing the sea
    * changes this line, because it changes which layer that is. */
   function surfaceOf(body, details, climate) {
+    var lid = lidOverSea(body);
+    if (lid) {
+      return lid.name + " all the way round, with the ocean sealed beneath " +
+             "it. There is no shore anywhere.";
+    }
     var land = landFractionOf(body, details);
     var frozen = climate.frozenFraction;
 
@@ -306,7 +331,8 @@ var CC = CC || {};
         { key: "temp", label: "Surface temp",
           value: CC.ClimateText.temperatureLine(climate, lo, hi, locked) },
         { key: "climate", label: "Climate",
-          value: CC.ClimateText.climateLine(climate, locked, settings.axialTilt || 0) },
+          value: CC.ClimateText.climateLine(climate, locked, settings.axialTilt || 0,
+                                            atmosphere.pressure < 0.02) },
         /* THE SECOND TEMPERATURE, WHERE THERE IS ONE.
          *
          * An ice-shelled moon has two and the card has to state both, or it

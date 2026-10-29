@@ -68,9 +68,20 @@ CC.ClimateText = (function () {
     cold: "frosted", frozen: "frozen solid"
   };
 
-  function climateLine(climate, locked, tilt) {
-    var hot = STATE_WORDS[climate.hottest] || climate.hottest;
-    var cold = STATE_WORDS[climate.coldest] || climate.coldest;
+  /* WITH NO AIR THERE IS NO WEATHER, so the words that imply one go (D286).
+   * "Arid" and "temperate" describe a sky's moisture and a sky's comfort; on
+   * a vacuum surface the honest words are about sunlight alone. The caller
+   * decides from the card's own Atmosphere row, so this follows the drawn
+   * atmosphere layer rather than any archetype. */
+  var AIRLESS_WORDS = {
+    boiled: "scorched bare", hot: "sun-baked", temperate: "mild",
+    cold: "frosted", frozen: "frozen solid"
+  };
+
+  function climateLine(climate, locked, tilt, airless) {
+    var words = airless ? AIRLESS_WORDS : STATE_WORDS;
+    var hot = words[climate.hottest] || climate.hottest;
+    var cold = words[climate.coldest] || climate.coldest;
 
     if (climate.spread < 0.1) {
       return "Uniform - " + hot + " from pole to pole, with no seasons to speak of.";
@@ -78,7 +89,8 @@ CC.ClimateText = (function () {
     if (locked) {
       var mid = (climate.states.temperate || 0);
       return "Its day face is " + hot + " and its night face is " + cold +
-        (mid > 0.08 ? ", with a habitable ribbon running between them."
+        (mid > 0.08 ? (airless ? ", with a ribbon of mild ground between them."
+                               : ", with a habitable ribbon running between them.")
                     : ", with nothing liveable in between.");
     }
     if (tilt > 0.55) {

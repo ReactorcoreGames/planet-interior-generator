@@ -188,6 +188,7 @@ Navigation            {hazard rating — what makes flying through it hard}
 What's inside         {protostars / debris / pockets / nothing}
 ```
 
+- **Compact card:** Size, Density, What's inside, Navigation and Biggest danger; Biggest danger closes it, as on every family (D286)
 - **Size:** 1–100 light-years
 - **Gravity:** effectively none
 - **Stand on it?** There is nothing to stand on — you fly through it

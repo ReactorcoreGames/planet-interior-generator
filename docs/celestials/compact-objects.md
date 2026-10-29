@@ -287,6 +287,7 @@ Point of no return    {n} km — past this, no course correction helps
 Biggest danger        Everything, from further away than you think
 ```
 
+- **Full card** adds Notable, Resources and Approach, like every family; Resources was missing until D286 (spin energy from the ergosphere, the disc's light, or nothing worth fetching)
 - **Radius (horizon):** 3 km (stellar-mass) to 10,000,000+ km (supermassive)
 - **Stand on it?** There is nothing to stand on.
 - **The hook:** the disc is the most energetic environment in the universe, and

@@ -86,6 +86,10 @@ CC.ClimateSummary = (function () {
        * cover scouring uses, so a card promising a lethal surface and a render
        * showing thick cover cannot both happen. */
       radiation: field.radiationHazard(),
+      /* The second temperature, or null — the card's "Beneath the ice" row
+       * reads it here. Left out of the summary, the row never printed on any
+       * ice-shelled moon (D286). */
+      subsurface: field.subsurface,
       activity: activity,
       shield: shield
     };

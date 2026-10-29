@@ -52,8 +52,8 @@ CC.Hazard = (function () {
    * 2. ABSOLUTE IS UNREACHABLE FOR A SOLID BODY. "Nothing survives approach"
    *    describes a black hole, not a hot planet — a rating a planet can reach
    *    is a rating that means something different on the card it appears on.
-   *    A compact-object template will raise its own ceiling when Phase 8
-   *    lands; this one stops at Lethal. */
+   *    The compact objects take Absolute outright (below); this ladder stops
+   *    at Lethal. */
   /* Retuned once the cold end got its own rungs — adding a rung shifts every
    * body up the ladder, so the cut points are no longer calibrated. That is
    * the same trap D45 records: when a formula's input changes range, its
@@ -106,7 +106,7 @@ CC.Hazard = (function () {
      * takes the ceiling outright and the score below is not consulted for
      * temperature at all.
      *
-     * ABSOLUTE STAYS RESERVED for the compact objects of Phase 8 — "nothing
+     * ABSOLUTE STAYS RESERVED for the compact objects — "nothing
      * survives approach" describes a black hole, and a rating a star can
      * reach is a rating that means something different on the card it appears
      * on. A star is Lethal, which is the top of the scale a body with a

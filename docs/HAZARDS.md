@@ -231,6 +231,7 @@ one.
 | `frozenFraction` | how much of the circumference is cold or frozen — the one-line answer to "does this world have ice" |
 | `radiation` | 0..1 radiation hazard, from Star activity and how much atmosphere shields the ground |
 | `activity` / `shield` | the two terms `radiation` is built from |
+| `subsurface` | the second temperature, under an ice shell, or null — the card's "Beneath the ice" row (D286: it was missing from the summary, so the row never printed) |
 
 Temperatures are **normalized 0..1, not degrees.** Turning that into a figure is
 the archetype's business: a star's 0.9 is not a planet's 0.9. The mapping lives
@@ -250,6 +251,8 @@ two would make a label flicker between neighbouring bearings.
 | `cold` | frost, thinning cover | liquid freezing at the margins |
 | `frozen` | ice cap, sea ice | volatiles frozen out; the atmosphere thins here |
 
+**With no air there is no weather** (D286). When the card's own Atmosphere row is vacuum or a trace, the climate sentence swaps the words that imply a sky: `hot` reads "sun-baked" rather than "arid", `temperate` reads "mild", and a locked airless body has "a ribbon of mild ground" between its faces rather than a habitable one. Keyed on the drawn atmosphere layer, not on the archetype.
+
 **An ordinary world is a sentence about latitude.** "Temperate at the equator,
 frozen at the poles" is now available on every body, not only on locked ones —
 and on a strongly tilted world it inverts, which is worth naming when it does.
@@ -268,6 +271,8 @@ picture rather than invented beside it.
 
 Text that names a face should say which — "the day side", "the night side",
 "the terminator" — because on a locked world *where* is half the fact.
+
+**Detail levels** (D286). Every family's Compact card is Size, the family's headline facts, and Biggest danger last, at most six lines; Full shows every row, Notable, Resources and Approach included, on every family. The templates below are the original spec sketches; the live line lists are in `js/gen/stats/<family>.js`.
 
 ### Solid bodies
 ```

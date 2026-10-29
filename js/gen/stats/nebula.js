@@ -274,9 +274,10 @@ var CC = CC || {};
     }
   });
 
-  /* Density in COMPACT, beside the size: the pair IS the hook. */
+  /* Density in COMPACT, beside the size: the pair IS the hook. Biggest
+   * danger closes it, as it closes every family's compact card (D286). */
   var LEVELS = {
-    compact: ["size", "density", "inside", "navigation"],
+    compact: ["size", "density", "inside", "navigation", "danger"],
     standard: ["size", "density", "composition", "temp", "visibility",
                "navigation", "inside", "danger"],
     full: null

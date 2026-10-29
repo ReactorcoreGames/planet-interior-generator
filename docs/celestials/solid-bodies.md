@@ -572,6 +572,8 @@ wearing a lid. Gated, that figure is **65%**, with 83% frozen surfaces and 81%
 liquid oceans — and the remainder are honest, because a dead moon's sea *does*
 freeze through and the card says so.
 
+**The ice moon's card states both temperatures and names the lid** (D286). Its Surface row reads "Ice shell all the way round, with the ocean sealed beneath it", found from the stack's shape (a relief layer sitting directly on the sea), and its "Beneath the ice" row gives the ocean's temperature. Both were missing before D286: the Surface row said "Dry rock", and the second temperature never reached the card. An airless moon's Climate row uses sunlight words ("sun-baked", "mild") rather than weather ones.
+
 **The ordering branch.** With an `ice-shell` the stack is ice → ocean → crust →
 mantle → core; without it, crust sits directly at the surface. The crust's
 `frac` therefore differs between the two branches, which is why two ranges are

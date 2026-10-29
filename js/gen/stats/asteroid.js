@@ -475,9 +475,13 @@ var CC = CC || {};
    * `structure` is in COMPACT, which no other family's characterful row is.
    * That is deliberate: on this body it is the single most informative line —
    * it is what the picture is of — and a compact card that omitted it would be
-   * describing a generic rock. */
+   * describing a generic rock.
+   *
+   * `composition` joins it (D286): it is read off the interior's own colours,
+   * so it is a thing the picture asserts, and it brings the compact card to
+   * five lines like the stars' and the compact objects'. */
   var LEVELS = {
-    compact: ["size", "gravity", "structure", "danger"],
+    compact: ["size", "gravity", "composition", "structure", "danger"],
     standard: ["size", "gravity", "standing", "temp", "composition",
                "structure", "caverns", "radioactivity", "danger"],
     full: null

@@ -108,7 +108,13 @@ CC.TraitPicker = (function () {
     "rock-belts": "Streams of dark, matte rock.",
     "metal-belts": "Dense knots of metal flecks catching the light.",
     "exotic-gas-pockets": "Small vivid pockets of a gas in a colour the cloud does not have.",
-    "hidden-station": "A small station tucked in the thickest gas, or in a cavity if there is one.",
+    "under-construction": "Not finished: where Hull integrity would tear wounds, the shells are cut clean and stepped, with scaffolding, cranes and welding. Needs Hull integrity below 92%.",
+    "blast-doors": "Heavy two-leaf doors where each access shaft crosses a shell. A dead world is sealed shut; a busy one has most of them open.",
+    "shaft-covers": "A sliding silo cover over each access shaft's mouth on the hull: shut on a dead world, slid aside on a busy one.",
+    "overgrown": "Moss or rust bloom reclaiming the hull: mats over the outer face, tendrils down the shafts and into the outer void, growth pooled in the wounds. Detail density sets how much of the hull it covers; on a world gone dark it is withered and grey.",
+    "weaponized": "One great cannon barrel driven from a breech at the heart out through every shell, ringed with accelerator coils, its muzzle standing past the hull. Charged by the reactor: burning on a running world, a dull red on emergency power, cold on a derelict.",
+    "worldship": "A cluster of drive bells on one side of the hull, a thrust frame carrying their push down into the shells, and a plume burning out of them: it is going somewhere. Fired by the reactor; on emergency power the throats glow red, and on a derelict the engines are cold.",
+    "hidden-station":"A small station tucked in the thickest gas, or in a cavity if there is one.",
     "mining-flotilla": "Ships in file working a pocket of material.",
     "derelict-fleet": "Dead hulls tumbling in the cloud."
   };

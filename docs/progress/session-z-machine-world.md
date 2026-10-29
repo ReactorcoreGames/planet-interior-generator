@@ -1,6 +1,6 @@
 # Session Z — Phase 9a, the `machine-world` archetype
 
-*D248–D271 so far. Built in four stages the user looked at between: (a) the stack with hollow shells, voids, pillars and access shafts; (b) colour, the accent hue and the always-drawn details; (c) Operational status and Hull integrity; (d) exclusive traits, stat card, flavour and presets.*
+*D248–D276 so far. Built in four stages the user looked at between: (a) the stack with hollow shells, voids, pillars and access shafts; (b) colour, the accent hue and the always-drawn details; (c) Operational status and Hull integrity; (d) exclusive traits, stat card, flavour and presets.*
 
 Scratch tools: `test/_tmp/_zstack.mjs` (prints the built stack and checks every combination of extremes), `test/_tmp/_zgrid.mjs` (contact sheets to `shots/z/`).
 
@@ -288,22 +288,96 @@ The stale list above is fixed: MACHINE-WORLDS.md (the stack, colour, layer-detai
 
 Scratch tool added: `test/_tmp/_zmarks.mjs` (each wound's mark counts).
 
-## Next session: stage (d)
+## Stage (d): exclusive traits, card, flavour, presets (D272–)
 
-Stages (a)–(c) are complete (D248–D271). **Stage (d)**: the machine world's exclusive traits, its stat card (it still falls back to the planet's; MACHINE-WORLDS.md § "Stats template"), its flavour pool and its presets (PARAMETERS.md § Artificial). Within it:
+### The audit (TRAIT-SYSTEM.md's three tests, against the body as built)
 
-- **Under construction** as an exclusive trait (D249): register an `edge: "clean"` style in `js/gen/woundedge.js` (`CC.WoundEdge.register`) and add scaffolding `truss` work; the trait has to switch the rupture's `edge`, without an archetype branch in `js/draw/`.
-- **Doors and shutters on the access shafts** (the user, stage a).
-- The spec's other exclusive traits (overgrown, weaponized, ancient-precursor, worldship, planet-cracker): audit each against the three tests before building.
-- Review Star activity against the machine world (the climate table's open cell).
+The machine world carried no trait at all (nothing required `artificial` or `machine`). Each spec trait was checked against the three tests and against the body's own vocabulary of marks (concentric bands, thin radial slots, hundreds of tiny repeated rectangles, glyphs in the haze, torn wedges with debris), since a trait must be a different kind of mark:
 
-Previous sub-step list for stage (b), all done:
+- **Build**: Under construction (open lattice and squared cuts), Blast doors (slabs across the slots), Shaft covers (the user's "shutters", see D274), Overgrown (the one irregular organic mark), Weaponized (the one big filled object: a bore barrel 3–5× a shaft's width with coils and a muzzle past the silhouette), Worldship (an asymmetric silhouette and the body's first soft emissive gas: engine bells on one bearing, a plume, cold when offline).
+- **Cut: ancient-precursor.** It fails test 2 as a mark and test 3 as a stack: "unfamiliar geometry" would be a re-skin of every element, a second art style, and "still running" is a position on Operational status. It moves to the card's Construction row and the flavour pool (age read from what is drawn: Overgrown ancient, Under construction still being built).
+- **Removed: planet-cracker**, by the user ("the other 6 traits are enough"). It would have been the first trait to swap a stack, needing a new presence form.
+- Doors and shutters as **two traits** (the user's call).
 
-Same rules: render for the user between sub-steps (`_zcrop.mjs` for close-ups, `_zgrid.mjs` for sheets), no archetype branch in `js/draw/`, ≤500 lines per file with hooks only in `scene.js` / `details.js` / `elemgen.js` / `palette.js`, no new tests unless asked. Elements go in `js/data/elements/machine.js` after each layer's `texture` element.
+### D272 — `sets`: a trait that switches structure data
 
-1. ~~**`cellgrid`**~~ — **done, D255.** Seams on the hull, hex panelling on habitation, windows in the power core, chips in the machinery.
-2. ~~**`glyph`**~~ — **done, D257.** Defense-grid platforms.
-3. ~~**Even spacing for layer details**~~ — **done, D256.** `spacing: "even"` and `jitter` on any recipe.
-4. **The spec's always-drawn details per layer** (MACHINE-WORLDS.md § "Layer details"): ~~radiator fins, sensor arrays, docking ports~~ (done, D258: fins on surface-systems, docks and sensors on the hull's face); ~~machinery truss lattice and gear/rotor shapes~~ (done, D259); ~~computation data-flow pulses~~ (done, D260); ~~power-core glow stipple and containment rings~~ (done, D261); ~~conduits~~ (done, D262–D263, with the board's capacitors).
+`js/gen/traitsets.js`. Most machine-world traits are not marks placed round a layer but a change to a general structure feature the archetype already declares (the rupture, the shafts), which the placement grammar cannot say and no builder should branch on. A trait declares `sets: { rupture: { edge: "clean" } }`; `CC.TraitSets.apply` merges every chosen trait's `sets` over the archetype one key deep (objects merged, anything else replaced), in `gen/details.js` straight after `CC.TraitRoll.select`, so every detail-stage builder reads an archetype that simply says "clean". **Detail stage only**: the structure stage has run on the plain archetype, so `sets` changes what is built along the layers, never the layers. `TraitRoll.place` skips a trait with `sets` and no `element`. The archetype is never mutated.
 
-Stages (c) and (d) follow as planned (see D249 and the opening of this file). Door/shutter traits for the shafts come with the traits.
+Machine traits live in `js/data/traits/machine.js`, `requires: ["machine"]`, tagged `artificial`; blurbs in `js/ui/traitpicker.js`.
+
+### D273 — Under construction: the `clean` edge style
+
+`js/gen/woundclean.js` registers `"clean"` with `CC.WoundEdge.register(style, fn, opts)`; `register` gained **options** read by `CC.WoundEdge.option`: `jag` scales the serration and the floor's raggedness in `gen/rupture.js` (stored on each wound as `w.jag`, so `edgeAt` agrees), `rim` names how `draw/woundedge.js` strokes the outline (`RIMS.scorch`, the old figures; `RIMS.trim`, a dark seam with a lit bevel). Torn is `{ jag: 1, rim: "scorch" }`, and its renders are byte-identical to before. Clean is `{ jag: 0, rim: "trim" }`: square steps, a flat floor, terraced like a building going up. Same wounds, growing with the same dial. Marks, all pinned by hashes of what does not move as the wound grows:
+
+- **frame**: each missing shell as bare steel in its own metal, ring girders along the band's top and bottom reaching in from both faces, radial ribs every 0.016, a diagonal per bay; two in five meet in the middle. A hollow layer's frame is its band alone, the void left open. Added after the first look: towers and cranes alone left the wound an empty flat notch at sheet size, where the torn style fills it with debris.
+- **posts**: the next level's pillars standing full height on each void's floor ledge at the real pillars' bearings (`stubs` with `clean: true`, drawn whole, no break).
+- **scaffold**: amber lattice towers against the faces, floor to top (85%); cranes at the surface lips (mast, jib over the mouth, tie, counter-jib, hook let down into the wound; the main wound always has one). Painted safety amber, red where the accent is itself near amber (`draw/woundscaffold.js`).
+- **sparks**: welding glints on the faces and a beacon on each crane, gated by `CC.Activity.gate`, so a stalled site is dark. In the warning colour (red on a blue-accent world); offered to the user as changeable to blue-white.
+- No debris, no fire. At Hull integrity ≥ 92% it draws nothing: the world is finished.
+
+`draw/primitives/built.js` gained `CC.Primitives.beam(ctx, a, b, w, style)`, the truss between two pixel points; `truss` calls it. `draw/woundedge.js` reads `rupture.rim`, draws `m.frame` and `m.scaffold` through `CC.WoundScaffoldDraw.draw`, and tolerates a style with no debris.
+
+The user: "Amazing result."
+
+### D274 — Blast doors and Shaft covers
+
+General properties of the archetype's `shafts`, `doors: { thick }` and `covers: { thick }`, each switched on by its trait's `sets`; built in `js/gen/shaftdoors.js` (one line in the `gen/details.js` result, `details.doors`), drawn in `js/draw/shaftdoors.js` (one hook in `draw/scene.js` after the capacitors, inside the rupture clip so a wound takes doors in its path).
+
+- **Open or shut by Operational status**: each door asks its layer's `CC.Activity.gate` with a stable hash: dark → shut, emergency → jammed 10–35% open, lit → open with chance 0.55 × `busy` (at most 0.9), never fully (55–78%) so the jaws stay visible. An airlock pair shares one state. A derelict is sealed.
+- **Blast doors**: an airlock pair where each shaft crosses a shell below the outermost, a 0.017 slab at the top and bottom of the band. Two dark grey leaves, each sliding out of a pocket in the shaft wall (the hidden part sunk in shadow, only as deep as it has gone; a shut door shows a seam), a lit outer lip, a thin warning tape down each leading edge.
+- **Shaft covers**: a dark grey silo cover seated in the top of each shaft, flush with the hull (the body is clipped to its surface at that point of the scene, so anything standing proud was cut off), 1.6× the shaft's width, two panel seams, a thin warning tape along its bottom, sliding aside along a rail by its open share, direction rolled per shaft.
+- **The user's corrections, round one**: the doors were white, the status light too busy, the warning stripes odd, the leaves did not seem to slide into their slots; now grey slabs, no light, thin tape where they meet, pockets. The shutters (a louvred housing standing proud) were "the wrong thing altogether": too tall, too complicated; now a sliding silo cover with a thin tape at the bottom. Then: both darker (value 0.34, lip 0.52). **The revised version was approved** (next session, rendered lit, on emergency power and offline). Noted then: at 20% on seed v4 every door on the zoomed shaft gated dark (shut) rather than jammed, so the jammed state is rare to see; not raised as a problem.
+
+### D275 — Overgrown: `overgrowth`, a general structure feature
+
+`js/gen/overgrowth.js` builds, `js/draw/overgrowth.js` draws; the trait sets `overgrowth: { cover: [0.15, 0.85], proud: 0.020, creep: 0.045, hang: 140, pool: 0.022, wither: [0.0, 0.15] }`. The one irregular organic mark:
+
+- **Mats** on the outermost layer's outer face: where one smooth periodic field round the circumference (1440 cells) clears a threshold set by the cover, so Detail density grows the same mats in place. A cushion outline of domes (|sin| under a square root, two frequencies) standing proud, drips down the cut face (capped at 85% of the hull's thickness), a darker root band, leaf dots in three tones and three sizes counted by body-space area (never by pixels, at most 9000).
+- **Tendrils**: tapering wobbling strands down each shaft's walls from the mouth (2–7 where a mat is over it, else at most one), and a curtain from the outer void's ceiling under the mats (`hang` × cover). Mid-tone: the dark tone vanished against the shaft.
+- **Pools**: a mound on every wound's floor and (by chance rising with cover) its ledges, clipped to the wound's outline so its base sits below the ragged floor and fills the dips; lifted 0.020 × the edge's `jag` on the floor so the torn floor's teeth do not poke through. Each pool carries its own dots, clipped with it.
+- **Hue**: moss (60%) or a rust bloom, rolled per body.
+- **Withered by Operational status** (the user: growth on a running world can be deliberate cover masking what the body is, so the dial never changes HOW MUCH; asked first about an atmosphere toggle, but the machine world has no atmosphere layer, and the user chose Operational status). Through `wither: [lo, hi]` against `CC.Activity.level`: lush from 15%, drifting to grey straw (hue 40, saturation ×0.30, value ×0.80) by 0%. A body with no `activity` never withers.
+
+Two hooks in `draw/scene.js`: phase `"body"` (mats, tendrils, leaves) after the shaft doors, inside the rupture clip, so a wound takes the growth in its path; phase `"wounds"` (pools) after the torn edge. `gen/details.js` hoists the rupture into a variable so the growth can read it. Scratch tool: `test/_tmp/_zpools.mjs` (hue, counts, each pool's height).
+
+The user: "I like what I see"; withering "Looks good". Open, the user's call if it bothers them: dead growth is grey on grey steel at sheet size, so at 0% it nearly vanishes.
+
+### D276 — Weaponized: `bore`, a general structure feature
+
+`js/gen/bore.js` builds, `js/draw/bore.js` draws; the trait sets `bore: { width: [3, 5], cap: [0.042, 0.085], muzzle: 0.075, coils: 0.10 }`. The one big filled object: a barrel from a breech on the innermost built layer out through every shell and void to a muzzle crown past the surface, on one rolled bearing kept clear of the shafts. Half-width is `width` × the shafts' mean half-width, clamped to `cap` (in practice usually at the cap). Nothing looked up by role.
+
+- **Barrel**: constant body-space width (not angle), shaded as a cylinder by one linear gradient across it, two panel seams, a bore channel down the middle. **Collars** where it passes each shell's faces and each void's edges.
+- **Coils** in stages of three (the middle ring the big one), pitch `coils`, each stage clear of the collars; in a lit stage the gaps between rings glow. First built as single thin rings at an even pitch: it read as a ladder, the shafts' and pillars' own mark.
+- **Crown**: a flared block and a pair of rails past the surface, a radial glow at the mouth when charged. If a wound contains the barrel's exit through the surface, there is no crown (nothing floats past a hole).
+- **Seated on the heart** (the user, three rounds): the breech is a tapered housing whose base is an arc in the barrel's frame (`sqrt(R² − x²)` along), sitting in a **saddle**, a bolted curved clamp on the heart's rim drawn OVER the housing's base, `saddle: { r0, r1, span }` built in gen so the feeds and the saddle agree. **Feeds**: 7–9 slots with the outermost each side left empty, so 5–7 pipes parallel to the barrel across the saddle's width, each from a round socket in the heart (sockets on one arc round the heart's centre at 0.58 × the saddle's inner radius, so the middle pipes reach deepest) to a junction box with its light on the saddle's inner edge (so the boxes follow its curve); tubes shaded as the barrel, collared, an energy line down a powered one. Rejected on the way: a flat block with a lit window (read as a screen), braces from the breech's shoulders to the saddle (the user: they did not look good), conduit-thin radial runs (scrawny), few fat parallel tubes with no curvature (too big, too few).
+- **Charge by Operational status**: the innermost layer's `live`, raised by the hive multiplier; each coil stage and feed asks that layer's `CC.Activity.gate`. Dark: cold. Emergency: a dim red bore, only the stages the gate keeps burning. Lit: the accent.
+- **Draw order**: last of the body's own passes in `draw/scene.js`, just before `CC.RuptureDraw.end` — after Overgrown's body pass AND after the escaping pass where seated fixtures (docking ports, sensors) are drawn, so the gun covers them (the user), and still inside the rupture clip, so a wound cuts it. The user liked the remnant of a barrel left standing in a wound.
+
+Scratch tool: `test/_tmp/_zbore.mjs` (each seed's bearing, half-width, crown kept or taken). The user: "big and looks cool shape and details wise"; the base approved after the feed rework.
+
+### D277 — Worldship: `engines`, a general structure feature
+
+`js/gen/engines.js` builds, `js/draw/engines.js` draws; the trait sets `engines: { bells: [3, 4], bell: [0.065, 0.090], mount: 0.035, reach: [0.40, 0.60], depth: 0.75 }`. The two marks the body lacked: an asymmetric silhouette and a soft emissive gas.
+
+- **Bells**: 3–4 main bells side by side across one bearing, a vernier at 0.45 scale outboard of each end (two size tiers), hung from an engine block whose base follows the hull's curve and whose face is flat. Each bell is shaded as a cylinder, flares from its throat (half-width `t + (e − t)·u^0.6`), with cooling lines along it, two stiffener rings and a lit lip; a firing bell glows orange-hot at the throat. First built at 0.050–0.075 and 3–5 bells: too small at sheet size.
+- **Thrust frame**: one heavy longeron from under each main bell down through the shells, converging (to 0.40 of its spread) on a bolted curved thrust plate at the outer face of the outermost built layer below `depth` (the machinery in practice; found by radius, never by role), with cross-ties at each shell face and void edge.
+- **Plume**, added with `lighter`: a merged wake of 70 soft radial puffs across the whole cluster further out, under each bell's own gas (46 puffs), a core of small white-to-accent puffs crowding the exit, 3–5 shock diamonds as soft elongated glows (an ellipse by transform), and sparks fanning out. Positions are 0..1 along the plume, scaled by its length at draw, so the dial stretches it in place. Rejected on the way: a hard tapering core polygon (read as a blue light cone) and hard lozenge diamonds (paper cut-outs).
+- **Where**: a bearing clear of every shaft; with a bore, aft of it (opposite, ±1.1 rad), and never within 0.35 rad plus the cluster's span of it, so the gun points forward and the drive pushes from behind. `gen/details.js` hoists the bore into a variable so the engines can read it.
+- **Fired by Operational status**, as the bore is charged: the innermost layer's `live` raised by `busy`, each bell gated by `CC.Activity.gate`. Dark: cold metal. Emergency: a dull red in each throat, no plume. Lit: plume length 0.55–1.0 of its reach by the charge.
+- **Wounds**: a bell whose footing on the hull lies in a wound is torn off; with no main bell left, nothing is drawn. Drawn in `draw/scene.js` right after `CC.BoreDraw`, before `CC.RuptureDraw.end`, so it covers the growth and the seated fixtures and a wound cuts the frame.
+
+Open, the user's call if they bother them: the frame's lattice is akin to Under construction's scaffold; the soft tail can run past the frame (nothing reserves room for it in the framing); when a wound takes the outboard bells, the block stands out over the wound's mouth as a stub; the emergency throat glow is faint at sheet size.
+
+The user: "Looks absolutely amazing, I'm impressed."
+
+## Next session: stage (d) continued
+
+Stages (a)–(c) and stage (d) sub-steps 1–4 are built and approved (D248–D277: Under construction, Blast doors, Shaft covers, Overgrown, Weaponized, Worldship). All six exclusive traits are done. `npm test` passes. Remaining, in order, rendering for the user between each:
+
+5. **The stat card**: `js/gen/stats/machine.js` (the archetype already says `statTemplate: "machine"` and falls back to the planet's); MACHINE-WORLDS.md § "Stats template". Every figure measures the render: Power from the reactor's drawn radius × Operational status; Population from habitation's presence and volume × its lit share; Status from the Operational status bands (and Under construction); Hull integrity from the wounds actually cut (how many, how deep, which shell); Docking from shafts, doors, covers and docks; Construction from what is drawn (ancient-precursor's home); Biggest danger from drawn hazards; Weaponized and Worldship each owe the card a line read from `details.bore` / `details.engines` (charged or cold, how many bells firing). Laypeople's wording, metric with a comparison.
+6. **Flavour pool** (`js/data/flavour/`), including the cut precursor's story.
+7. **Presets** (PARAMETERS.md § Artificial): Derelict Machine World, Hive World, Automated Factory, Unfinished World, Worldship. **Planet-Cracker is removed** (strike it from PARAMETERS.md). Render each against its blurb.
+8. **Star activity** against the machine world, and fill the climate table's open cell (likely ✖ for the render, ◐ only if the card carries a radiation line).
+9. **Close Phase 9a**: decisions here; MACHINE-WORLDS.md (exclusive traits table: the six built with their structure features — `rupture.edge: "clean"`, `shafts.doors` / `covers`, `overgrowth`, `bore`, `engines` — ancient-precursor cut, planet-cracker removed; `sets`; stats; flavour), ARCHITECTURE.md's archetype-property table (`bore`, `engines`, `overgrowth`) and PARAMETERS.md to the code; PROGRESS.md and checklist.md; `npm test`.
+
+Same rules: no archetype branch in `js/draw/`, ≤500 lines per file with hooks only in `scene.js` / `details.js` / `elemgen.js` / `palette.js`, no new tests unless asked. Scratch tools: `_zgrid.mjs` (sheets), `_zwound.mjs` / `_zcrop.mjs` / `_zzoom.mjs` / `_zlayer.mjs` (close-ups), `_zrow.mjs` (compare; it rescales, so read crop coordinates at the source size), `_zpools.mjs`, `_zbore.mjs`.

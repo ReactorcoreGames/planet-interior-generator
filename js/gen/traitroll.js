@@ -976,6 +976,8 @@ CC.TraitRoll = (function () {
       var sectors = null;
       /* Modifiers draw nothing themselves — they perturb the layers. */
       if (CC.Traits.isModifier(trait)) continue;
+      /* Nor do traits that only switch structure data (gen/traitsets.js). */
+      if (trait.sets && !trait.element) continue;
 
       /* A TRAIT THAT IS AN ABSENCE RATHER THAN A MARK.
        *

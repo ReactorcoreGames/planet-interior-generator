@@ -126,6 +126,9 @@ CC.Details = (function () {
     var archetype = CC.Archetypes.get(body.archetype);
     var formFn = body.form ? CC.Form.fn(body.form) : null;
     var traits = CC.TraitRoll.select(archetype, params, seed);
+    /* A trait may switch the archetype's own structure data (`sets`,
+     * gen/traitsets.js): every builder below reads the result. */
+    archetype = CC.TraitSets.apply(archetype, traits);
 
     /* THE ANGULAR AXIS IS ARCHETYPE DATA, NOT A TRAIT.
      *
@@ -811,6 +814,9 @@ CC.Details = (function () {
                                placed.spanning);
     var conduits = CC.Conduits.build(body, params, seed);
     var pillars = CC.Shells.pillars(body, params, seed);
+    var rupture = CC.Rupture.build(archetype, body, params, seed,
+                                   { pillars: pillars, conduits: conduits });
+    var bore = CC.Bore.build(archetype, body, params, seed, rupture);
 
     return {
       caves: caves,
@@ -826,10 +832,21 @@ CC.Details = (function () {
       /* The lit back walls seen through those voids and down the shafts
        * (gen/shellwalls.js). Null on every body without either. */
       walls: CC.ShellWalls.build(body, params, seed),
+      /* Doors and shutters on the shafts, where a trait sets them
+       * (gen/shaftdoors.js). Null otherwise. */
+      doors: CC.ShaftDoors.build(archetype, body, params),
       /* A wedge torn out of the outer layers (gen/rupture.js). Null on every
        * body declaring no `rupture`. */
-      rupture: CC.Rupture.build(archetype, body, params, seed,
-                                { pillars: pillars, conduits: conduits }),
+      rupture: rupture,
+      /* Growth over the hull, down the shafts and pooled in the wounds,
+       * where a trait sets it (gen/overgrowth.js). Null otherwise. */
+      growth: CC.Overgrowth.build(archetype, body, params, seed, rupture),
+      /* One great barrel through the shells, where a trait sets it
+       * (gen/bore.js). Null otherwise. */
+      bore: bore,
+      /* Drive bells on one bearing, aft of any bore, where a trait sets
+       * them (gen/engines.js). Null otherwise. */
+      engines: CC.Engines.build(archetype, body, params, seed, rupture, bore),
       byRole: byRole,
       terrain: terrain,
       /* Per-role surface-film masks, keyed the same way as `terrain`. */

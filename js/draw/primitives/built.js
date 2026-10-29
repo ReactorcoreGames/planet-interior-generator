@@ -3,7 +3,7 @@
  *   truss   a straight strut between two radii along one bearing: a pillar
  *           across a void, a conduit through a band. Rails and cross-bracing
  *           where it is wide enough to show them, a single hard line where
- *           it is not.
+ *           it is not. `beam` is the same strut between two pixel points.
  *
  * Takes `style` as hullFill's {hull, lit, shade, trim} set. Pixels enter
  * only through `view`, so a truss is the same strut at every resolution.
@@ -21,11 +21,15 @@ var CC = CC || {};
    * a dim web between two lit rails, braced with alternating diagonals —
    * nothing in nature has diagonals in a rectangle. */
   function truss(ctx, view, el, style) {
-    var a = view.at(el.r0, el.angle), b = view.at(el.r1, el.angle);
+    beam(ctx, view.at(el.r0, el.angle), view.at(el.r1, el.angle), view.px(el.width), style);
+  }
+
+  /* The same strut between any two pixel points, `w` pixels across: a
+   * gantry, a crane's jib (draw/woundscaffold.js). */
+  function beam(ctx, a, b, w, style) {
     var dx = b.x - a.x, dy = b.y - a.y;
     var len = Math.sqrt(dx * dx + dy * dy);
     if (len < 0.5) return;
-    var w = view.px(el.width);
     var ux = dx / len, uy = dy / len;
     var nx = -uy * w / 2, ny = ux * w / 2;
 
@@ -75,4 +79,5 @@ var CC = CC || {};
   }
 
   CC.Primitives.register({ "truss": truss });
+  CC.Primitives.beam = beam;
 })();

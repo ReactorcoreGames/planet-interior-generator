@@ -5,10 +5,12 @@
  * every mark here stands in the wound or on its lip: a peeled plate leans
  * into the gap, a stub juts into it. From the back forward:
  *
- *   rim      a dark scorched band along every edge and the floor, clipped
+ *   rim      a dark scorched band along every edge and the floor (or, on a
+ *            clean edge, a trimmed seam), clipped
  *            OUTSIDE the wound and to the body's material, so it scorches
  *            the metal and never paints over a void or space
  *   debris   the field drifting out of the wound (draw/wounddebris.js)
+ *   scaffold construction work on a clean edge (draw/woundscaffold.js)
  *   stubs    snapped pillars, the pillars' own truss with a broken tip
  *   pipes    severed pipe ends and cut conduit runs
  *   plates   peeled plating
@@ -30,8 +32,15 @@ CC.WoundEdgeDraw = (function () {
   var TAU = Math.PI * 2;
   function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
 
-  /* The scorched rim: wide and faint to narrow and dark, body radius. */
-  var RIM = [[0.034, 0.20], [0.020, 0.32], [0.010, 0.50], [0.004, 0.70]];
+  /* HOW THE OUTLINE IS STROKED, named by the edge style (`rupture.rim`,
+   * gen/woundedge.js): [width in body radius, h, s, v, alpha], widest first.
+   * Scorch: wide and faint to narrow and dark. Trim: a clean cut, a dark
+   * seam with a lit bevel inside it. */
+  var RIMS = {
+    scorch: [[0.034, 18, 0.55, 0.04, 0.20], [0.020, 18, 0.55, 0.04, 0.32],
+             [0.010, 18, 0.55, 0.04, 0.50], [0.004, 18, 0.55, 0.04, 0.70]],
+    trim: [[0.007, 0, 0, 0.03, 0.55], [0.0026, 40, 0.06, 0.92, 0.55]]
+  };
 
   /* Pixel frame at (r, a): out (radial), and `into`, along the arc toward
    * the wound's middle from an edge on `side`. */
@@ -67,9 +76,11 @@ CC.WoundEdgeDraw = (function () {
     material(ctx, view, body);
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
+    var RIM = RIMS[rupture.rim] || RIMS.scorch;
     for (var k = 0; k < RIM.length; k++) {
-      ctx.strokeStyle = CC.Color.hsva(18, 0.55, 0.04, clamp(RIM[k][1] * alpha, 0, 1));
-      ctx.lineWidth = Math.max(0.6, view.px(RIM[k][0]));
+      var R = RIM[k];
+      ctx.strokeStyle = CC.Color.hsva(R[1], R[2], R[3], clamp(R[4] * alpha, 0, 1));
+      ctx.lineWidth = Math.max(0.6, view.px(R[0]));
       ctx.beginPath();
       for (var i = 0; i < rupture.wounds.length; i++) {
         CC.RuptureDraw.path(ctx, view, rupture.wounds[i].poly, 0);
@@ -158,6 +169,8 @@ CC.WoundEdgeDraw = (function () {
    * stretch bent off line by `lean`. */
   function stub(ctx, view, S, st, pst) {
     CC.Primitives.truss(ctx, view, S, pst);
+    /* A clean post is whole: the next level's pillar, not a broken one. */
+    if (S.clean) return;
     var A = view.at(S.r0, S.angle), B = view.at(S.r1, S.angle);
     var dx = B.x - A.x, dy = B.y - A.y, l = Math.sqrt(dx * dx + dy * dy);
     if (l < 1) return;
@@ -267,7 +280,11 @@ CC.WoundEdgeDraw = (function () {
       var k;
       /* The field drifting out of the wound, under the faces' own marks
        * (draw/wounddebris.js). */
-      CC.WoundDebrisDraw.draw(ctx, view, m.debris, st, clamp(alpha, 0, 1));
+      if (m.debris) CC.WoundDebrisDraw.draw(ctx, view, m.debris, st, clamp(alpha, 0, 1));
+      /* Construction work, on a clean edge (draw/woundscaffold.js). */
+      if (m.frame || m.scaffold) {
+        CC.WoundScaffoldDraw.draw(ctx, view, m.frame, m.scaffold, palette, alpha);
+      }
       if (m.stubs) for (k = 0; k < m.stubs.length; k++) {
         var S = m.stubs[k];
         stub(ctx, view, S, st(S.role), ps(S.role));

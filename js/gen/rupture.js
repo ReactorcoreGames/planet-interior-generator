@@ -37,7 +37,7 @@
  * same wound in place.
  *
  * Output, in body polar coordinates:
- *   { amount, edge, wounds: [{ angle, floor, outer, size, salt,
+ *   { amount, edge, rim, wounds: [{ angle, floor, outer, size, salt,
  *                              poly: [[r, a], ...],
  *                              cuts: [{ role, r0, r1, aL, aR }],
  *                              marks }] }
@@ -82,8 +82,10 @@ CC.Rupture = (function () {
 
   var MAX_WOUNDS = 5;
 
-  /* One wound: the steps and the outline. `rolls` are its own draws. */
-  function wound(body, angle, floor, W, outer, rolls) {
+  /* One wound: the steps and the outline. `rolls` are its own draws; `jag`
+   * scales the serration and the floor's raggedness (the edge style's, 1
+   * torn, 0 a clean square cut). */
+  function wound(body, angle, floor, W, outer, rolls, jag) {
     /* THE STEPS. One per real layer the cut passes through, outermost first,
      * each from the layer's floor (its void's floor, for a hollow layer) to
      * its top; the outermost step runs on out to `outer`. Wider toward the
@@ -121,8 +123,8 @@ CC.Rupture = (function () {
         rs.push(C.r1);
         for (var j = 0; j < rs.length; j++) {
           var rr = rs[j];
-          var jag = (hash(Math.round(rr / STEP), salt + k) - 0.5) * 2 * JAG;
-          pts.push([rr, angle + side * (w + jag / Math.max(0.05, rr))]);
+          var tooth = (hash(Math.round(rr / STEP), salt + k) - 0.5) * 2 * JAG * jag;
+          pts.push([rr, angle + side * (w + tooth / Math.max(0.05, rr))]);
         }
       }
       return pts;
@@ -140,12 +142,12 @@ CC.Rupture = (function () {
     var nF = Math.max(2, Math.ceil(Math.abs(fR - fL) * floor / (ARC_STEP * 0.5)));
     for (k = 1; k < nF; k++) {
       var fa = lerp(fL, fR, k / nF);
-      var jf = (hash(Math.round(fa * 400), 3) - 0.5) * 2 * FLOOR_JAG *
+      var jf = (hash(Math.round(fa * 400), 3) - 0.5) * 2 * FLOOR_JAG * jag *
                Math.sin(Math.PI * k / nF);
       poly.push([Math.max(0.02, floor + jf), fa]);
     }
     return { angle: angle, floor: floor, outer: outer, poly: poly, cuts: cuts,
-             salt: salt };
+             salt: salt, jag: jag };
   }
 
   /* The bearing of a wound's torn edge at radius r, exactly as the outline
@@ -160,8 +162,9 @@ CC.Rupture = (function () {
       if (r >= c.r0 - 1e-9 && r <= c.r1 + 1e-9) { C = c; if (!inner) break; }
     }
     if (!C) return null;
-    var jag = (hash(Math.round(r / STEP), w.salt + (side > 0 ? 1 : 2)) - 0.5) * 2 * JAG;
-    return w.angle + side * ((side > 0 ? C.aR : C.aL) + jag / Math.max(0.05, r));
+    var tooth = (hash(Math.round(r / STEP), w.salt + (side > 0 ? 1 : 2)) - 0.5) * 2 * JAG *
+                (w.jag === undefined ? 1 : w.jag);
+    return w.angle + side * ((side > 0 ? C.aR : C.aL) + tooth / Math.max(0.05, r));
   }
 
   /* Whether (r, a) lies inside a wound: above its floor and between its
@@ -194,6 +197,8 @@ CC.Rupture = (function () {
     if (t <= 0) return null;
 
     var outer = 1 + REACH;
+    var edge = spec.edge || "torn";
+    var jag = CC.WoundEdge.option(edge, "jag", 1);
     var wounds = [];
     for (w = 0; w < n; w++) {
       var P = plan[w];
@@ -206,11 +211,13 @@ CC.Rupture = (function () {
       if (tw <= 0) continue;
       var floor = 1 - size * lerp(spec.depth[0], spec.depth[1], tw);
       var W = size * lerp(spec.width[0], spec.width[1], tw);
-      var made = wound(body, ((angle % TAU) + TAU) % TAU, floor, W, outer, P.rolls);
+      var made = wound(body, ((angle % TAU) + TAU) % TAU, floor, W, outer, P.rolls, jag);
       if (made) { made.size = size; wounds.push(made); }
     }
     if (!wounds.length) return null;
-    var out = { amount: t, edge: spec.edge || "torn", wounds: wounds };
+    /* `rim`: how draw/woundedge.js strokes the outline, the style's. */
+    var out = { amount: t, edge: edge, rim: CC.WoundEdge.option(edge, "rim", "scorch"),
+                wounds: wounds };
     /* The marks along each cut face, in the style the archetype names
      * (js/gen/woundedge.js). */
     for (w = 0; w < wounds.length; w++) {

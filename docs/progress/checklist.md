@@ -186,9 +186,9 @@ assumed.
 - [x] **the `nebula` card** — crossed, not reached; every figure computed and checked (D238); a navigational **hazard rating** calibrated against the frequency contract (D239)
 - [x] **flavour pool and seven presets**, each checked against its blurb (D240)
 
-### Phase 9a — the `machine-world` archetype 🟡 (Session Z, stage d next)
+### Phase 9a — the `machine-world` archetype 🟡 (Session Z, stage d under way)
 
-[session-z-machine-world.md](session-z-machine-world.md) — D248–D271 so far. **No archetype branch in `js/draw/`**; `npm test` passes.
+[session-z-machine-world.md](session-z-machine-world.md) — D248–D277 so far. **No archetype branch in `js/draw/`**; `npm test` passes.
 
 - [x] **the stack**: four hollow shells round a solid heart, re-cut so every band holds at all extremes (D250); `frac_when` lifts the machinery and the reactor when an optional layer is absent
 - [x] **`gapBelow`, `pillars`, `shafted`, `shafts`** (D248): true voids, two-tier pillars, 2-6 access shafts through every shell to space (`js/gen/shells.js`, `js/draw/shells.js`)
@@ -202,7 +202,9 @@ assumed.
 - [x] stage (c2): **Hull integrity** — `rupture`, 1–5 stepped, serrated wounds clipped out of the body (D267–D268) (`js/gen/rupture.js`, `js/draw/rupture.js`)
 - [x] stage (c3): **the torn edge** — `edge: "torn"` style registry, scorched rim, peeled plating, snapped pillars, severed pipe (D269); the debris field (D270); sparks, fire and embers by Operational status (D271) (`js/gen/woundedge.js`, `js/gen/wounddebris.js`, `js/draw/woundedge.js`, `js/draw/wounddebris.js`)
 - [x] stage (c) docs: MACHINE-WORLDS.md and PARAMETERS.md brought up to the code; ARCHITECTURE.md gains the archetype-property and colour-entry tables
-- [ ] stage (d): exclusive traits, stat card, flavour, presets
+- [x] stage (d): the trait audit; `sets`, a trait switching structure data (D272, `js/gen/traitsets.js`)
+- [x] stage (d): **the six exclusive traits** — Under construction, the `clean` edge style (D273); Blast doors and Shaft covers (D274); Overgrown, `overgrowth` (D275); Weaponized, `bore` (D276); Worldship, `engines` (D277)
+- [ ] stage (d): stat card, flavour, presets, Star activity, close-out docs
 
 ### Phase 7 review ✅ (Session Y)
 

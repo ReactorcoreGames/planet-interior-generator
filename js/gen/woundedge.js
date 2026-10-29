@@ -5,7 +5,8 @@
  * structure, not a clean slice. The archetype names a STYLE on its rupture
  * (`edge: "torn"`), looked up in `styles` here, so another style (stage d's
  * Under construction: clean faces and scaffolding) is one more entry and
- * the draw pass needs no case for it. Nothing here knows the archetype.
+ * the draw pass needs no case for it (it is js/gen/woundclean.js). Nothing
+ * here knows the archetype.
  *
  * THE TORN STYLE, per cut step and per side of the wound:
  *
@@ -210,7 +211,11 @@ CC.WoundEdge = (function () {
     return m;
   }
 
+  /* A STYLE is its builder plus how the cut itself is made: `jag` scales the
+   * serration and the floor's raggedness (gen/rupture.js), `rim` names how
+   * the outline is stroked (draw/woundedge.js). */
   var styles = { torn: torn };
+  var options = { torn: { jag: 1, rim: "scorch" } };
 
   /* The marks for one wound in the named style; null for a style nobody
    * registered. */
@@ -219,7 +224,17 @@ CC.WoundEdge = (function () {
     return fn ? fn(body, w, spec, params, extras) : null;
   }
 
-  function register(style, fn) { styles[style] = fn; }
+  function register(style, fn, opts) {
+    styles[style] = fn;
+    options[style] = opts || {};
+  }
 
-  return { build: build, register: register, styles: styles };
+  function option(style, key, dflt) {
+    var o = options[style];
+    return o && o[key] !== undefined ? o[key] : dflt;
+  }
+
+  return { build: build, register: register, option: option, styles: styles,
+           /* For the other styles' files. */
+           hash: hash, byRole: byRole, surfaceOf: surfaceOf };
 })();

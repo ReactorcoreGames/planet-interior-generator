@@ -997,6 +997,11 @@ CC.Scene = (function () {
     CC.ConduitDraw.draw(ctx, view, details.conduits, palette, elementOpacity);
     /* Cans on the board, among the runs (draw/capacitors.js). */
     CC.CapacitorDraw.draw(ctx, view, details.capacitors, palette, elementOpacity);
+    /* Doors down the shafts and shutters over their mouths
+     * (draw/shaftdoors.js). */
+    CC.ShaftDoorDraw.draw(ctx, view, details.doors, palette, elementOpacity);
+    /* Growth over the hull and down the shafts (draw/overgrowth.js). */
+    CC.OvergrowthDraw.draw(ctx, view, details.growth, "body", elementOpacity);
 
     /* --- 3e. deferred fluid layers ---
      *
@@ -1370,11 +1375,20 @@ CC.Scene = (function () {
       }
     }
 
+    /* The bore barrel, last of the body's own passes: over the growth and
+     * over the seated fixtures on the hull (docking ports, sensors), and
+     * still inside the rupture clip, so a wound cuts it (draw/bore.js). */
+    CC.BoreDraw.draw(ctx, view, details.bore, palette, elementOpacity);
+    /* The drive cluster and its plume, likewise (draw/engines.js). */
+    CC.EngineDraw.draw(ctx, view, details.engines, palette, elementOpacity);
+
     CC.RuptureDraw.end(ctx, ruptured);
     /* The torn faces of those wounds — scorched rim, peeled plating, snapped
      * pillars, severed pipe — standing in the gap the cut left
      * (draw/woundedge.js). */
     CC.WoundEdgeDraw.draw(ctx, view, body, details.rupture, palette, elementOpacity);
+    /* Growth pooled on the wounds' floors and ledges. */
+    CC.OvergrowthDraw.draw(ctx, view, details.growth, "wounds", elementOpacity);
 
     /* --- 5. outward traits, front half --- */
     CC.ZonePaint.drawOutward(ctx, view, details, palette, elementOpacity, "front", sky);

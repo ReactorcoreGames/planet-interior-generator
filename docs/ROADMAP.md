@@ -52,7 +52,7 @@ The architecture is designed so later phases slot in without rework: archetypes 
 
 **Session Y reviewed Phase 7** (the nebula signed off; the neutron star and pulsar reworked) and **reordered what remains** (D246, [session-y-compact-review.md](progress/session-y-compact-review.md)):
 
-1. **9a — the `machine-world` archetype first**, so the polish pass covers every body type that will ship.
+1. ✅ **9a — the `machine-world` archetype first**, so the polish pass covers every body type that will ship. Done in Session Z (D248–D281, [session-z-machine-world.md](progress/session-z-machine-world.md)).
 2. **8 — overlay, scale bar, polish**, including the per-type stat templates, over the full set of archetypes.
 3. **9b — megastructure traits.** Audit MACHINE-WORLDS.md's per-body lists against the artificial and natural traits that already exist, settle a cleaned list with the user, then build it.
 4. **9c — a final clean-up pass**, so everything lands together.

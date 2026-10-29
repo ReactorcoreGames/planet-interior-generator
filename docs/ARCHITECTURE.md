@@ -135,12 +135,17 @@ Declared on the archetype, beside `stack` and `colorProfile`. Each is general: a
 
 | Property | Type | Meaning |
 |---|---|---|
-| `shafts` | `{ count, width }` | Access routes: bearings shared by every `shafted` layer, width in body radius (D248, `js/gen/shells.js`) |
+| `shafts` | `{ count, width, doors, covers }` | Access routes: bearings shared by every `shafted` layer, width in body radius (D248, `js/gen/shells.js`). `doors: { thick }` adds an airlock pair where a shaft crosses each shell, `covers: { thick }` a silo cover over its mouth, each open or shut by `activity` (D274, `js/gen/shaftdoors.js`) |
 | `activity` | `{ param }` | The named parameter is how alive the body is; with each layer's `lit`, it decides which lights are on, dark or on emergency power (D264–D266, `js/gen/activity.js`). Which light is a stable hash of its position (`CC.Activity.gate`), never a stream draw |
-| `rupture` | `{ param, start, depth, width, count, edge, pipes }` | Wounds torn out of the outer layers as the named parameter falls below `start`: `depth` and `width` from the onset to 0, 1–`count` wounds, each a stepped funnel clipped out of the body's draw (D267–D268, `js/gen/rupture.js`). `edge` names the cut faces' style, registered in `js/gen/woundedge.js` (`"torn"`, default); `pipes` lists the layers whose faces show severed pipe (D269) |
+| `rupture` | `{ param, start, depth, width, count, edge, pipes }` | Wounds torn out of the outer layers as the named parameter falls below `start`: `depth` and `width` from the onset to 0, 1–`count` wounds, each a stepped funnel clipped out of the body's draw (D267–D268, `js/gen/rupture.js`). `edge` names the cut faces' style, registered in `js/gen/woundedge.js` (`"torn"`, default; `"clean"`, Under construction's building sites, D273); `pipes` lists the layers whose faces show severed pipe (D269) |
+| `overgrowth` | `{ cover, proud, creep, hang, pool, wither }` | Moss or a rust bloom over the outermost layer's face, down the shafts, hung in the outer void and pooled in the wounds; `cover` by Detail density, `wither` by `activity` (D275, `js/gen/overgrowth.js`) |
+| `bore` | `{ width, cap, muzzle, coils }` | One cannon barrel on a bearing clear of the shafts, from the heart out past the surface, ringed with coil stages; charged by the innermost layer's `live` (D276, `js/gen/bore.js`) |
+| `engines` | `{ bells, bell, mount, reach, depth }` | A cluster of drive bells on one bearing, aft of any `bore`, a thrust frame down to `depth` and a plume; fired by the innermost layer's `live` (D277, `js/gen/engines.js`) |
 | `dials` | `{ param: { label, ... } }` | Relabels an existing control for this archetype (Interior heat → Operational status, Cohesion → Hull integrity) |
 
-`gapBelow`, `pillars`, `shafted`, `conduits`, `capacitors`, `lit`, `activity` and `rupture` are **generic properties, not machine-world
+**A trait can set these too.** A trait's `sets` merges structure data over the archetype's own, one key deep, before the detail stage reads it (D272, `js/gen/traitsets.js`): Under construction is `sets: { rupture: { edge: "clean" } }`, and `overgrowth`, `bore` and `engines` are declared by no archetype today, only switched on by the machine world's Overgrown, Weaponized and Worldship. Nothing anywhere asks which trait is on.
+
+`gapBelow`, `pillars`, `shafted`, `conduits`, `capacitors`, `lit`, `activity`, `rupture`, `overgrowth`, `bore` and `engines` are **generic properties, not machine-world
 special-casing.** (They replace the spec's `shell` + `gap` above-and-below, D248.) Only machine worlds use them today, but the renderer
 implements them as ordinary layer geometry — which is what keeps the "body types
 never get their own drawing code" rule intact.

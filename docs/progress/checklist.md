@@ -186,9 +186,9 @@ assumed.
 - [x] **the `nebula` card** — crossed, not reached; every figure computed and checked (D238); a navigational **hazard rating** calibrated against the frequency contract (D239)
 - [x] **flavour pool and seven presets**, each checked against its blurb (D240)
 
-### Phase 9a — the `machine-world` archetype 🟡 (Session Z, stage d under way)
+### Phase 9a — the `machine-world` archetype ✅ (Session Z)
 
-[session-z-machine-world.md](session-z-machine-world.md) — D248–D278 so far. **No archetype branch in `js/draw/`**; `npm test` passes.
+[session-z-machine-world.md](session-z-machine-world.md) — D248–D281. **No archetype branch in `js/draw/`**; `npm test` passes.
 
 - [x] **the stack**: four hollow shells round a solid heart, re-cut so every band holds at all extremes (D250); `frac_when` lifts the machinery and the reactor when an optional layer is absent
 - [x] **`gapBelow`, `pillars`, `shafted`, `shafts`** (D248): true voids, two-tier pillars, 2-6 access shafts through every shell to space (`js/gen/shells.js`, `js/draw/shells.js`)
@@ -205,7 +205,10 @@ assumed.
 - [x] stage (d): the trait audit; `sets`, a trait switching structure data (D272, `js/gen/traitsets.js`)
 - [x] stage (d): **the six exclusive traits** — Under construction, the `clean` edge style (D273); Blast doors and Shaft covers (D274); Overgrown, `overgrowth` (D275); Weaponized, `bore` (D276); Worldship, `engines` (D277)
 - [x] stage (d): **the stat card** — `statTemplate: "machine"`, every row read from the render, a `machine` hazard branch, the danger pool (D278) (`js/gen/stats/machine.js`)
-- [ ] stage (d): flavour, presets, Star activity, close-out docs
+- [x] stage (d): **the flavour pools** — Notable, Resources, Approach, each line guarded by a card fact, the cut precursor's story told by `age` (D279) (`js/data/flavour/machine.js`)
+- [x] stage (d): **Star activity** measured inert on the machine world, the climate cell ✖ (D280)
+- [x] stage (d): **five presets**, each checked against its blurb on three seeds; Planet-Cracker struck (D281) (`js/data/presets-machine.js`)
+- [x] Phase 9a closed: MACHINE-WORLDS.md, ARCHITECTURE.md and PARAMETERS.md brought up to the code
 
 ### Phase 7 review ✅ (Session Y)
 

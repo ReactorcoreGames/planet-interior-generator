@@ -94,15 +94,18 @@ var CC = CC || {};
     return (lower ? cmp : cap(cmp)) + " (" + nice(w / 1e12) + " terawatts)";
   }
 
+  function litWord(share) {
+    return share > 0.9 ? "nearly all" : share > 0.6 ? "most" : share > 0.4 ? "about half"
+      : share > 0.25 ? "about a third" : share > 0.12 ? "about one in five" : "about one in ten";
+  }
+
   function popLine(n, share, busy) {
     var e = n / EARTH_PEOPLE;
     var cmp = e >= 1.5 ? Math.round(e) + " times Earth's population"
       : e >= 0.7 ? "about as many people as live on Earth"
       : e >= 0.08 ? "about a " + (e >= 0.4 ? "half" : e >= 0.2 ? "quarter" : "tenth") + " of Earth's population"
       : "fewer than live in one big country";
-    var lit = share > 0.9 ? "nearly all" : share > 0.6 ? "most" : share > 0.4 ? "about half"
-      : share > 0.25 ? "about a third" : share > 0.12 ? "about one in five" : "about one in ten";
-    return "About " + nice(n) + " - " + cmp + ". Going by the lights: " + lit +
+    return "About " + nice(n) + " - " + cmp + ". Going by the lights: " + litWord(share) +
            " of the windows in the habitation levels are lit" + (busy > 1.35 ? ", and every lit deck is crowded" : "");
   }
 
@@ -251,19 +254,24 @@ var CC = CC || {};
 
       /* CONSTRUCTION: who built it, read from what is drawn. The cut
        * ancient-precursor trait lives here: an overgrown hull is old. */
-      var growth = details.growth, construction;
+      var growth = details.growth, construction, age;
       var skin = growth ? (growth.moss ? "moss" : "rust bloom") : "";
       if (building) {
+        age = dark ? "unfinished" : "building";
         construction = dark ? "Never finished. Whoever was building it stopped, and the sites are still open"
                             : "Still being built - scaffolding and cranes stand in the open sites";
       } else if (growth && (dark || growth.wither > 0.5)) {
+        age = "ancient";
         construction = "Ancient. The builders are long gone, and the " + skin + " on the hull has had ages to spread";
       } else if (growth) {
+        age = "ageless";
         construction = "Older than anyone can say, and still running under a skin of " + skin + " that nobody clears away";
       } else if (dark) {
+        age = wounds.length ? "old" : "unknown";
         construction = wounds.length ? "Old, by the scars. Nobody alive claims to have built it"
                                      : "Unknown. Nothing aboard is answering to say";
       } else {
+        age = "kept";
         construction = (status === "automated" || status === "unmanned"
           ? "Built by someone, and kept by machines" : "Built, and kept by whoever lives aboard") +
           (wounds.length ? ". Every seam was true until something tore it open" : ". Not one seam is out of true");
@@ -277,7 +285,9 @@ var CC = CC || {};
         shafts: shafts.length, openShafts: openShafts, ports: ports, craft: craft,
         platforms: platforms, armed: armed,
         bore: bore ? bore.power : -1, engines: eng ? eng.power : -1,
-        overgrown: !!growth, withered: !!growth && growth.wither > 0.5,
+        overgrown: !!growth, withered: !!growth && growth.wither > 0.5, moss: !!growth && !!growth.moss,
+        age: age, reactor: !!heart, core: !!layerOf(body, "computation"),
+        lit: hab ? hab.live : 0, litWord: hab ? litWord(hab.live) : "",
         radius: R, radiation: 0, sunless: false, locked: false, gravity: 0,
         atmosphere: { present: false, pressure: 0, text: "" }, breathable: false,
         tempMin: 0, tempMax: 0, traits: traits
@@ -296,6 +306,10 @@ var CC = CC || {};
       ];
       if (weapon) lines.push({ key: "weapon", label: "Weapon", value: weapon });
       if (drive) lines.push({ key: "drive", label: "Drive", value: drive });
+      lines.push(
+        { key: "notable", label: "Notable", value: CC.Flavour.notableOf(facts, rng) },
+        { key: "resources", label: "Resources", value: CC.Flavour.resourceOf(facts, rng) },
+        { key: "approach", label: "Approach", value: CC.Flavour.approachOf(facts, rng) });
       lines.push({ key: "danger", label: "Biggest danger", value: CC.Flavour.dangerOf(facts, rng) });
 
       return { lines: lines, facts: facts, hazard: hazard, levels: LEVELS };

@@ -287,20 +287,20 @@ The **accent hue** (`accent`, js/gen/accent.js) sits 150–210° from the hull h
 
 ### Exclusive traits
 
-Only available to `machine-world`:
+Only available to `machine-world`. *As built (D272–D277): six traits, each switching on a general structure feature through `sets` (D272) — a trait carries structure data the way an archetype does, merged over the archetype's own, so the feature lives in `js/gen/` and is not tied to a trait id. Every one is gated by the two dials: Operational status lights or darkens it, Hull integrity cuts it.*
 
-| Trait | What it does |
-|---|---|
-| **overgrown** | Vegetation or corrosion reclaiming the outer hull |
-| **weaponized** | Massive bore-hole cannon spanning several layers |
-| **ancient-precursor** | Unfamiliar geometry, unreadable systems, still running |
-| **worldship** | Engine cluster on one side; it's going somewhere |
-| **planet-cracker** | Built around a captured natural core — a hybrid |
+| Trait | `sets` | What it draws |
+|---|---|---|
+| **under-construction** | `rupture.edge: "clean"` | The wounds Hull integrity cuts become the parts not built yet: clean faces, scaffolding and cranes, welding lights gated by Operational status (D273, `js/gen/woundclean.js`). At 92% or more there is nothing left to build |
+| **blast-doors** | `shafts.doors` | An airlock pair where each shaft crosses a shell, open or shut by Operational status (D274, `js/gen/shaftdoors.js`) |
+| **shaft-covers** | `shafts.covers` | A silo cover over each shaft's mouth, sliding aside into the hull (D274) |
+| **overgrown** | `overgrowth` | Moss or a rust bloom over the hull, down the shafts, hung in the outer void and pooled in the wounds; Detail density sets the cover, Operational status only its colour, withering as the world goes dark (D275, `js/gen/overgrowth.js`) |
+| **weaponized** | `bore` | One bore-cannon barrel from a breech at the heart out through every shell, ringed with accelerator coils, its muzzle crown past the surface; charged, dim red on emergency power, or cold (D276, `js/gen/bore.js`) |
+| **worldship** | `engines` | A cluster of drive bells on one bearing, aft of any bore, a thrust frame into the shells and a plume; firing, glowing, or cold by Operational status (D277, `js/gen/engines.js`) |
 
-**planet-cracker** is the interesting hybrid case: a `machine-world` stack
-wrapped around a natural `core` and `mantle`, allowing a few natural traits in
-those inner layers only. It's a genuine **stack branch** — it swaps the inner
-layers for natural ones — so it passes test 3 and stays structural.
+**Cut: ancient-precursor.** It fails TRAIT-SYSTEM.md's test 2 as a mark and test 3 as a stack: "unfamiliar geometry" would be a re-skin of every element, a second art style, and "still running" is a position on Operational status. It lives in the card's Construction row and the flavour pool instead, its age read from what is drawn — an overgrown hull on a dark or withered world is ancient.
+
+**Removed: planet-cracker**, by the user ("the other 6 traits are enough"). It would have been the first trait to swap a stack, needing a new presence form.
 
 ### The two machine-world axes
 
@@ -338,13 +338,13 @@ Each layer's `lit: [wake, full]` sets when its lights come on, so the dial reads
 
 **The torn edge** (`edge: "torn"`, js/gen/woundedge.js and js/gen/wounddebris.js, drawn by the matching js/draw/ files): a scorched rim inside the remaining metal; plating peeled and bent outward, biggest at the surface lips; snapped pillar stubs; severed pipe ends on the faces of the layers in `pipes` and on every conduit run the wound cuts; a debris field pouring out of the mouth in three size tiers, mostly small; sparks, fire and embers in the warning colour, gated by Operational status, so a derelict wound is cold and dark.
 
-**Under construction** (stage d) is an exclusive trait rather than the spec's `construction: true` flag (D249): it registers an `edge: "clean"` style plus scaffolding `truss` work — an unfinished world rather than a wrecked one. Same geometry, a different edge treatment and a different stats line.
+**Under construction** is an exclusive trait rather than the spec's `construction: true` flag (D249, built D273): it sets `rupture.edge: "clean"`, so the wounds become building sites with scaffolding and cranes — an unfinished world rather than a wrecked one. Same geometry, a different edge treatment and a different stats line.
 
 ### Stats template
 
 Machine worlds need their own template entirely.
 
-*As built (D278): `js/gen/stats/machine.js`, every row read from the render — power from the reactor's drawn size × the share running, population from habitation's drawn band × its lit windows, status from the layers' lights, hull integrity as `1 − rupture.amount` with the wounds cut and the deepest layer reached, docking from shafts, doors, covers, ports and platforms. Weaponized and Worldship add a Weapon and a Drive row; Under construction relabels Hull integrity as Completion; the cut ancient-precursor lives in the Construction row.*
+*As built (D278): `js/gen/stats/machine.js`, every row read from the render — power from the reactor's drawn size × the share running, population from habitation's drawn band × its lit windows, status from the layers' lights, hull integrity as `1 − rupture.amount` with the wounds cut and the deepest layer reached, docking from shafts, doors, covers, ports and platforms. Weaponized and Worldship add a Weapon and a Drive row; Under construction relabels Hull integrity as Completion; the cut ancient-precursor lives in the Construction row. Notable, Resources and Approach rows from the flavour pool show at the full detail level (D279).*
 
 ```
 Size                  {km} across — {comparison}
@@ -363,6 +363,8 @@ Biggest danger        {hazard}
 - "Nothing is answering hails, but the power core is still running."
 - "The outer hull is scarred from something that happened a long time ago."
 - "There are lights on in about a third of the habitation ring. Somebody's home."
+
+*As built (D279): `js/data/flavour/machine.js`, four pools (Notable, Resources, Approach, Biggest danger), every line guarded by a fact the card shows. The spec's four lines are there, guarded where they make a claim: the size of a moon only where the Size row says Moon or larger; nobody answering hails only on an automated world; the old scars only where the Construction row reads the world as old or ancient; the lights line on the card's own lit share, in its own words ("about half of the habitation levels"). The cut ancient-precursor's story is told by `age`, set beside the Construction row so the two cannot disagree.*
 
 ---
 

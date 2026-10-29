@@ -132,7 +132,7 @@ as Ocean depth and Interior heat: an axis, not two checkboxes.
 | **Accretion rate** | black hole | 0–100% (default 60) | `feeding` / `dormant` | **A new slider.** Disc presence (none below ~4%), brightness, density, the hot inner torus, jets (from about a quarter up) |
 | *Core size bias → **Mass class*** | black hole | −100…+100 | `supermassive` / `stellar-mass` | **A `dials` relabel**, log-scaled: ~5 suns at the bottom, ~10⁵ in the middle, ~10⁹ at the top. Horizon size and every derived stat; the picture is a diagram and keeps its scale |
 | *Interior heat → **Operational status*** | machine world | 0–100% (default 55) | `dormant` / `automated` / `hive-populated` | **A `dials` relabel** driving the archetype's `activity` (D264–D266): which lights are on, layer by layer (the plant wakes first, habitation last), emergency red near the bottom, fully dark at 0, the board and reactor dimmed at the low end, busier than the default above 55%, and the sparks and fire on a wound's torn edge |
-| *Cohesion → **Hull integrity*** | machine world | 0–100% (default 45) | `damaged` / `partial-construction` | **A `dials` relabel** driving the archetype's `rupture` (D267–D269): 1–5 wounds torn out of the outer layers from 92% down, to the reactor's rim at 0, with a torn edge, debris and sparks. Stage (d)'s Under construction trait swaps the torn edge for a clean one with scaffolding |
+| *Cohesion → **Hull integrity*** | machine world | 0–100% (default 45) | `damaged` / `partial-construction` | **A `dials` relabel** driving the archetype's `rupture` (D267–D269): 1–5 wounds torn out of the outer layers from 92% down, to the reactor's rim at 0, with a torn edge, debris and sparks. The Under construction trait swaps the torn edge for a clean one with scaffolding (D273) |
 | **Enclosure** | dyson-structure trait | 0–100% | `dyson-swarm` / `dyson-sphere` | Collector spacing, jitter and arc — scattered swarm → half-built shell → full sphere |
 
 **Core size bias** (above) also absorbs the gas giant's `oversized-core` /
@@ -217,7 +217,7 @@ Legend: **✅** consume it · **◐** consume it partially, see the note ·
 | **neutron star / pulsar** | ✖ | ✖ | ◐ own field, not a star's | ✖ | ✖ |
 | **black hole** | ✖ | ✖ | ✖ | ✖ | ✖ |
 | **nebula** | ◐ embedded stars light it | ✅ **strongly** | ◐ | ✖ | ✖ |
-| **machine world** | ✖ `starlit: false` | ✖ | ◐ not yet reviewed (stage d) | ✖ `latitude: 0` | ✖ no sea |
+| **machine world** | ✖ `starlit: false` | ✖ | ✖ reaches nothing: not a pixel changes, and the card carries no radiation line (D280) | ✖ `latitude: 0` | ✖ no sea |
 
 **How an archetype declares each answer:**
 
@@ -562,15 +562,17 @@ Built in Session V — `js/data/presets-compact.js`.
 
 | Preset | Sets |
 |---|---|
-| **Derelict Machine World** | Operational status 0, Hull integrity ~50 — dark, breached, cold core |
-| **Hive World** | Operational status 100 — every window lit, habitation maxed |
-| **Automated Factory** | Operational status ~35, no habitation layer — running, nobody home |
-| **Unfinished World** | Hull integrity ~40 with the Under construction trait — scaffolding, clean edges |
-| **Worldship** | Machine world + worldship — engine cluster on one side |
-| **Planet-Cracker** | Machine world wrapped around a captured natural core |
+| **Derelict Machine World** | Operational status 3, Hull integrity 40 — dark, breached, cold core. 3%, not 0: just above zero is the dial's own "derelict" (red emergency lights, the reactor cold); 0 is offline, a blanker picture |
+| **Hive World** | Operational status 100, Hull integrity 100, Optional layers 100 — every window lit, habitation maxed, the hull whole |
+| **Automated Factory** | Operational status 35, Hull integrity 85, Optional layers 0 (no habitation layer) — running, nobody home |
+| **Unfinished World** | Operational status 50, Hull integrity 40 with the Under construction trait — scaffolding, clean edges, crews at work |
+| **Worldship** | Operational status 65, Hull integrity 80, with the Worldship trait — engine cluster on one side, firing |
+| ~~**Planet-Cracker**~~ | **Removed** by the user in Session Z, with the planet-cracker trait |
 | **Half-Built Dyson** | Main star + dyson-structure, Enclosure ~50 |
 | **Coruscant World** | Planet + surface-city at max density + orbital-ring |
 | **Hollowed Asteroid** | Built as **Hollowed Rock**: Asteroid, Caverns 96, Cohesion 62, mining-station + tunnel-borer (`hollowed-out` retired in U1; it is a position on the Caverns axis since U2) |
+
+The five machine-world presets were built in Session Z — `js/data/presets-machine.js`. Derelict, Hive and Factory ban Under construction and Worldship (`traitsOff`): one would contradict the blurb, the other is the Worldship preset; any other machine trait may roll. Half-Built Dyson and Coruscant World wait for Phase 9b's megastructure traits; Hollowed Asteroid is built (Session U).
 
 **Presets are not a body type.** A desert world is a planet whose ocean depth is
 zero — which is why "frozen desert with a dying core" or "tidally locked ocean

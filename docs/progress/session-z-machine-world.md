@@ -389,13 +389,34 @@ Scratch tool: `test/_tmp/_zcard.mjs` (12 bodies, each beside its card). Noted to
 
 The user: "The cards look good, I saw the renders. I approve."
 
-## Next session: stage (d) continued
+### D279 — the flavour pools: Notable, Resources, Approach
 
-Stages (a)–(c) and stage (d) sub-steps 1–5 are built and approved (D248–D278: the six exclusive traits and the stat card). `npm test` passes. Remaining, in order, rendering for the user between each:
+`js/data/flavour/machine.js` gains `notable`, `resource` and `approach` beside D278's `danger`, and the card's full level shows Notable / Resources / Approach before Biggest danger, as the nebula's card does. Every line is guarded by a fact the card shows. New facts in `js/gen/stats/machine.js` for the guards: `age` (`ancient`, `ageless`, `old`, `unknown`, `building`, `unfinished`, `kept`), set in the same branches that write the Construction row so the two cannot disagree; `lit` and `litWord` (habitation's lit share, in the Population row's own words); `moss`; `reactor`; `core`.
 
-6. **Flavour pool** (`js/data/flavour/machine.js`): the danger pool exists (D278); add `notable`, `resource` and `approach`, each line guarded by a fact the card shows (`facts` in `js/gen/stats/machine.js`), including the cut precursor's story and the spec's four lines (MACHINE-WORLDS.md § "Flavour"), and add Notable / Resources / Approach rows to the card's full level as the nebula's card has them.
-7. **Presets** (PARAMETERS.md § Artificial): Derelict Machine World, Hive World, Automated Factory, Unfinished World, Worldship. **Planet-Cracker is removed** (strike it from PARAMETERS.md). Render each against its blurb.
-8. **Star activity** against the machine world, and fill the climate table's open cell (likely ✖ for the render; ◐ only if the card carried a radiation line, and it does not).
-9. **Close Phase 9a**: decisions here; MACHINE-WORLDS.md (exclusive traits table: the six built with their structure features — `rupture.edge: "clean"`, `shafts.doors` / `covers`, `overgrowth`, `bore`, `engines` — ancient-precursor cut, planet-cracker removed; `sets`; flavour), ARCHITECTURE.md's archetype-property table (`bore`, `engines`, `overgrowth`) and PARAMETERS.md to the code; PROGRESS.md and checklist.md; `npm test`.
+- **The spec's four lines**, each guarded where it makes a claim: "the size of a moon" only where the Size row says Moon or larger (it was offered to every world at first and the user asked for it to come up less); "nothing is answering hails, but the power core is still running" only automated or unmanned; "scarred from something that happened a long time ago" only where `age` is old or ancient; the lights line reads "about a third / about half / most of the habitation levels" from `litWord`, between 25% and 60% lit.
+- **The cut ancient-precursor's story**: ancient (overgrown on a dark or withered world) "Whoever built it is gone…" and "It was old before anyone alive now learned to build anything"; overgrown and lived in "The people aboard didn't build it. They found it, and moved in"; overgrown and automated "The machines are still running, and nobody knows who left them on"; under construction "It isn't finished…", and abandoned half-built "Someone meant to finish this…".
+- **Contradictions caught by printing every eligible line per case** (`test/_tmp/_zflav.mjs`, which sweeps the picker's rng): "the reactor is cold" on an emergency world whose card says it is barely ticking over (now a line per status); "it moves" on a cold drive (only when firing; a stopped ship has its own line); "with the traffic" down the shafts of an unmanned world (crewed and hive only).
+- **The approach line for armed platforms** came up on most lit bodies, as the danger line does (about 30 platforms on most); it is now split by who is aboard: crewed "broadcasting who you are", automated "nobody aboard to call them off".
+- **The universal "Sensors are useless here"** (`js/data/flavour/registry.js`) was offered to every family unguarded. Nothing on a machine world's card says so, so it is withheld from that family only; no other family's picks change.
 
-Same rules: no archetype branch in `js/draw/`, ≤500 lines per file with hooks only in `scene.js` / `details.js` / `elemgen.js` / `palette.js`, no new tests unless asked. Scratch tools: `_zgrid.mjs` (sheets), `_zcard.mjs` (cards beside bodies), `_zwound.mjs` / `_zcrop.mjs` / `_zzoom.mjs` / `_zlayer.mjs` (close-ups), `_zrow.mjs` (compare; it rescales, so read crop coordinates at the source size), `_zpools.mjs`, `_zbore.mjs`.
+The user: "I'm mostly happy with the lines, they're really cool."
+
+### D280 — Star activity reaches nothing on a machine world: ✖
+
+Measured (`test/_tmp/_zstar.mjs`): Star activity 0 against 100 changes **not one pixel** on four bodies — plain, Overgrown, Worldship, emergency power. The archetype already declares the star away (`climate: { latitude: 0, starlit: false }`), the stack has no fluid or cover for `coverAt` to scour, and the card sets `radiation: 0` and carries no radiation line. So the climate table's open cell is **✖**, not ◐. There is no inert-control mechanism for universal controls (the black hole's ✖ is table-only too), so the slider stays in the panel doing nothing on this body, as it does on a black hole.
+
+### D281 — five presets (`js/data/presets-machine.js`)
+
+Derelict Machine World, Hive World, Automated Factory, Unfinished World, Worldship (PARAMETERS.md § Artificial). Planet-Cracker is struck. Rendered on three seeds each (`test/_tmp/_zpresets.mjs`) against its blurb:
+
+- **Derelict at Operational status 3, not the spec's 0** (the memory "a literal control reading can be wrong"): just above zero is the dial's own "derelict", red emergency lights and the reactor cold, and the card's Status reads "Derelict"; 0 is offline, a blanker picture the card calls "dead, or playing dead". **Hull integrity 40, not ~50**: at 50 the breaches were too modest for a blurb that promises deep wounds.
+- **Hive** at 100 / 100 / Optional layers 100: every window lit, the hull whole. **Factory** at 35 / 85 / Optional layers 0: running, no habitation layer, the card's "nowhere for anyone to be". **Unfinished** at 50 / 40 with Under construction: crews at work in the open sites. **Worldship** at 65 / 80 with Worldship: the drive firing.
+- **`traitsOff`**: Derelict, Hive and Factory ban Under construction (a derelict "under construction" is not a derelict) and Worldship — two seeds in three rolled it, and then the preset is just the Worldship preset. Overgrown, Weaponized, Blast doors and Shaft covers may roll: a derelict overgrown or a hive with a gun is still what its name says.
+
+## Phase 9a closed
+
+All four stages are built and approved: the stack (a), the materials and details (b), Operational status and Hull integrity (c), and the six exclusive traits, the stat card, flavour and presets (d). MACHINE-WORLDS.md (the exclusive traits table as built, with each trait's `sets` and structure feature; ancient-precursor cut; planet-cracker removed; flavour as built), ARCHITECTURE.md (the archetype-property table gains `overgrowth`, `bore`, `engines` and the `shafts` doors / covers, and a note on `sets`), PARAMETERS.md (presets, Planet-Cracker struck, Star activity ✖) and PROGRESS.md are brought up to the code. `npm test` passes.
+
+## Next session
+
+Phase 8: overlay, scale bar and polish (D246's order). See PROGRESS.md and ROADMAP.md.

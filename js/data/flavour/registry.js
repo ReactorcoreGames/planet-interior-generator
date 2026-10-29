@@ -84,7 +84,9 @@ CC.Flavour = (function () {
         "It's bright enough at midnight to read by, from ring-light alone.");
       add(facts.day && facts.day.slow,
         "A day here lasts longer than most expeditions.");
-      add(true, "Sensors are useless here. So is long-range communication.");
+      /* Not for a machine world: nothing on its card says so (D279). */
+      add(facts.family !== "machine",
+        "Sensors are useless here. So is long-range communication.");
     } else if (which === "approach") {
       add(facts.traits.indexOf("ring-system") >= 0,
         "The ring system makes a clean approach vector hard to find.");

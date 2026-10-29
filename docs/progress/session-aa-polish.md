@@ -1,8 +1,8 @@
 # Session AA — Phase 8, overlay, scale bar and polish
 
-*D282–D286 so far. Phase 8 runs over several sessions, one item each, with the user looking between them (D282). Item 1, the layer-name overlay, item 2, the scale bar, and item 3, the stat-template inconsistency pass, are done.*
+*D282–D287 so far. Phase 8 runs over several sessions, one item each, with the user looking between them (D282). Item 1, the layer-name overlay, item 2, the scale bar, item 3, the stat-template inconsistency pass, and item 4, settings persistence + Reset to defaults, are done.*
 
-Scratch tools: `test/_tmp/_aacards.mjs` (one card per archetype as text, with each line's Compact/Standard membership), `test/_tmp/_aastack.mjs` (each archetype's drawn stack), `test/_tmp/_aaoverlay.mjs` (the overlay sheet across every archetype plus edge cases, to `shots/aa/`), `test/_tmp/_aacrop.mjs` (pulls cells out of a sheet at full size), `test/_tmp/_aascale.mjs` (the scale-bar sheet, printing each case's bar, rung and card Size line), `test/_tmp/_aasplit.mjs` (splits a tall sheet into 1920x1080 pages), `test/_tmp/_aasweep.mjs` (the giants' cloud-top temperature and the stars' Activity across their controls), `test/_tmp/_aamoon*.mjs` (the moon's rows, stack and renders across seeds and Starlight), `test/_tmp/_aabefore.mjs` (the affected cards; before and after in `shots/aa/cards-*.txt`).
+Scratch tools: `test/_tmp/_aacards.mjs` (one card per archetype as text, with each line's Compact/Standard membership), `test/_tmp/_aastack.mjs` (each archetype's drawn stack), `test/_tmp/_aaoverlay.mjs` (the overlay sheet across every archetype plus edge cases, to `shots/aa/`), `test/_tmp/_aacrop.mjs` (pulls cells out of a sheet at full size), `test/_tmp/_aascale.mjs` (the scale-bar sheet, printing each case's bar, rung and card Size line), `test/_tmp/_aasplit.mjs` (splits a tall sheet into 1920x1080 pages), `test/_tmp/_aasweep.mjs` (the giants' cloud-top temperature and the stars' Activity across their controls), `test/_tmp/_aamoon*.mjs` (the moon's rows, stack and renders across seeds and Starlight), `test/_tmp/_aabefore.mjs` (the affected cards; before and after in `shots/aa/cards-*.txt`). `test/_tmp/_aapersist.mjs` (boots the app with real storage: save and reload, Reset, stale and junk stores).
 
 ---
 
@@ -119,3 +119,31 @@ The black hole's extra flavour roll moves the random stream for Approach and Big
 - **A render defect, not a card one:** the ice shell draws at full weight whatever its presence `strength`. At Starlight 0.4 its strength is 0.04, yet a solid shell is drawn under a 78 °C equator, and the card truthfully reports that temperature over it.
 
 `npm test` passes.
+
+## D287 — Settings persistence and Reset to defaults
+
+Proposed to the user before building; they approved the design with four answers: save locks, Reset includes the seed, the button's place and two-press confirm as proposed, and `trait-salt` joins the share string. **There are no users yet, so compatibility with old strings is not a constraint**: the newest release is treated as the initial one.
+
+**Checked against the code first.** The audit held: only `cc.sections.v1` (the accordion) was stored, and the accordion's own comment said control values had been left out deliberately, because they would hand a returning user a half-configured app "with no obvious way back to defaults". Reset is that way back, so the objection is answered. `js/ui/share.js` already had the serialiser (`settingsText`, a diff against the DOM's defaults) and the restore (`applySettingsText`, which defaults every omitted control), so no second serialiser was written.
+
+**`js/ui/persist.js`, one key, `cc.state.v1` = `{ v: 1, settings, locks }`.**
+
+- `settings` is the share string, so every panel control, the trait picks and exclusions, and the framing are saved, and a control added later is saved without an edit here. `locks` sits beside it, since a lock is not part of the body and the share string leaves locks out on purpose.
+- **Saved from the redraw, not from each control.** Randomize, presets, a paste, framing gestures and the trait picker all write through `CC.Controls.set`, which fires no change event; every one ends in a draw. `draw()` calls `CC.Persist.schedule()`, debounced 300 ms and written only when the snapshot differs. Locks redraw nothing, so `change` and `click` on `#panel` schedule too, and `pagehide` flushes.
+- **Restored before the first draw** in `main.js`'s init, after `ExportUI.init` (which hands Share the trait-salt setter), through `applySettingsText` and then the paste's syncs (`syncRotationEnabled`, `syncBackgroundColour`, `ExportUI.syncArchetypeConsumers`, now exported). The app opens on the saved body without flashing the default.
+- **Never fatal.** Every storage access is wrapped. Bad JSON, a non-object, a wrong `v` or a non-string `settings` reads as nothing stored. An exception during restore resets to defaults and drops the key. Unknown keys are skipped and missing ones defaulted, as the paste already did.
+
+**Not saved:** the accordion (already saved under its own key; layout, not the body, so Reset leaves it), the preset gallery's highlight (transient by design), and disabled or hidden rows (derived, recomputed by the syncs).
+
+**Two defects found on the way, fixed in `js/ui/share.js` for paste and persistence alike:**
+
+- **Re-rolled traits were not in the share string.** With nothing ticked, traits are rolled with `traitSalt`, which Randomize and Re-roll traits advance, and the string did not carry it: a shared body, and with persistence a reloaded one, came back wearing different traits. The string now has `trait-salt: N` when it is not 0, and applying a string sets the salt (absent means 0, the diff rule). The setter is injected from `main.js` through `CC.Export.init`.
+- **A dropdown value with no option blanked the control.** Setting a `<select>` to a value it lacks leaves `selectedIndex` at −1 instead of raising an error, so a renamed archetype id gave an empty dropdown. Such a key is now skipped, and the omitted-control sweep puts it back to its default.
+
+**Reset to defaults** is a full-width button under Lock all / Unlock all / Invert in Randomize settings, which already holds the buttons that act on everything; the pinned bar is full. It takes two presses: the first arms it (red, "Click again to reset", disarms after 3 s), the second resets. Reset applies an empty settings string — every control including the seed (`first-light`) and framing, no trait picks or exclusions, salt 0 — then unlocks all, clears the key and shows a toast. It does not consult locks, since "defaults" means having none. Randomize settings' stale "arrive with the MVP" note is gone.
+
+**Presets, Randomize and paste are unchanged**, and are saved like any other change.
+
+**Tests: none added.** domtest's settings round-trip covers the serialiser, and jsdom without an origin makes `localStorage` throw, so every `npm test` boots the app with storage blocked. The restore path itself was checked with `test/_tmp/_aapersist.mjs` (save and reload of archetype, seed, labels, zoom, a lock and re-rolled traits; Reset's two presses; a stale store with an unknown archetype, key and locks; five junk stores), all passing. The user tried it in the real app: "looks good". `npm test` passes.
+
+**Listed, not fixed:** PARAMETERS.md's Randomize settings section specifies four controls that were never built (Randomize scope, Archetype pool, Respect locks, Auto-randomize on load); it now says so. Auto-randomize on load, if it is ever built, would have to decide whether it overrides the restored body.

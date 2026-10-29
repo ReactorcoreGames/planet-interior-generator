@@ -337,6 +337,10 @@ var CC = CC || {};
     }
 
     updateMeta(settings);
+
+    /* Every change ends in a draw, whatever route it took, so this is where
+     * the settings are saved (debounced, and only when they changed). */
+    if (CC.Persist) CC.Persist.schedule();
   }
 
   /* Render the current body to an arbitrary context at an arbitrary size, with
@@ -607,7 +611,10 @@ var CC = CC || {};
         /* The card as data, for the composed export, the card-only export and
          * the markdown factsheet — all three paint the same stats.lines the
          * on-screen panel shows. */
-        getStats: function () { return currentStats; }
+        getStats: function () { return currentStats; },
+        /* A settings string carries the trait salt, so restoring one has to
+         * be able to put it back. */
+        setTraitSalt: function (n) { traitSalt = n; }
       }
     });
 
@@ -628,6 +635,22 @@ var CC = CC || {};
         var previewEl = document.getElementById("preview");
         if (previewEl) new ResizeObserver(requestDraw).observe(previewEl);
       }
+    }
+
+    /* THE SAVED SESSION, RESTORED BEFORE THE FIRST DRAW, so the app opens on
+     * the body it was closed on rather than flashing the default first. It is
+     * applied like a settings paste, and needs the same syncs afterwards. */
+    if (CC.Persist) {
+      CC.Persist.init({
+        requestDraw: requestDraw,
+        toast: CC.ExportUI.toast,
+        afterApply: function () {
+          syncRotationEnabled();
+          syncBackgroundColour();
+          CC.ExportUI.syncArchetypeConsumers();
+        }
+      });
+      CC.Persist.restore();
     }
 
     draw();

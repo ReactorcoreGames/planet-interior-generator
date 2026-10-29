@@ -188,14 +188,14 @@ assumed.
 
 ### Phase 8 — overlay, scale bar, polish (Session AA, in progress)
 
-[session-aa-polish.md](session-aa-polish.md) — D282–D286. One item per session (D282).
+[session-aa-polish.md](session-aa-polish.md) — D282–D287. One item per session (D282).
 
 - [x] the audit: every item checked against the code and PARAMETERS.md; "Copy seed + settings" found already built; Composition and Show body name struck (D282)
 - [x] **layer names** — `js/data/layernames.js` by role, a spec's `name` overriding, resolved in `js/gen/structure.js` (D283)
 - [x] **the layer-name overlay** — `js/draw/overlay.js`: one ray per side, sized from the frame, drawn level; Show layer labels, Label side, Label text size (D284)
 - [x] **the scale bar** — `js/draw/scalebar.js`: lower-left, a round 1-2-5 length in units from m to light-years, measuring the card's own radius (`radiusKm` on the stats result), sized from the frame; the silhouette is the largest rung of `js/data/scaleladder.js` that fits the corner at true scale, or none; Show scale bar, Size comparison (D285)
 - [x] **the stat-template inconsistency pass** — Biggest danger on the nebula's Compact, Composition on the asteroid's, Compact is "Size, headline facts, Biggest danger, ≤6"; the black hole's Resources row; the ice moon's Surface row names its shell and its Beneath-the-ice row prints again (`subsurface` through the climate summary); airless climate words; the giants' cloud-top temperature and the stars' Activity checked and found to move (D286)
-- [ ] settings persistence + Reset to defaults
+- [x] **settings persistence + Reset to defaults** — `js/ui/persist.js`: the share string plus the locks in one `localStorage` key, saved after any redraw or panel change, restored before the first draw, a bad store ignored; `trait-salt` joins the share string; a dropdown value with no option is skipped; a two-press Reset to defaults in Randomize settings clears everything a first launch has, locks included, and leaves the accordion (D287)
 - [ ] keyboard shortcuts
 
 ### Phase 9a — the `machine-world` archetype ✅ (Session Z)

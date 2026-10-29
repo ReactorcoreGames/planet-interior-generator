@@ -397,7 +397,8 @@ CC.Export = (function () {
     CC.Share.init({
       getSettings: getSettings,
       getStats: getStats,
-      filenameFor: filenameFor
+      filenameFor: filenameFor,
+      setTraitSalt: opts.setTraitSalt || null
     });
   }
 

@@ -29,6 +29,7 @@ CC.Share = (function () {
   var getSettings = null;
   var getStats = null;
   var filenameFor = null;
+  var setTraitSalt = null;
 
   /* ---- the settings string ---------------------------------------------- */
 
@@ -80,6 +81,12 @@ CC.Share = (function () {
       var ex = CC.TraitPicker.excluded();
       if (ex && ex.length) lines.push("traits-off: " + ex.join(", "));
     }
+
+    /* THE TRAIT SALT, which Randomize and Re-roll traits advance. With nothing
+     * ticked the traits are ROLLED, and the roll folds the salt in, so a string
+     * without it restores the right body wearing the wrong traits. */
+    var salt = getSettings ? getSettings().traitSalt : 0;
+    if (salt) lines.push("trait-salt: " + salt);
 
     return lines.join("\n");
   }
@@ -223,7 +230,7 @@ CC.Share = (function () {
 
   function applySettingsText(text) {
     var lines = String(text).split(/\r?\n/);
-    var applied = [], skipped = [], traits = null, traitsOff = null;
+    var applied = [], skipped = [], traits = null, traitsOff = null, salt = 0;
 
     for (var i = 0; i < lines.length; i++) {
       var m = /^\s*([a-z][a-z0-9-]*)\s*:\s*(.*?)\s*$/i.exec(lines[i]);
@@ -238,12 +245,22 @@ CC.Share = (function () {
         traitsOff = value ? value.split(/\s*,\s*/) : [];
         continue;
       }
+      if (key === "trait-salt") {
+        salt = parseInt(value, 10) || 0;
+        continue;
+      }
 
       var el = document.getElementById(key);
       if (!el || key.indexOf("lock-") === 0) { skipped.push(key); continue; }
 
       if (el.type === "checkbox") CC.Controls.set(key, value === "on" || value === "true");
       else CC.Controls.set(key, value);
+
+      /* A <select> handed a value it has no option for goes BLANK rather than
+       * erroring — a renamed archetype id would leave an empty dropdown and a
+       * default render. Counted as skipped, so the sweep below puts it back to
+       * its default like any control the string never mentioned. */
+      if (el.tagName === "SELECT" && el.selectedIndex < 0) { skipped.push(key); continue; }
       applied.push(key);
     }
 
@@ -276,6 +293,8 @@ CC.Share = (function () {
       CC.TraitPicker.setExcluded(traitsOff || []);
       CC.TraitPicker.setSelection(traits || []);
     }
+    /* Absent means 0, by the same diff rule as every omitted control. */
+    if (setTraitSalt) setTraitSalt(salt);
 
     return { ok: applied.length > 0, applied: applied, skipped: skipped,
              traits: traits };
@@ -285,6 +304,7 @@ CC.Share = (function () {
     getSettings = opts.getSettings;
     getStats = opts.getStats;
     filenameFor = opts.filenameFor;
+    setTraitSalt = opts.setTraitSalt || null;
   }
 
   return {

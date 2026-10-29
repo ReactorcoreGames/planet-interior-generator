@@ -5,11 +5,10 @@
  * Export off the page — that was a v2 failure the layout is designed against.
  * Those two buttons live outside the accordion entirely; see index.html.
  *
- * WHICH SECTIONS ARE OPEN SURVIVES A REFRESH, stored in localStorage. This is
- * the ONLY thing the app persists: it is invisible state that cannot produce a
- * wrong render, unlike control values, which would hand a returning user a
- * half-configured app with no obvious way back to defaults. A seed and a
- * settings block already cover reproducing an actual body — see ui/share.js. */
+ * WHICH SECTIONS ARE OPEN SURVIVES A REFRESH, stored in localStorage under its
+ * own key. The body — controls, traits, framing, locks — is persisted
+ * separately by ui/persist.js, and kept apart on purpose: this is layout, not
+ * the body, so Reset to defaults leaves it alone. */
 
 var CC = CC || {};
 

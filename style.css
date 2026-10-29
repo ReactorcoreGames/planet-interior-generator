@@ -531,6 +531,7 @@ html, body {
 .mini-btn.wide { flex: 1; }
 
 .bulk-locks { display: flex; gap: 6px; padding: 4px 0 10px; }
+.mini-btn.armed { color: var(--ink); border-color: #c0605a; background: #4a2a36; }
 
 .phase-note {
   margin: 8px 0 2px;

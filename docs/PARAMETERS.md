@@ -44,6 +44,8 @@ Locks are visually distinct when engaged (highlighted, not just checked).
 **Bulk actions:** `Lock all` / `Unlock all` / `Invert locks` at the top of the
 Randomize settings.
 
+Locks persist between visits with the rest of the settings, and Reset to defaults clears them (see Persistence).
+
 ---
 
 ## ▾ Body
@@ -586,7 +588,9 @@ lives.
 
 ## Randomize settings
 
-Lives inside a section; the **button stays pinned**.
+Lives inside a section; the **button stays pinned**. The section holds the bulk lock buttons and **Reset to defaults** (see Persistence).
+
+**Built so far:** the bulk lock buttons and Reset. The four controls below are specified and not built.
 
 | Control | Type | Notes |
 |---|---|---|
@@ -614,12 +618,23 @@ Lives inside a section; the **button stays pinned**.
 
 ## Persistence
 
-Settings persist in `localStorage` between sessions. A **Reset to defaults**
-button lives at the bottom of the panel.
+**The app reopens on the body it was closed on** (D287, `js/ui/persist.js`). One `localStorage` key, `cc.state.v1`, holds `{ v, settings, locks }`: `settings` is the "Copy seed + settings" string below, so every panel control is saved — the archetype, the seed, framing, the label and scale-bar controls, output and background — plus the trait picks, exclusions and trait salt; `locks` lists the locked controls. It is saved about 300 ms after any redraw or panel change, only when it differs, and on `pagehide`; it is restored before the first draw, through the same path as a paste.
+
+| Not saved | Why |
+|---|---|
+| Which accordion sections are open | Saved already under its own key (`cc.sections.v1`); it is layout, not the body |
+| The preset gallery's highlight | Transient by design: once applied a preset is just control values |
+| Disabled and hidden rows | Derived; recomputed after every restore |
+
+**A stale or broken store never stops the app booting.** Unknown keys are skipped, missing ones take their default, a dropdown value with no matching option (a renamed archetype) falls back to the default, and an unreadable store (bad JSON, wrong `v`, blocked storage) is ignored. Every storage read and write is wrapped.
+
+**Reset to defaults** is in Randomize settings, under the lock buttons. It takes two presses: the first arms it ("Click again to reset", red, 3 s), the second resets. It returns everything a first launch has — every control including the seed and the framing, no trait picks or exclusions, trait salt 0, **no locks** — and clears the stored key. Locks are not consulted. The accordion is left as it is. The defaults are the DOM's own `defaultValue` / `defaultChecked`: Reset applies an empty settings string.
+
+**Presets, Randomize and paste are unchanged** and are saved like any other change. Presets and Randomize still respect locks; after a reload the locks are still there to respect.
 
 **Shareable state:** the seed plus all non-default settings encode into a short
 string (via the "Copy seed + settings" export). Pasting it into the seed field
-restores that exact body. No server, no URL shortener — just a string.
+restores that exact body. No server, no URL shortener — just a string. The string carries `trait-salt: N` when Randomize or Re-roll traits has advanced it, so the rolled traits come back too.
 
 ---
 

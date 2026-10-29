@@ -669,7 +669,10 @@
             <button id="unlock-all" class="mini-btn wide" title="Unlock every control.">Unlock all</button>
             <button id="invert-locks" class="mini-btn wide" title="Flip every lock to its opposite state.">Invert</button>
           </div>
-          <p class="phase-note">Randomize scope and the archetype pool arrive with the MVP.</p>
+          <!-- Two presses: the first arms it, the second resets. See js/ui/persist.js. -->
+          <div class="bulk-locks">
+            <button id="reset-defaults" class="mini-btn wide" title="Put every control, the traits, the framing and the locks back to a first launch. Press twice. Your settings are otherwise remembered between visits.">Reset to defaults</button>
+          </div>
         </div>
       </section>
 
@@ -979,6 +982,7 @@
 <script src="js/ui/share.js"></script>
 <script src="js/ui/framing.js"></script>
 <script src="js/ui/exportui.js"></script>
+<script src="js/ui/persist.js"></script>
 
 <script src="js/main.js"></script>
 </body>

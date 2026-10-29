@@ -85,8 +85,9 @@ CC.ExportUI = (function () {
 
   /* Every module that keeps its own copy of the archetype, told what it is
    * now. Called after any gesture that can change the archetype control
-   * WITHOUT firing its change event — currently a settings paste; a future
-   * one should call this rather than growing a second copy of the list. */
+   * WITHOUT firing its change event — a settings paste, and the restore and
+   * Reset in ui/persist.js; a new one should call this rather than growing a
+   * second copy of the list. */
   function syncArchetypeConsumers() {
     var id = CC.Controls.get("archetype") || "planet";
     if (CC.TraitPicker) {
@@ -265,5 +266,5 @@ CC.ExportUI = (function () {
   }
 
   return { init: init, flashExport: flashExport, toast: toast,
-           runExport: runExport };
+           runExport: runExport, syncArchetypeConsumers: syncArchetypeConsumers };
 })();

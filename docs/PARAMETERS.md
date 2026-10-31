@@ -106,6 +106,7 @@ Archetype dropdown contents:
 | **Optional layers** | slider | 0–100% | Chance that optional layers (atmosphere, ocean, ice-shell) are present |
 | **Core size bias** | slider | −100…+100 | Push the core smaller or larger within its range. Affects derived stats |
 | **Ocean depth** | slider | 0–100% | 0 = no ocean (desert/airless). Low = seas. High = global ocean. Max = the crust is barely a floor. Solid bodies only |
+| **Atmosphere opacity** | slider | 10–200% | How dense the air reads, not how much there is: the band's height stays rolled (D308). Scales the atmosphere's fill peak, its haze and sub-bands and its zone tint; 100% is the tuned look, past it the fill clips opaque further out into a milky envelope. **Draw-time only**, like Element opacity. Planets and moons with an atmosphere only; coronae, cloud decks and the machine shell keep their own (D312) |
 | **Interior heat** | slider | 0–100% | 0 = dead (solid core, static mantle, thick crust, grey palette). 100 = molten (liquid core, fully convecting mantle, thin fractured crust, magma reaching the surface). Solid bodies only. **The machine world relabels it Operational status** (below) |
 | **Tidal locking** *(a star relabels this to* **Binary companion**) | slider | 0–100% | **One slider, two causes — and the label follows the archetype.** On a solid body: 0 = an ordinary rotating world; as it rises one face bakes and the other freezes, the ocean boils off the hot side and pools frozen on the cold side, an ice cap spreads down from the night face, terrain flattens where it is baked, and the atmosphere thins at both extremes. Sits beside Ocean depth because the two are coupled. **On a star it drives a close companion's pull instead:** the outer envelope bulges toward it and the facing hemisphere runs hotter and more agitated, while the body itself stays round — a tidal bulge on a star is a bulge in the thin outer layers, not a deformation of the interior. Both are the same quantity (how hard the asymmetry is driven) aimed at different things, which is why they share one control rather than growing a second (D27). The label and tooltip come from the archetype's own `axes` declaration; see D132. **Inert on the two gaseous archetypes**, which declare no angular axis |
 | **Lock facing** *(a star relabels this to* **Companion bearing**) | slider | 0–360° | Where the interesting face points — the dayside on a planet, the companion on a star. Rolled per body; set deliberately to aim it at the viewer |
@@ -656,6 +657,7 @@ first thing anyone sees.
 | Optional layers | 75% | ✅ |
 | Core size bias | 0 | ✅ |
 | Ocean depth | 40% — visible seas without drowning the crust | ✅ |
+| Atmosphere opacity | 100% | ✅ |
 | Interior heat | 55% — a live, convecting interior; the mantle has something to show | ✅ |
 | Boundary irregularity | 100% | ✅ |
 | Keep upright | off | ✅ |

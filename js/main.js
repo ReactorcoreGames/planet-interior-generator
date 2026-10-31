@@ -65,6 +65,8 @@ var CC = CC || {};
        * stage: it decides which layers exist. */
       nebulaForm: c.get("nebula-form") || "cloud",
       oceanDepth: (c.get("ocean-depth") || 0) / 100,
+      /* Draw only (D312), like Element opacity: in no cache key. */
+      atmosphereOpacity: (c.get("atmosphere-opacity") === undefined ? 100 : c.get("atmosphere-opacity")) / 100,
       interiorHeat: (c.get("interior-heat") || 0) / 100,
       boundaryIrregularity: (c.get("boundary-irregularity") || 0) / 100,
       keepUpright: !!c.get("keep-upright"),
@@ -426,6 +428,7 @@ var CC = CC || {};
     { id: "luminosity", stage: "detail", format: pct },
     { id: "nebula-form", stage: "structure" },
     { id: "ocean-depth", stage: "structure", format: pct },
+    { id: "atmosphere-opacity", stage: "detail", format: pct },
     { id: "interior-heat", stage: "structure", format: pct },
     { id: "boundary-irregularity", stage: "structure", format: pct },
     { id: "keep-upright", stage: "structure" },

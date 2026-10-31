@@ -46,7 +46,7 @@
 
 | [session-ah-cleanup.md](session-ah-cleanup.md) | D307–D308 — Phase 9c's audit: Phase 9b committed; every preset, family and trait rendered together (Ringed Giant without its rings, built traits rolling into natural presets, two ring geometries on one planet); the 23 files over 500 lines, five of them one function each; the spec drift; 9c split into sessions AI–AN from a checklist; atmosphere height left rolled, its opacity the open lever (Session AH) |
 
-| [session-ai-fixes.md](session-ai-fixes.md) | D309–D311 — Phase 9c block AI, part one: Ringed Giant forces the giants' `ringlet-system` and the ring flavour checks both kinds; natural presets ✕ every built trait from their roll (`CC.Presets.offList`); the orbital ring beside the ring system accepted as is; Trait count 0–8 (Session AI) |
+| [session-ai-fixes.md](session-ai-fixes.md) | D309–D312 — Phase 9c block AI. Part one: Ringed Giant forces the giants' `ringlet-system` and the ring flavour checks both kinds; natural presets ✕ every built trait from their roll (`CC.Presets.offList`); the orbital ring beside the ring system accepted as is; Trait count 0–8. Part two: the machine world's defense shell kept, Under construction with Overgrown allowed, open question 1b closed, Atmosphere opacity (Session AI) |
 
 Sessions are listed oldest first. `session-f.md` is a stub left where Session F used to be; it points at the three F files above.
 

@@ -909,8 +909,15 @@ CC.Scene = (function () {
          * Archetype data rather than a role check, so any layer that is
          * substantial-then-fading can say so. Carried on the layer by
          * gen/structure.js. */
+        /* ATMOSPHERE OPACITY (D312) scales the air alone: the fill's peak,
+         * its haze and sub-bands, and its zone tint. 1 is the tuned look; past
+         * 1 the peak clips to opaque further out, which is what reads as a
+         * denser envelope. Coronae, cloud decks and the machine world's
+         * defense shell share this branch and keep 1. */
+        var airK = layer.role === "atmosphere" && settings.atmosphereOpacity !== undefined
+          ? settings.atmosphereOpacity : 1;
         CC.Layers.fillOutward(ctx, view, layer, inner,
-          outwardStyle(colour, 0.82 * layer.strength, layer.fadeHold,
+          outwardStyle(colour, 0.82 * layer.strength * airK, layer.fadeHold,
                        ATMOSPHERE_BLEND),
           reachFn);
 
@@ -938,7 +945,7 @@ CC.Scene = (function () {
         ctx.arc(view.cx, view.cy, view.px(inner), 0, Math.PI * 2, true);
         ctx.clip("evenodd");
         CC.DrawDetails.drawLayer(ctx, view, details.get(layer.role), colour, {
-          elementOpacity: elementOpacity * 0.85,
+          elementOpacity: elementOpacity * 0.85 * airK,
           flowMode: details.flowMode,
           /* Details ride the layer's own falloff, so the atmosphere dissolves
            * as a whole rather than fading its fill while its haze stays flat
@@ -950,7 +957,10 @@ CC.Scene = (function () {
         /* The atmosphere carries the zone too. It is the outermost thing the
          * eye sees, so leaving it uniform washes a flat film over both faces
          * and cancels the terminator underneath it. */
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, airK);
         CC.ZonePaint.paintZoneBand(ctx, view, layer, colour, details.zones, inner);
+        ctx.restore();
         ruptured = CC.RuptureDraw.begin(ctx, view, details.rupture);
         continue;
       }

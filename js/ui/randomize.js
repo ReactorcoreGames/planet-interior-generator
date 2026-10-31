@@ -43,6 +43,8 @@ CC.Randomize = (function () {
      * three different pictures. Inert on every other body. */
     { id: "luminosity", lo: 0, hi: 100 },
     { id: "ocean-depth", lo: 0, hi: 100 },
+    /* Near the default, like Element opacity: the tuned look, leaned. */
+    { id: "atmosphere-opacity", lo: 70, hi: 140 },
     { id: "interior-heat", lo: 0, hi: 100 },
     { id: "rotation", lo: 0, hi: 360 },
     { id: "primary-hue", lo: 0, hi: 360 },

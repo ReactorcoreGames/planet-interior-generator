@@ -259,6 +259,16 @@
             <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-ocean-depth"><span class="lock-icon">&#128274;</span></label>
           </div>
 
+          <!-- ATMOSPHERE OPACITY (D312). How the air reads, not how much
+               there is: its height stays rolled (D308). Draw only, so dragging
+               it re-rolls nothing. -->
+          <div class="control-row" title="How dense the air looks. Low values are a faint, clear haze; 100% is the default; high values are a thick, milky envelope. Planets and moons with an atmosphere only.">
+            <label for="atmosphere-opacity">Atmosphere opacity</label>
+            <input type="range" id="atmosphere-opacity" min="10" max="200" value="100">
+            <output data-readout="atmosphere-opacity"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-atmosphere-opacity"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
           <!-- STARLIGHT SITS ABOVE TIDAL LOCKING because it is the more
                fundamental of the two: locking redistributes heat around a
                body, but Starlight decides how much there is to redistribute.

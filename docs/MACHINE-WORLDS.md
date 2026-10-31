@@ -50,122 +50,119 @@ don't.
 ## Megastructure traits (on natural bodies)
 
 All use the standard trait grammar from [TRAIT-SYSTEM.md](TRAIT-SYSTEM.md).
-All are tagged `artificial` and `megastructure`.
+All are tagged `artificial`, which files them under "Built" in the trait picker and weights them at a third of a natural trait in Randomize (D291); the spec's second tag, `megastructure`, was never used. **Phase 9b is complete (Session AG)**: the lists below are what was built, family by family, with what the audit dropped (D289–D290). The rule for any future one: visible at the body's scale, and open to interpretation (D290).
 
 ### For stars
 
-| Trait | Anchor / reach | Elements | Density 0.0 → 1.0 |
-|---|---|---|---|
-| **dyson-structure** | orbit, outward | `plate` ×3 tiers | 12 → 200 collectors, scattered to solid |
-| **stellar-collector** | orbit, outward | `plate` + `truss` | 2 → 20 large extraction platforms |
-| **matter-siphon** | photosphere, outward | `ribbon` + `truss` | 1 → 4 streams lifting material |
-| **orbital-mirrors** | orbit, outward | `plate`, even spacing | 6 → 60 reflectors |
+**Built (Phase 9b, Session AE, D298–D301).** Four traits on all four star archetypes, gated on `stellar`, stacked lowest first. The collectors and mirrors are in `js/data/traits/stellar-built.js`; the shell and the swarm are declared in `js/data/traits/dyson.js`, built by `js/gen/dyson.js` and drawn by `js/draw/primitives/dyson.js`, each ONE element rolled by its builder (Detail density does not change it).
 
-**`dyson-swarm` and `dyson-sphere` merged into one trait with an
-`enclosure` parameter (0–100%).** The doc already noted they were mutually
-exclusive, which is the axis tell — and they were never two different things,
-just two points on one progression:
+Every one is placed with `depthAbove` measured from the halo's edge **capped at 1.15** (`edgeCap`, D298): a young star's or a giant's corona alone fills the frame's height, so the stack sinks into the glow there rather than leaving the frame, and the shell stays a whole circle.
 
-| Enclosure | Reads as | Mechanism |
+| Trait | Altitude | What it draws |
 |---|---|---|
-| 0–30 | **Swarm** — scattered discrete collectors | `spacing: random`, jitter 0.8, arc partial |
-| 40–70 | **Under construction** — a shell half-built | jitter falling, arc widening, ragged leading edge |
-| 80–100 | **Sphere** — near-solid enclosure | `spacing: even`, jitter ~0, arc → 360° |
+| ✅ **stellar-collector** | halfway from the surface to the mirrors' orbit (`depthFrac`, D299) | 2–12 cone stations evenly on one orbit, tips aimed at the star, 0.072–0.085 radii long |
+| ✅ **orbital-mirrors** | 0.02–0.03 above the capped edge | 18–34 panels evenly on one orbit, metal backing and a glass face in the star's own colour turned to it (D298; formerly a random scatter at 1.34–1.62) |
+| ✅ **dyson-shell** | 0.085–0.09 above the capped edge (at most about 1.24) | the cut edge of a lattice sphere: three rows of near-equilateral triangles between four rails, plates in 25–70% of them laid in runs, the corona through the open cells, the inner rail lit, heavy ribs every 10–16 cells, lights at nodes (D300) |
+| ✅ **dyson-shell-unfinished** | as the shell | the same shell with 1–9 arcs not built, together 15–80% of the circle, each ending at a rib with bare rail run on a cell or three past it; one sector per gap so two never merge (D305). Excludes `dyson-shell` |
+| ✅ **dyson-swarm** | 0.24–0.72 above the capped edge (about 1.39–1.87), at the bearings the frame's height shows | 3–5 staggered rows of small stone slabs evenly spaced, one size per row, each along its own radial with its small end to the star, a row of lit windows, a docking port at the outer end or both (D301) |
 
-The middle of that range is the payoff: a **partially-built Dyson sphere** is
-already listed below as one of the generator's most evocative outputs, and as
-two mutually-exclusive traits it was the one thing you couldn't make.
+Under a shell the collectors can read as its control rods and the mirrors as its adjustment mirrors; alone they read as themselves (D290). The swarm's slabs point along the radial because a long body in orbit settles that way (gravity-gradient stabilization), which also gives every colony the same small sunward end; level slabs sat at odd angles in the corners and slabs turned to the orbit read as dashed lines (D301).
+
+**The Enclosure axis was not built.** The spec's single `dyson-structure` trait with an `enclosure` parameter, swarm through a half-built shell to a sphere, became separate layers on the user's list (D289), and the half-built sphere became `dyson-shell-unfinished` (D305): the shell's other state as one line of data (`gaps`), rolled across its whole range per body because a trait has no dial of its own. The Half-Built Dyson preset forces it (D306); TRAIT-SYSTEM.md § Dyson shell says why it is a pair.
+
+**Dropped by the Session AB audit (D289):** matter-siphon (a ribbon off the photosphere is the prominence's mark).
 
 ### For planets and moons
 
-| Trait | Anchor / reach | Elements | Density 0.0 → 1.0 |
-|---|---|---|---|
-| **orbital-ring** | orbit, outward | `truss` band + `plate` nodes | thin ring → ring with 20+ stations and tethers |
-| **surface-city** | crust, on | `plate` clusters + light glints | few patches → planet-spanning grid |
-| **underground-city** | crust/mantle, inward | `plate` + `truss` in cavities | 2 cavities → sprawling network |
-| **satellite-network** | orbit, outward | `glyph` (triangles), even | 8 → 120 satellites |
-| **orbital-platforms** | orbit, outward | `plate` | 2 → 30 stations |
-| **starship-fleet** | orbit, outward | `glyph` (triangles), clustered | 3 → 50 ships in formation |
-| **orbital-minefield** | orbit, outward | `glyph` (X marks), random | 20 → 300 mines |
-| **space-elevator** | crust, outward, spanning | `truss` line + `plate` anchor | 1 → 4 tethers |
-| **lagrange-colonies** | orbit, outward | `plate` clusters at fixed angles | 1 → 5 cluster sites |
-| **terraforming-array** | atmosphere, on | `plate` + gradient shift | subtle → visible atmosphere change |
+**Built (Phase 9b, Session AC, D293–D295).** Three traits, gated on the
+`rounded` body tag (planet and moon, not the asteroid), declared in
+`js/data/traits/orbital-built.js`, built by `js/gen/orbitalbuilt.js` and drawn
+by `js/draw/primitives/orbital-built.js` and `orbital-mines.js`. Each is ONE
+element rolled by its builder; Detail density does not change it. Altitudes
+are `depthAbove` the body's own reach, lowest first:
 
-**surface-city** is the Coruscant/hive-world look — at high density it should
-cover the entire crust layer with a fine regular grid of lit blocks. That
-transition from "a few settlements" to "the whole planet is a machine" is one
-of the most dramatic density responses in the generator.
+| Trait | Altitude above the body's reach | What it draws |
+|---|---|---|
+| ✅ **orbital-ring** | 0.10–0.15 (about 1.10–1.21 radii) | A truss band in the plane of the cut with habitat modules at even spacing, pods on both faces, and 2–6 space elevators: two cables from an anchor station on the ground (the top of the outermost non-haze layer) through a hub module to a counterweight, with 1–3 climbers |
+| ✅ **defence-network** | 0.27–0.45 (about 1.30–1.50) | 2–6 gun platforms — two "4"s merged at the middle through 180°, barrels along the radial, so neither end is the gun — in the gaps of one evenly spaced constellation of satellites (a metal box, two cyan panels, all one size and aligned to the orbit) |
+| ✅ **minefield** | 0.70–1.00 (about 1.70–2.05) | 2–3 staggered rows of identical mines, each a metal orb with four spikes twice its diameter, all turned the same way; a third carry a red light |
 
-**underground-city** pairs naturally with `void-pockets` — the cavities become
-inhabited.
+The network and the minefield place only on bearings where a mark stays
+inside the frame's height (1.18 body radii from the centre, under the 1.28 the
+default Body size shows), which at their altitude means the sides. Ordered
+rather than scattered: the user's review found scattered heights and turns
+read as space junk.
+
+**Dropped by the Session AB audit and the user's list (D289–D290):**
+surface-city, underground-city (a city is invisible at the scale a body is
+drawn; settlements belong to a surface-map generator), orbital-platforms and
+space-elevator (merged into orbital-ring), satellite-network (merged into the
+defence network's satellites), starship-fleet, lagrange-colonies,
+terraforming-array. The orbital-minefield was dropped as an X-mark symbol and
+restored by the user as a drawn thing.
 
 ### Artificial traits respond to the body's parameters
 
-This is what stops megastructures being a bolted-on layer. They read the same
-parameters the natural body does:
+This is what stops megastructures being a bolted-on layer. The spec's table here named traits that were never built (surface-city, underground-city, terraforming-array, `hollowed-out` as a trait); what the built ones actually read:
 
 | Trait | Responds to | How |
 |---|---|---|
-| **surface-city** | Ocean depth | Settles on land only — at high ocean depth it retreats to isolated island clusters or goes to floating platforms |
-| **surface-city** | Interior heat | Avoids the most volcanic regions |
-| **underground-city** | Interior heat | A molten interior means shallower cavities; a dead world allows deep ones |
-| **terraforming-array** | Ocean depth, Interior heat | Implies it's *changing* them — the stats line should say toward what |
-| **gas-miner-platforms** | Zones | Cluster in a calm latitude or the twilight band, not the storm |
-| **hollowed-out** | Cohesion | It *is* low Cohesion, plus lining |
+| **orbital-ring** | the ground | Each elevator stands on the top of the outermost non-haze layer, so it lands on the real surface whatever the ocean and frosting do (D293) |
+| **gas-miner-platforms**, **skyhook-cities** | the cloud deck | Hang in the troposphere; a skyhook's scoop sits in the cloud tops (D296) |
+| **mining-station**, **tunnel-borer** | Caverns, Cohesion | The borer's bore belongs to the caves; the hollowed habitat is the top of the Caverns axis, capped by Cohesion (U2) |
+| **hidden-station** | the nebula's cavity | Nests in a wind-blown cavity when there is one |
+| **ringworld** | the gas | Sinks under the other traits in a dense region or a shell's band; its sun lights the cloud round it (D302) |
+| every star's built layer | the corona's reach | Measured from the halo's edge, capped by `edgeCap` so the stack stays in frame (D298) |
 
 ### Zone bias — where people build
 
-On a body with [angular zones](TRAIT-SYSTEM.md#angular-zones), artificial traits
-should declare `zoneBias`. It is the single cheapest thing that makes a
-megastructure look *reasoned* rather than scattered:
-
-- On a **tidally locked** world, everything habitable biases to `twilight` —
-  the one survivable strip. `surface-city`, `underground-city` and
-  `space-elevator` all belong there.
-- **Industry** biases the other way: mining and power installations sit on the
-  `hot` face, radiators on the `cold` face.
-- Around a **binary star**, `orbital-mirrors` and collectors bias to `facing`.
-
-A locked world with its cities crowded into the twilight ribbon and its
-refineries on the burning side tells a complete story with no text at all.
+`zoneBias` exists in the grammar and in `anchorAngles`, but **no built trait declares it**: the 9b traits are orbital and evenly spaced, so a zone has nothing to choose between. The idea stands for a future trait that sits on a surface: on a tidally locked world anything habitable biases to `twilight`, industry to the `hot` face and radiators to the `cold`; round a binary, collectors bias to `facing`.
 
 ### For gas giants and ice giants
 
-| Trait | Anchor / reach | Elements | Density 0.0 → 1.0 |
-|---|---|---|---|
-| **gas-miner-platforms** | troposphere, on | `plate` + descending `truss` | 2 → 25 floating rigs |
-| **hab-flotilla** | troposphere, on | `plate` clusters | 1 → 12 floating cities |
-| **skyhook** | orbit, outward, spanning | `truss` + `plate` | 1 → 3 tethers reaching into the atmosphere |
-| **orbital-cities** | orbit, outward | `plate` | 2 → 20 stations |
+**Built (Phase 9b, Session AD, D296).** Three traits, gated on `gaseous`. The
+two older ones are in `js/data/traits/gaseous.js`; the new one is declared in
+`js/data/traits/giant-built.js`, built by `js/gen/giantbuilt.js` and drawn by
+`js/draw/primitives/giant-built.js`, ONE element rolled by its builder (Detail
+density does not change it). Lowest first:
 
-Floating structures sit *within* the cloud layers rather than in orbit — that
-placement is what makes them read as gas-giant-specific.
+| Trait | Altitude | What it draws |
+|---|---|---|
+| ✅ **gas-miner-platforms** | in the troposphere | `capsule` hulls hanging along the local vertical, randomly spaced |
+| ✅ **skimmer-tracks** | 0.94–1.08 radii, straddling the cloud tops | the same `capsule` lying along the orbit, diving and climbing |
+| ✅ **skyhook-cities** | platforms 0.08–0.11 above the body's reach (about 1.11–1.17); cities 1.36–1.48 | 3–11 skyhooks evenly spaced on one orbit: a funnel scoop hung mouth-down in the cloud deck, a tether with 1–3 gas pods climbing it, a platform with a winch house and radiator fins, a counterweight. On 1–5 of the hooks nearest the sides the tether climbs on past the platform to an orbital city, all one design per body: a **wheel** (broad and narrow habitat rings, 3–4 spokes with lift cars, on a keel), a **pair** (two cylinders along the orbit, lit land and glazed strips, a frame and spine) or a **spire** (a spine through 3–5 saucer decks with blocks on each, a mast) |
+
+The cities are small beside the giant (half-size 0.050–0.068 radii) and
+several, after the user's review found the first pass, three times the size,
+absurd for a world 100,000 km across. They place only where they stay inside
+the frame's height, so a giant with few hooks may get fewer than it rolled.
+
+**Dropped by the Session AB audit (D289):** hab-flotilla (the gas miners drawn
+bigger), and orbital-cities and skyhook as separate traits — merged into one.
 
 ### For asteroids
 
-| Trait | Anchor / reach | Elements | Density 0.0 → 1.0 |
-|---|---|---|---|
-| **mining-station** | outer-shell, on | `plate` + bore shafts | 1 → 6 sites |
-| **hollowed-out** | interior, on | large `void` + `plate` lining | one chamber → fully honeycombed |
-| **docked-ships** | outer-shell, outward | `glyph` | 2 → 20 ships |
-| **derelict-hulk** | outer-shell, on | irregular `plate` wreckage | 1 wreck → debris field |
+**Nothing added in 9b** (D289); what exists was built in U2:
 
-**hollowed-out** is **not** a structural exception. It replaces interior Voronoi
-cells with a large void and lines it with structure — which is the asteroid's
-**Cohesion** slider driven to its low end, plus `plate` lining. The classic
-hollowed-asteroid habitat comes out of a parameter that already exists.
+| Trait | What it draws |
+|---|---|
+| ✅ **mining-station** | `plate` modules seated on the outline, tilted to the slope |
+| ✅ **tunnel-borer** | a `borer` and its bore, which belongs to the cave system |
 
-This is the one case where an artificial trait rides a *natural* body
-parameter, and it's a good sign: it means the artificial system isn't a
-separate machine bolted on.
+**hollowed-out** is not a trait: it is the top of the **Caverns** axis (U2), bored tunnels and mined halls added to the natural caves and capped by Cohesion. The classic hollowed-asteroid habitat comes out of a parameter that already exists. **Dropped** (D289): docked-ships (deferred with the fleet), derelict-hulk (irregular wreckage on a body of irregular fragments reads as more rock).
 
 ### For compact objects
 
-| Trait | Anchor / reach | Elements | Density 0.0 → 1.0 |
-|---|---|---|---|
-| **research-station** | orbit, outward | `plate`, few | 1 → 6 stations at a safe distance |
-| **energy-extraction-array** | accretion-disc, on | `plate` ring | 4 → 40 collectors |
-| **navigation-beacon** | orbit, outward | `glyph` | 1 → 8 markers |
+**Nothing added in 9b** (D289); what exists was built in Session V:
+
+| Trait | Body | What it draws |
+|---|---|---|
+| ✅ **research-station** | neutron star, pulsar | `plate` stations at a safe distance |
+| ✅ **hole-station** | black hole | a station beyond the photon sphere and the ergosphere |
+| ✅ **energy-extraction-array** | black hole | aimed collectors on an orbit just outside the ergosphere, off the jets and out of the disc |
+| ✅ **navigation-beacon** | pulsar | even relays on one orbit |
+
+The black hole's **lensing** (D304) was on 9b's list but is not a trait: the starfield behind every hole is bent into an Einstein ring (compact-objects.md).
 
 Anything near a compact object should be **sparse and distant** — the contrast
 between a tiny fragile station and an object that would annihilate it is the
@@ -178,6 +175,15 @@ point.
 | **hidden-station** | dense-region, on | `plate` in a cavity | 1 → 5 concealed sites |
 | **mining-flotilla** | dense-region, on | `plate` + `glyph` | 3 → 30 vessels |
 | **derelict-fleet** | sparse-region, on | `glyph` wreckage, scattered | 5 → 60 hulks |
+| **ringworld** | dense-region or shell, `place: "pocket"` | one `ringworld` element | always one |
+
+**ringworld** (D302, Session AF): one ring round its own sun, seen at a slant —
+the inner face of land and sea on the far half, the dark hull on the near —
+sunk in the gas: under the other traits, its sun lighting the cloud, the
+cloud's own veils drifting across it. About 0.05–0.10 body radii in radius,
+cut 60% on the user's review because a nebula is light-years across. Placed
+liberally anywhere in the gas. The surface is lush, arid or frozen, and
+nothing says whether it is a habitat, a ruin or something else (D290).
 
 ---
 

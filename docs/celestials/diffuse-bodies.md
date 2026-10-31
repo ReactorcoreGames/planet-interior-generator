@@ -112,7 +112,15 @@ ice-belts · rock-belts · metal-belts · exotic-gas-pockets
 
 **Type character:** *not traits — see below*
 
-**Artificial:** hidden-station · mining-flotilla · derelict-fleet
+**Artificial:** hidden-station · mining-flotilla · derelict-fleet · ringworld
+
+> **ringworld** (D302): one per body, a slanted ring round its own small sun,
+> about 0.05–0.10 body radii in radius — small against a cloud light-years
+> across. The far half shows its inner face (land, seas, cloud banks, night
+> under shadow squares, rim walls), the near half its dark hull. It sits *in*
+> the gas: drawn under the other traits, its sun lighting the cloud round it,
+> veils of the nebula's own gas across it. Placed anywhere in the gas, on a
+> shell in its band. Lush, arid or frozen; nothing says who built it.
 
 > `pirate-haven` and `sensor-shadow` removed — neither draws anything a
 > `hidden-station` in a `cavity` doesn't already draw. They're **story labels**
@@ -168,6 +176,11 @@ the nebula's layers, each visually distinct:
 | metal-belts | small bright specular glints, denser clusters |
 | exotic-gas-pockets | small vivid off-hue blobs, higher saturation than surroundings |
 | debris-fields | mixed chunk sizes, scattered wide |
+
+**Belts or fields.** Ice and rock pockets are a long streak (stretch 3–4.5)
+half the time and a round-to-oval field (stretch 1–1.8, the same area, filled
+evenly) the other half, rolled per pocket, so one nebula usually has both
+(`oval`, D303). Metal belts are knots, tight or loose.
 
 Combined with `cavity` and `dark-lanes`, this gives the "mixed terrain worth
 exploring" feel — pockets of different material, voids to hide in, dense regions

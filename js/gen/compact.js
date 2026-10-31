@@ -205,6 +205,7 @@ CC.Compact = (function () {
       accretion: acc,
       disc: disc,
       umbra: spec.umbra || null,
+      lens: spec.lens || 0,
       ergoColour: spec.ergoColour || (d && d.colour) || null
     };
   }

@@ -67,6 +67,10 @@ var CC = CC || {};
       add(facts.traits.indexOf("great-storm") >= 0,
         "The storm. It is larger than most planets and has been running " +
         "longer than anyone has been watching.");
+      /* The built trait (D296): the line leaves the story open (D290). */
+      add(facts.traits.indexOf("skyhook-cities") >= 0,
+        "The tethers. A snapped skyhook falls for hours, and it does not " +
+        "fall alone.");
     },
 
     /* ---- notable conditions -------------------------------------------- */
@@ -106,6 +110,9 @@ var CC = CC || {};
        * body the Depth line has just called shallow. */
       add(facts.crushKm > 5500,
         "The survivable band is thicker than most worlds are wide.");
+      add(facts.traits.indexOf("skyhook-cities") >= 0,
+        "Cities hang over the clouds on tethers, fishing the atmosphere. " +
+        "Who lives in them depends on who you ask.");
     },
 
     /* ---- resources ----------------------------------------------------- */
@@ -140,6 +147,9 @@ var CC = CC || {};
       add(facts.deck && facts.deck.key === "stripped",
         "Very little. The volatiles that made this worth visiting boiled " +
         "off a long time ago.");
+      add(facts.traits.indexOf("skyhook-cities") >= 0,
+        "Whatever the skyhooks lift. The cities above them do not say what " +
+        "they are drawing up, only that they have never stopped.");
     },
 
     /* ---- approach ------------------------------------------------------ */
@@ -169,6 +179,9 @@ var CC = CC || {};
       add(facts.traits.indexOf("shepherd-moons") >= 0,
         "Mind the shepherd moons. The gaps in the rings are gaps because " +
         "something is keeping them that way.");
+      add(facts.traits.indexOf("skyhook-cities") >= 0,
+        "Dock at a city, not a platform. The platforms take cargo, and " +
+        "nobody aboard will be expecting a passenger.");
     }
   });
 })();

@@ -186,6 +186,41 @@ assumed.
 - [x] **the `nebula` card** — crossed, not reached; every figure computed and checked (D238); a navigational **hazard rating** calibrated against the frequency contract (D239)
 - [x] **flavour pool and seven presets**, each checked against its blurb (D240)
 
+### Phase 9b — megastructure traits on natural bodies ✅ (Sessions AB–AG)
+
+[session-ab-megastructures.md](session-ab-megastructures.md) — D289–. The audit, then the user's own list (D289) and the rule behind it: a trait must be visible at the body's scale and leave the story open (D290). One family per session; each ends with the prompt for the next.
+
+- [x] **the audit** (AB): the spec's 28 entries set beside what each family already has; planets and moons the only natural bodies with nothing built; the `artificial` tag is only a picker group
+- [x] **the list settled with the user** (AB, D289–D290): no cities, no fleets, no underground settlements; asteroid, neutron star, pulsar and machine world unchanged
+- [x] **the roll weighting** (AC, D291): the user chose built traits at a third of the weight in Randomize; the roll only, the picker and presets untouched; existing seeds in families with built traits re-roll
+- [x] **AC — planet and moon** ([session-ac-planet-megastructures.md](session-ac-planet-megastructures.md), D291–D295): the `rounded` tag on both, not the asteroid (D292); altitudes stated above the body's reach, fitted round ring-system and debris-belt; the network and minefield kept to the bearings the frame's height shows
+  - [x] orbital ring + space elevators, lowest (D293): truss band, modules, pods, 2–6 elevators from the real ground (`opts.ground`) to counterweights — approved
+  - [x] orbital defence network (D294): 2–6 platforms of two merged "4"s, in the gaps of one evenly spaced constellation of satellites — approved after the satellites were ordered and the platforms shrunk ~15%
+  - [x] orbital minefield (D295): 2–3 staggered rows of identical spiked orbs, about 1.70–2.05 radii — approved after the orbs were enlarged so they stopped reading as X marks
+  - [x] every count body-space, no pixel-threshold collapse, after the zoom op-count check failed
+  - [x] spec (MACHINE-WORLDS.md, solid-bodies.md, TRAIT-SYSTEM.md), flavour lines (danger, notable, approach) brought up to it; prompt for AD written
+- [x] **AD — gas and ice giants** ([session-ad-giant-megastructures.md](session-ad-giant-megastructures.md), D296–D297): gated on `gaseous`, no new tag
+  - [x] skyhook platforms + orbital cities, one trait (D296): 3–11 skyhooks evenly on one orbit just above the skimmers (not lowered), scoop in the cloud deck, tether, platform, counterweight; 1–5 small cities hanging the hooks nearest the sides, one design per body — wheel, pair or spire — approved after shrinking (skyhooks ~30%, cities ~70%) and restoring the spire
+  - [x] built marks drawn over natural ones in the orbit pass (D297)
+  - [x] spec (MACHINE-WORLDS.md, gaseous-bodies.md, TRAIT-SYSTEM.md), flavour lines (danger, notable, resources, approach) brought up to it; prompt for AE written
+- [x] **AE — stars** ([session-ae-star-megastructures.md](session-ae-star-megastructures.md), D298–D301): four layers, lowest first, on all four star archetypes, gated on `stellar`, no new tag
+  - [x] the stack measured from the halo's edge capped at 1.15 (`edgeCap`), so it stays in frame where the corona fills the frame's height (D298)
+  - [x] orbital mirrors on one evenly spaced orbit just above the capped edge, no longer a random scatter off the frame (D298) — approved
+  - [x] stellar collectors halfway from the surface to the mirrors (`depthFrac`), +30% then the user's own size, 0.072–0.085 (D299) — approved
+  - [x] Dyson shell (D300): the cut edge of a lattice sphere, three rows of triangles between four rails, plates in runs, ribs, lights; a whole circle in frame — approved after thickening from a thin truss
+  - [x] Dyson swarm / stellar colonies (D301): staggered rows of stone slabs with windows and docking ports at the sides, each on its own radial (level and tangent tried and rejected), first row dropped, 1.5× thicker — approved
+  - [x] spec (stars.md, MACHINE-WORLDS.md, TRAIT-SYSTEM.md), flavour lines (danger, notable, resources, approach) brought up to it; prompt for AF written
+- [x] **AF — nebula** ([session-af-nebula-megastructures.md](session-af-nebula-megastructures.md), D302–D303): gated on `diffuse`, no new tag
+  - [x] one ringworld (D302): a slanted ring round its own sun, inner face of land, seas, clouds and night on the far half, dark hull on the near, sunk under the other traits with gas veils across it and its sun lighting the cloud; three files of its own — approved after the ribbon was widened, the size cut 60% and the placement loosened
+  - [x] ice and rock belts as round or oval fields on half the rolls (D303): `oval` in the pocket placer, stretch 1–1.8, the streak's area kept, filled evenly — approved
+  - [x] spec (diffuse-bodies.md, MACHINE-WORLDS.md, TRAIT-SYSTEM.md), flavour lines (danger, notable, resources, approach) brought up to it; prompt for AG written
+- [x] **AG — black hole, then close 9b** ([session-ag-close-9b.md](session-ag-close-9b.md), D304–D306)
+  - [x] background lensing round the hole (D304): measured first — +10 ms a render at 1080p and 4K against 74/252 ms for a pixel remap, op count fixed under zoom and resolution — so built, star by star (`js/draw/lens.js`), the ring drawn by faint deep stars the lens brightens, Einstein radius 1.5, umbra lightened to 0.5; the composed export lensed too — approved
+  - [x] presets settled with the user: Coruscant World rebuilt from the three orbital traits and renamed **Fortress World**; **Half-Built Dyson** with unbuilt gaps; a **Ringworld Nebula** added — all three in `js/data/presets-built.js`, each checked against its blurb on three seeds (D306); `ringworld` added to the nebula's plain-kind ban list — approved
+  - [x] the unfinished Dyson shell (D305): `dyson-shell-unfinished`, the shell plus `gaps`, 1–9 open arcs over 15–80% of the circle (widened by the user from 1–3 and 30–55%), each ending at a rib with bare rail past it; flavour lines — approved
+  - [x] TRAIT-SYSTEM.md's Dyson worked example, PARAMETERS.md's preset table and Enclosure row, MACHINE-WORLDS.md's per-body lists, stars.md and compact-objects.md brought up to what was built
+  - [x] 9b closed in PROGRESS.md and ROADMAP.md
+
 ### Phase 8 — overlay, scale bar, polish (Session AA) ✅
 
 [session-aa-polish.md](session-aa-polish.md) — D282–D288. One item per session (D282).

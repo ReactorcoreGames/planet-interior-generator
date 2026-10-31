@@ -483,9 +483,9 @@ it. Now every visible consequence comes from a system that already existed:
 deposition sit on the terrain, pool in valleys and thin on ridges, where a
 drawn wedge could only ever be a polygon laid over the top of it.
 
-**Artificial:** see [MACHINE-WORLDS.md](../MACHINE-WORLDS.md) —
-orbital-ring · surface-city · underground-city · satellite-network ·
-orbital-platforms · starship-fleet · orbital-minefield
+**Built:** ✅ orbital-ring · ✅ defence-network · ✅ minefield — gated on
+`rounded`, shared with the moon. See
+[MACHINE-WORLDS.md](../MACHINE-WORLDS.md#for-planets-and-moons).
 
 ### Stats template
 
@@ -721,7 +721,9 @@ across a bright shell.
 
 subsurface-ocean · cryovolcanic · heavily-cratered ·
 mineral-veins · void-pockets · impact-basin · shattered · tidal-heating ·
-surface-city · underground-city · orbital-platforms
+✅ orbital-ring · ✅ defence-network · ✅ minefield (built, by the `rounded`
+tag the planet also carries — a moon may not hold a natural ring, below, but
+it has an orbit to build in)
 
 > `ice-caps` and `tidally-locked` are gone from this list for the same reason
 > they left the planet's: tidal locking is an axis every solid body will

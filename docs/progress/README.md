@@ -32,6 +32,18 @@
 
 | [session-aa-polish.md](session-aa-polish.md) | D282–D288 — Phase 8, one item per session: the audit and the order settled; layer names by role with a spec override; the layer-name overlay on one ray per side, sized from the frame; the scale bar with an automatic silhouette; the stat-template inconsistency pass; settings persistence and Reset to defaults; the full keyboard map, one table for the bindings and Help's list (Session AA, Phase 8 complete) |
 
+| [session-ab-megastructures.md](session-ab-megastructures.md) | D289–D290 — Phase 9b's audit and plan: the spec's per-body lists set beside the traits each family already has (planets and moons the only ones with nothing built, the `artificial` tag only a picker group); a proposal of cities and fleets rejected by the user, who set the list — ring, defence network and minefield on planets and moons, skyhooks and orbital cities on giants, a Dyson shell and swarm over the stars, a ringworld in the nebula, lensing if cheap — and the rule that a trait must be visible at the body's scale and leave the story open (Session AB) |
+
+| [session-ac-planet-megastructures.md](session-ac-planet-megastructures.md) | D291–D295 — Phase 9b on planets and moons: built traits rolled at a third of the weight; a `rounded` tag named for the physical fact; the orbital ring with elevators standing on the real ground; a defence network of 180°-symmetric gun platforms in an ordered satellite constellation; a minefield of spiked orbs that first read as X marks; and every count made body-space after the zoom check caught pixel-threshold collapses (Session AC) |
+
+| [session-ad-giant-megastructures.md](session-ad-giant-megastructures.md) | D296–D297 — Phase 9b on the gas and ice giants: skyhooks and orbital cities as one trait, the city hanging the hook, three city designs (wheel, cylinder pair, spire), shrunk and multiplied after the user found the first pass absurd round a giant; and built marks drawn over natural ones in the orbit pass (Session AD) |
+
+| [session-ae-star-megastructures.md](session-ae-star-megastructures.md) | D298–D301 — Phase 9b on the stars: the built stack measured from a capped halo edge (`edgeCap`) so it stays in frame, the mirrors on one ordered orbit, the collectors halfway to them (`depthFrac`) and larger; the Dyson shell as a geodesic lattice band; the Dyson swarm of stone colonies, each on its own radial after level and tangent were tried (Session AE) |
+
+| [session-af-nebula-megastructures.md](session-af-nebula-megastructures.md) | D302–D303 — Phase 9b on the nebula: one ringworld round its own sun, sunk in the gas with veils across it and its sun lighting the cloud, shrunk 60% on the user's review and placed liberally; and ice and rock belts as round or oval fields half the time (`oval`), filled evenly with the streak's area (Session AF) |
+
+| [session-ag-close-9b.md](session-ag-close-9b.md) | D304– — Phase 9b closed: the starfield lensed round a black hole star by star, its ring drawn by the faint stars the lens brightens, at a tenth of a pixel remap's cost; the presets; the cross-cutting docs (Session AG) |
+
 Sessions are listed oldest first. `session-f.md` is a stub left where Session F used to be; it points at the three F files above.
 
-Decision numbers (`D#`) are referenced from code comments and other docs. To find a specific one, `grep -rn "D42" docs/progress/` is faster than opening each file. The next free number is **D289**.
+Decision numbers (`D#`) are referenced from code comments and other docs. To find a specific one, `grep -rn "D42" docs/progress/` is faster than opening each file. The next free number is **D307**.

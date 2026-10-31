@@ -67,6 +67,17 @@ var CC = CC || {};
       add(facts.habitableZone < 0.2,
         "Anything in the habitable zone is close enough to be in the flare " +
         "envelope. Warm and irradiated are the same orbit here.");
+      /* The built traits (D299-D301): each line leaves the story open
+       * (D290). */
+      add(facts.traits.indexOf("dyson-shell") >= 0,
+        "The shell. Whatever runs it decides how much of this star the rest " +
+        "of the system gets to see, and it has never said why.");
+      add(facts.traits.indexOf("dyson-shell-unfinished") >= 0,
+        "The open arcs. Whatever the shell is for, it does it on one side of " +
+        "the star and not the other, and the edges are not tidy.");
+      add(facts.traits.indexOf("dyson-swarm") >= 0,
+        "Traffic. Thousands of colonies share these orbits, and a slab " +
+        "knocked out of line does not stop for anyone.");
     },
 
     /* ---- what is worth knowing ----------------------------------------- */
@@ -98,6 +109,15 @@ var CC = CC || {};
         "It puts out so little light that a world would have to sit almost on " +
         "top of it to be warm - and it will still be doing so in a trillion " +
         "years.");
+      add(facts.traits.indexOf("dyson-shell") >= 0,
+        "Something has wrapped the star in a lattice. From outside, its light " +
+        "comes through the open cells and nowhere else.");
+      add(facts.traits.indexOf("dyson-shell-unfinished") >= 0,
+        "Half a lattice round the star, the frames ending at bare rail. " +
+        "Nobody can say from here whether it is going up or coming down.");
+      add(facts.traits.indexOf("dyson-swarm") >= 0,
+        "The swarm is made of stone, not metal: whole slabs of rock, hollowed " +
+        "out and lived in, every one turned edge-on to the star.");
       add(facts.young,
         "It is still surrounded by the material it formed from. The planets " +
         "here have not finished being planets yet.");
@@ -128,6 +148,10 @@ var CC = CC || {};
         "to collect is another matter.");
       add(facts.traits.indexOf("stellar-collector") >= 0,
         "There is already infrastructure in place taking a share of the output.");
+      add(facts.traits.indexOf("dyson-shell") >= 0 ||
+          facts.traits.indexOf("dyson-shell-unfinished") >= 0,
+        "Whatever the shell does not let past. Who holds the controls is the " +
+        "real question, and the answer has changed hands before.");
       add(facts.activity > 0.7,
         "The flares themselves, if you have something that can take a charge " +
         "and survive delivering it.");
@@ -152,6 +176,9 @@ var CC = CC || {};
         "closest approach against the streamers, not against the disc.");
       add(facts.traits.indexOf("binary-companion") >= 0,
         "There are two of them, and the space between is not a place to be.");
+      add(facts.traits.indexOf("dyson-swarm") >= 0,
+        "Dock at a colony in the swarm, never at the shell. The slabs keep " +
+        "their ports on the dark end.");
     }
   });
 })();

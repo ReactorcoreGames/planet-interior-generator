@@ -99,7 +99,8 @@ not dozens. It's the texture that makes a star look like a star.
 
 prominences (3–30) · flare-storms · starspot-clusters · coronal-holes ·
 accretion-disc · protoplanetary-disc · stellar-jets ·
-t-tauri-variability · orbital-mirrors · stellar-collector
+t-tauri-variability · orbital-mirrors · stellar-collector ·
+dyson-shell · dyson-shell-unfinished · dyson-swarm
 
 > **`binary-companion` was built as an AXIS, not a trait** (Session O). It
 > changes values in the stack rather than the stack itself, which is
@@ -176,7 +177,7 @@ radiative zones. Small, but it's a nice piece of specificity.
 ### Eligible traits
 
 prominences · starspot-clusters · coronal-holes ·
-orbital-mirrors · stellar-collector
+orbital-mirrors · stellar-collector · dyson-shell · dyson-shell-unfinished · dyson-swarm
 
 > `binary-companion` is an axis on every star, not a trait — see the note
 > under `young-star` above.
@@ -248,7 +249,8 @@ is a nice bit of visual storytelling.
 ### Eligible traits
 
 prominences · shed-shells · dust-formation · pulsating ·
-engulfed-planet · dredge-up · stellar-collector · orbital-mirrors
+engulfed-planet · dredge-up · stellar-collector · orbital-mirrors ·
+dyson-shell · dyson-shell-unfinished · dyson-swarm
 
 ### Stats
 
@@ -311,7 +313,8 @@ larger here than on a main-sequence star.
 
 ### Eligible traits
 
-starspot-clusters · prominences · orbital-mirrors
+starspot-clusters · prominences · orbital-mirrors · stellar-collector ·
+dyson-shell · dyson-shell-unfinished · dyson-swarm
 
 > **Removed:** `flare-star`, `heavy-starspots`, `tidally-locked-planets`,
 > `long-lived` and `habitable-zone-close`
@@ -398,6 +401,20 @@ disc, it has gone too far — see D131, where the fix for a tame limb turned out
 to be the wobble's *frequency* rather than its amplitude.
 
 ---
+
+## Built round a star
+
+*Phase 9b, Sessions AE and AG, D298–D301 and D305; the full table is MACHINE-WORLDS.md § For stars.*
+
+**Artificial:** stellar-collector · orbital-mirrors · dyson-shell · dyson-shell-unfinished · dyson-swarm, on every star archetype, gated on `stellar`, and stacked lowest first in that order:
+
+- **Collectors** — cone stations aimed at the star, halfway between its surface and the mirrors' orbit.
+- **Mirrors** — one evenly spaced ring of glass-faced panels just above the halo's edge.
+- **Dyson shell** — the cut edge of a lattice sphere, a band of triangulated mesh with plates in some cells and the corona glowing through the rest; a whole circle in frame.
+- **Unfinished Dyson shell** — the same shell with 1–9 arcs not built yet, 15–80% of the circle, each ending at a rib with bare rail run on past it; the other state of the shell, excluding it (Session AG, D305). Whether it is going up or coming down is the author's.
+- **Dyson swarm** — rows of small stone slabs with lit windows and docking ports, each along its own radial, at the sides of the star above the shell.
+
+The stack is measured from the halo's edge capped at 1.15 body radii (`edgeCap`), because a young star's or a giant's corona alone reaches the top of the frame (1.20–1.44 radii against about 1.28): there the built layers sink into the glow rather than off the canvas. Under a shell the collectors read as control rods and the mirrors as its adjustment mirrors; the picture leaves that to the author (D290).
 
 ## Family notes
 

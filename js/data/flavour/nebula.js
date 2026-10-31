@@ -35,6 +35,9 @@ var CC = CC || {};
         "briefly is a dose you do not walk away from.");
       add(has(f, "derelict-fleet"),
         "Whatever happened to the last fleet that came in here.");
+      add(has(f, "ringworld"),
+        "The ring's own sun. Whatever runs the shadows round it decides who " +
+        "gets daylight, and it has never answered a hail.");
       add(has(f, "bow-shocks"),
         "The shock fronts. Crossing one is like hitting surf at a thousand " +
         "kilometres a second.");
@@ -66,6 +69,12 @@ var CC = CC || {};
       add(has(f, "pillars"),
         "The pillars are being eaten by the starlight. In a few hundred " +
         "thousand years they will be gone.");
+      add(has(f, "ringworld"),
+        "A ring round its own sun, hidden in the gas. Nobody knows who built it, " +
+        "or whether anyone still lives on the inside.");
+      add(has(f, "ringworld"),
+        "Seas and land along the inside of the ring, more ground than a " +
+        "thousand worlds, and no record of it in any chart.");
       add(has(f, "dark-lanes"),
         "The rift is dust, not empty space. It is where the cloud is THICKEST.");
     },
@@ -80,6 +89,9 @@ var CC = CC || {};
         "you can bottle it.");
       add(f.form === "remnant", "Heavy elements: a supernova makes the iron, " +
                                 "gold and uranium a civilisation runs on.");
+      add(has(f, "ringworld"),
+        "Whatever is on the ring - living room, if it is empty, and a " +
+        "neighbour, if it is not.");
       add(true, "Hydrogen, in quantity - if you can scoop a gas this thin.");
       add(true, "Cover. Nobody outside can see what happens in here.");
     },
@@ -97,6 +109,9 @@ var CC = CC || {};
         "Through the cavity. There is a station in there, and it has seen you " +
         "long before you see it.");
       add(f.materials.length > 0, "Around the drifts, not through them.");
+      add(has(f, "ringworld"),
+        "Toward the light that does not belong to the cloud. Come in over the " +
+        "rim wall, never under the ring.");
     }
   });
 })();

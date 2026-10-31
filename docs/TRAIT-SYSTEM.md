@@ -168,7 +168,7 @@ declaring `zoneBias: "twilight"`. Null on most traits.
 
 **`when`** — `{ param, is: [...], dflt }`, the same shape as a layer's `presence`: the trait is offered only while that setting names one of the listed values. For an archetype with two stacks chosen by a setting, where a trait means something on one and nothing on the other — a nebula's wind-blown cavity is cloud-only, because a shell already is one. Honoured by the roller and the picker (Session X, D233). Absent on most traits.
 
-**`place`** — the name of a registered placer (`CC.ElemGen.registerPlacer`) that moves the built elements after the grammar has placed them. The grammar places round a body made of shells; a body made of gas has none, so a nebula's traits use `place: "pocket"` (js/gen/diffuse-pockets.js), which puts them where the gas is thick or thin, in clusters, belts, rows or files, aimed at the light. Its own fields are documented in that file (D234).
+**`place`** — the name of a registered placer (`CC.ElemGen.registerPlacer`) that moves the built elements after the grammar has placed them. The grammar places round a body made of shells; a body made of gas has none, so a nebula's traits use `place: "pocket"` (js/gen/diffuse-pockets.js), which puts them where the gas is thick or thin, in clusters, belts, rows or files, aimed at the light. Its own fields are documented in that file (D234). Among them `oval`, the chance a pocket is a round-to-oval field of the same area filled evenly rather than a streak (ice and rock belts, D303), and `formation: "centre"`, one element at a pocket's centre sized by it, which places the ringworld (D302).
 
 **`nest`** — a list of trait ids: after every trait is placed, this one's whole group moves onto the first of them present, at `nestAt` of the host's radius from its centre, and draws after it. A hidden station in a cavity, a flotilla beside a belt. With no host present it stays where it was placed (D235).
 
@@ -216,7 +216,10 @@ Traits declare `requires` and `excludes` against **body tags** and other traits.
 
 Body tags are set by the archetype: `solid-surface`, `solid-interior`,
 `gaseous`, `stellar`, `compact`, `diffuse`, `has-atmosphere`, `luminous`,
-`artificial`.
+`artificial`, `rounded`. A tag is named for the physical fact it asserts
+(data/traits/orbital.js): `rounded` is a body pulled round by its own
+gravity, which gates the built orbital traits on the planet and the moon and
+keeps them off the asteroid (D292).
 
 ```js
 requires: ["solid-surface", "has-atmosphere"]   // needs both
@@ -228,7 +231,21 @@ body and already-selected traits. Incompatible ones are hidden, not greyed —
 a long list of unavailable options is noise.
 
 **When rolling randomly:** pick from the compatible set, then re-filter after
-each pick, since selecting one trait can exclude others.
+each pick, since selecting one trait can exclude others. **The pick is
+weighted:** a trait tagged `artificial` rolls at a third of a natural one's
+weight, so natural is the default reading of a random body and something built
+the surprise (D291). The roll only — the picker and presets are untouched —
+and a pool that is all one kind (the machine world) rolls uniformly.
+
+**Built over natural, in orbit.** Every element carries `built` from its
+trait's `artificial` tag, and the orbit pass (draw/zonepaint.js) draws each
+half's natural material first and anything built after it, so a ring band's
+translucent haze never lies over a station's metal (D297).
+
+**Orbit heights relative to the body's halo.** An orbit trait may state its band as `depthAbove: [lo, hi]`, body radii above the outermost radius any layer reached (D127), so "just clear of the glow" means the same on every archetype. Two fields refine it for a stack of built layers round a star:
+
+- `edgeCap` measures from no higher than this radius, so where the halo already fills the frame's height (about 1.28 radii at the default Body size) the stack sinks into the glow instead of leaving the frame. The stars' built traits all carry 1.15 (D298).
+- `depthFrac: [lo, hi]` places the band at a fraction of the way from the surface up to the capped edge plus `depthAbove`'s first figure, for a layer held proportionally between the star and the layer above it: the collectors sit halfway to the mirrors' orbit (D299).
 
 ---
 
@@ -421,7 +438,8 @@ by nature, which is the tell. As axes, the values *between* the named extremes
 become reachable, which is usually where the better output lives. The Dyson case
 is the clearest proof: a **half-built sphere** was already listed as one of the
 generator's most evocative outputs, and the two-trait split made it the one
-thing you couldn't build.
+thing you couldn't build. (It is built now, as `dyson-shell-unfinished`, and
+the worked example below says why it is still a pair.)
 
 **2. Is it visible in the cutaway?** If not, it's **stats or flavour text**, not
 a trait. `long-lived`, `habitable-zone-close`, `tidally-locked-planets` and
@@ -567,28 +585,32 @@ correct-but-invisible feature first (see [PROGRESS.md](PROGRESS.md) D26):
 > ([PROGRESS.md](PROGRESS.md) D27), which is both less code and a better
 > picture.
 
-### Dyson structure
+### Dyson shell — and what became of `enclosure`
 
-Note `enclosure` — the parameter that replaced the old `dyson-swarm` /
-`dyson-sphere` pair. `spacing`, `jitter` and `arc` are **derived from it**
-rather than fixed, so one trait spans scattered swarm → half-built shell →
-full sphere.
+**As shipped** (Phase 9b, D298–D301, D305) — see `js/data/traits/dyson.js`. The spec's single `dyson-structure` trait with an `enclosure` parameter (scattered swarm → half-built shell → full sphere) was **not built that way**. The swarm end became `orbital-mirrors` early; in 9b the user set four layers round a star instead, lowest first: `stellar-collector` → `orbital-mirrors` → `dyson-shell` → `dyson-swarm`. Each is one element rolled by its builder (`js/gen/dyson.js`), placed with `depthAbove` from the halo's edge capped by `edgeCap` (D298) so the stack stays in frame.
 
 ```js
 {
-  id: "dyson-structure", label: "Dyson Structure",
-  anchor: "orbit", reach: "outward", depth: [1.6, 2.4],
-  arc: [0, 360], repeat: [12, 200],
-  spacing: "random",   // → "even" as enclosure rises
-  jitter: 0.8,         // → ~0 as enclosure rises
+  id: "dyson-shell", label: "Dyson Shell",
+  anchor: "orbit", reach: "outward",
+  depthAbove: [0.085, 0.09],  // just above the mirrors, from the halo's edge
+  edgeCap: 1.15,              // so a star whose corona fills the frame keeps it whole
+  arc: [0, 360], repeat: [1, 1], spacing: "even", jitter: 0,
   mirror: false, offset: [0, 360],
-  element: "plate", tiers: 3,
-  density: { min: 12, max: 200 },
-  enclosure: 0.5,      // 0 = swarm, 0.5 = half-built, 1.0 = solid sphere
-  requires: ["stellar"], excludes: [],
-  tags: ["artificial", "megastructure"]
+  element: "dyson-shell",     // ONE element: the cut edge of a lattice sphere
+  tiers: 1, named: true,
+  density: { min: 1, max: 1 },
+  alpha: [0.92, 1.0], tone: "lighter",
+  requires: ["stellar"], excludes: ["dyson-shell-unfinished"],
+  tags: ["stellar", "artificial"]
 }
+// "Unfinished Dyson Shell": the same declaration plus one line of data,
+//   id: "dyson-shell-unfinished", gaps: [1, 9], excludes: ["dyson-shell"]
 ```
+
+The builder draws three rows of triangles between four rails, plated in runs (25–70% of the cells), heavy ribs at intervals, lights at nodes. **`gaps`** opens 1–9 arcs, together 15–80% of the circle, each ending at a rib with bare rail run on past it, and the builder reads only the data: nothing asks which trait is on.
+
+**The half-built sphere, and the first test.** The pair excludes each other, which is test 1's tell for an axis in disguise, and the `enclosure` axis was the spec's answer. It is two traits because a trait has no dial of its own in the GUI (only zone modifiers do), and a preset can force a trait but not a position on a hidden axis. The in-between lives in the roll instead: the gap count and the open share are rolled per body across the whole range, from one short arc missing to a few fragments standing. If traits ever gain a dial, the two fold back into one shell with `gaps` driven by it.
 
 ### Stellar prominences
 ```js

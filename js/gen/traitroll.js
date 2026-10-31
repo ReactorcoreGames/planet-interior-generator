@@ -25,6 +25,7 @@ CC.TraitRoll = (function () {
   var M = CC.Math;
   var clamp = M.clamp, lerp = M.lerp;
   var TAU = M.TAU;
+  var BUILT_WEIGHT = 1 / 3;
 
   /* ---- selection -------------------------------------------------------- */
 
@@ -99,7 +100,26 @@ CC.TraitRoll = (function () {
       }
       if (!candidates.length) break;
 
-      var pickIdx = Math.floor(rng() * candidates.length);
+      /* BUILT TRAITS ROLL AT A THIRD OF THE WEIGHT (D291). Natural is the
+       * default reading of a random body and something built the surprise;
+       * a uniform pick gave nearly every black hole a station. The roll only:
+       * the picker and presets are untouched. With every weight equal this
+       * picks the same index `floor(rng × n)` did, so a pool with nothing
+       * built — or all built, the machine world — rolls exactly as before. */
+      var total = 0, w = [];
+      for (c = 0; c < candidates.length; c++) {
+        w.push((candidates[c].tags || []).indexOf("artificial") >= 0 ? BUILT_WEIGHT : 1);
+        total += w[c];
+      }
+      var allBuilt = true;
+      for (c = 0; c < w.length; c++) if (w[c] === 1) { allBuilt = false; break; }
+      if (allBuilt) total = candidates.length;
+      var target = rng() * total, pickIdx = 0;
+      for (c = 0; c < candidates.length; c++) {
+        target -= allBuilt ? 1 : w[c];
+        if (target < 0) { pickIdx = c; break; }
+        pickIdx = c;
+      }
       var pick = candidates[clamp(pickIdx, 0, candidates.length - 1)];
 
       chosen.push(pick);
@@ -507,6 +527,8 @@ CC.TraitRoll = (function () {
        * and comes back; a coronal streamer goes almost straight out. Both are
        * `vein`s and the only thing separating them is this. */
       lean: trait.lean,
+      /* An unfinished Dyson shell's open arcs (gen/dyson.js). */
+      gaps: trait.gaps,
       /* Filled per instance below when the trait is placed into thinning
        * sectors; undefined for every other trait. */
       half: undefined
@@ -539,6 +561,10 @@ CC.TraitRoll = (function () {
       orbit: trait.anchor === "orbit"
         ? (orbitBand(trait, body) || trait.depth)
         : null,
+      /* Where the ground is under an orbit — the top of the outermost layer
+       * that is not haze — for anything that reaches down to it: a space
+       * elevator's foot (gen/orbitalbuilt.js). */
+      ground: trait.anchor === "orbit" ? groundTop(body) : null,
       /* The body seed and the settings, as gen/details.js hands them to a
        * layer's builders — a builder that places by a per-body field needs
        * both. Every builder that does not read them ignores them. */
@@ -579,6 +605,9 @@ CC.TraitRoll = (function () {
       /* SEATED ON THE DRAWN SURFACE — see `seatOn` in draw/scene.js. Stamped
        * here for the same D159 reason as `escapes`. */
       made[i].seat = trait.seat;
+      /* SOMETHING SOMEBODY BUILT, drawn over the natural orbital material
+       * in its half (draw/zonepaint.js, D297). */
+      made[i].built = (trait.tags || []).indexOf("artificial") >= 0;
       /* The body's magnetic geometry, for a mark drawn along it (an
        * accretion stream follows a field line). Absent on every body that
        * declares no `poles`. See js/gen/compact.js. */
@@ -821,12 +850,30 @@ CC.TraitRoll = (function () {
    * result is an ordinary absolute band by the time anyone reads it.
    *
    * Returns null for a trait that did not ask, which is all of them but one. */
+  function groundTop(body) {
+    for (var i = 0; i < body.layers.length; i++) {
+      if (!body.layers[i].outward) return body.layers[i].outer;
+    }
+    return body.surface || 1;
+  }
+
   function orbitBand(trait, body) {
     if (!trait.depthAbove || trait.anchor !== "orbit" || !body) return null;
     /* `body.extent` is the outermost radius any LAYER reached — the halo's own
      * edge. It deliberately does not include outward traits, which is what
      * keeps one trait from pushing another further out each time. */
     var edge = Math.max(body.surface || 1, body.extent || 1);
+    /* `edgeCap` (D298): measure from no higher than this, so a stack of
+     * built layers over a halo that already fills the frame's height sinks
+     * into the glow rather than off the canvas. */
+    if (trait.edgeCap) edge = Math.min(edge, trait.edgeCap);
+    /* `depthFrac` (D298): a fraction of the way from the surface up to
+     * that edge plus `depthAbove`'s first figure, for a layer held
+     * proportionally between the star and the layer above it. */
+    if (trait.depthFrac) {
+      var s = body.surface || 1, top = edge + trait.depthAbove[0];
+      return [s + (top - s) * trait.depthFrac[0], s + (top - s) * trait.depthFrac[1]];
+    }
     return [edge + trait.depthAbove[0], edge + trait.depthAbove[1]];
   }
 

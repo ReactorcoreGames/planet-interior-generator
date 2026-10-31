@@ -12,7 +12,7 @@
 - Its **exclusive** traits, the ones that only make sense on a body that is artificial all the way down.
 - **Why first:** Phase 8's overlay, scale bar and stat-template pass should see every body type that will ship, so it is done once.
 
-### 9b — megastructure traits on natural bodies (next; Phase 8 is complete)
+### 9b — megastructure traits on natural bodies ✅ (Sessions AB–AG)
 
 **Audit before building.** MACHINE-WORLDS.md's per-body lists (stars, planets and moons, giants, asteroids, compact objects, nebulae) were written before most of the generator existed. Several families have since grown artificial traits of their own: stations, beacons, collectors, borers, mirrors, gas miners. So:
 
@@ -20,7 +20,11 @@
 2. Mark each spec entry: already exists, duplicate of something that exists, conflicts with a natural trait, still wanted, or drop.
 3. Agree the cleaned list with the user, then build it.
 
-### 9c — final clean-up pass (after 9b)
+**Settled in Session AB (D289–D290).** The user set the list: orbital ring + space elevators, an orbital defence network and an orbital minefield on planets and moons; skyhook platforms + orbital cities on the giants; a Dyson shell and a Dyson swarm of stellar colonies over the stars' existing collectors and mirrors; one ringworld and round belt fields in the nebula; background lensing on the black hole only if it is cheap. No cities or fleets: too small to see at the body's scale. One family per session, AC–AG. See [session-ab-megastructures.md](../progress/session-ab-megastructures.md) and [checklist.md](../progress/checklist.md) § Phase 9b.
+
+**Closed in Session AG (D304–D306)**: the black hole's starfield lensed star by star (about 10 ms a render, against 74–252 ms for a pixel remap), an unfinished Dyson shell with open arcs, and three presets — Fortress World (replacing Coruscant World, which needed cities), Half-Built Dyson and Ringworld Nebula. See [session-ag-close-9b.md](../progress/session-ag-close-9b.md).
+
+### 9c — final clean-up pass (next; 9b is complete)
 
 A last pass over the whole generator once the megastructures are in: does everything land together, on every family, with every trait, in the composed export? The user's eye leads; the open "for the user's eye" lists in the session write-ups are its agenda.
 

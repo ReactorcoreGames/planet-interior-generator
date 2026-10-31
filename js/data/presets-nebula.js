@@ -27,7 +27,7 @@ var CC = CC || {};
   var ALL = ["dark-lanes", "pillars", "bow-shocks", "cavity", "filament-web",
              "protostar-cluster", "embedded-star", "debris-fields", "ice-belts",
              "rock-belts", "metal-belts", "exotic-gas-pockets", "hidden-station",
-             "mining-flotilla", "derelict-fleet"];
+             "mining-flotilla", "derelict-fleet", "ringworld"];
 
   CC.Presets.register([
     {

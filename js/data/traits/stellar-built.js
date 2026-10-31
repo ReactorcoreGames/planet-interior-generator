@@ -63,33 +63,25 @@ var CC = CC || {};
     label: "Orbital Mirrors",
     anchor: "orbit",
     reach: "outward",
-    /* OUTSIDE THE CORONA — AND THIS TOOK TWO TRIES IN OPPOSITE DIRECTIONS.
-     *
-     * `anchor: "orbit"` places in BODY RADII, and a star's outward layers
-     * reach 1.09 to 1.32 depending on the archetype, which is far further than
-     * any other family's because a corona is enormous. That makes the usable
-     * band narrow and it is bounded on BOTH sides:
-     *
-     *   TOO FAR OUT and the elements leave the frame entirely — the first
-     *     version put them at 1.30-1.80 and the collector trait diffed at ZERO
-     *     PIXELS on a young star, whose extent is 1.34.
-     *   TOO FAR IN and they are inside the corona, where a manufactured object
-     *     has nothing to silhouette against: the correction to 1.14-1.42 drew
-     *     73 collectors as bright specks lost in a bright halo.
-     *
-     * What a panel needs is BLACK BEHIND IT. The hard edges and the glowing
-     * face that make it read as manufactured only work against something
-     * plain, so the band starts just past where the corona has faded and stays
-     * inside the frame. */
-    depth: [1.34, 1.62],
+    /* ONE ORBIT, JUST ABOVE THE HALO, CAPPED (D298). The mirrors were a
+     * random scatter at 1.34-1.62 body radii, which put most of them off the
+     * top and bottom of the frame and read as debris; they are now one
+     * evenly spaced ring 0.02-0.03 above the halo's edge, the edge capped at
+     * 1.15 so that on a star whose corona fills the frame's height the ring
+     * sinks into the glow instead — leaving room above it for the Dyson
+     * shell (data/traits/dyson.js) as a whole circle. Ordered, as the
+     * planet's satellites taught (D294). */
+    depthAbove: [0.02, 0.03],
+    edgeCap: 1.15,
     arc: [0, 360],
-    repeat: [1, 1],
-    spacing: "random",
-    jitter: 1,
+    repeat: [18, 34],
+    spacing: "even",
+    jitter: 0.08,
     mirror: false,
     offset: [0, 360],
     element: "orbital-mirror",
-    tiers: 2,
+    tiers: 1,
+    named: true,
     /* D82: A SYMBOL IS NOT A SCALE MODEL, AND THIS IS THE MOST EXTREME CASE
      * OF IT IN THE GENERATOR.
      *
@@ -105,24 +97,18 @@ var CC = CC || {};
      * enough — 73 objects can change a lot of pixels while no single one of
      * them is legible. `maxdelta` was the tell: high contrast, no size.
      *
-     * ALSO SIZED FOR THE SURVIVING TIER (D122). At `tiers: 2` and the default
-     * Size-tiers of 3, the largest drawn is 0.52x the authored figure, so the
-     * authored number has to carry that too. */
-    size: [0.115, 0.230],
+     * One tier and `named` since D298, so the authored size is the drawn
+     * size: about what the old scatter's surviving tier (D122) drew. */
+    size: [0.050, 0.058],
     /* A RANGE, and BELOW 1: `aspect` is the panel's depth relative to its
      * span, so a low figure is a wide thin sail and a high one is a stubby
      * paddle. The range is what keeps a ring from being stamped from one die.
      * Lower than the old capsule's, because a mirror IS thin — the depth is
      * only there to have room for two materials. */
-    aspect: [0.26, 0.44],
-    alpha: [0.75, 1.0],
-    density: { min: 14, max: 70 },
-    spread: [0.6, 1.5],
-    /* Random with a gap, not even: an installation that grew over time reads
-     * as built by people, and perfectly even spacing at this count reads as a
-     * drawn diagram (D85). The collectors below make the opposite call for the
-     * opposite reason — see the note there. */
-    minGap: 3,
+    aspect: [0.30, 0.36],
+    alpha: [0.85, 1.0],
+    /* `{1, 1}`: the count is the `repeat` roll (see the collectors). */
+    density: { min: 1, max: 1 },
     tone: "lighter",
     requires: ["stellar"],
     excludes: [],
@@ -149,44 +135,16 @@ var CC = CC || {};
     label: "Stellar Collector",
     anchor: "orbit",
     reach: "outward",
-    /* CLOSER TO THE STAR THAN THE MIRRORS, AND STATED RELATIVE TO THIS BODY'S
-     * OWN HALO RATHER THAN AS AN ABSOLUTE RADIUS.
-     *
-     * `depthAbove` is body radii ABOVE wherever the outward layers actually
-     * reached, and it exists because of what measuring showed: a star's halo
-     * runs from 1.06 on a quiet dwarf to 1.40 on an old giant, while the frame
-     * holds a full circle only to about 1.15. NO fixed band clears every
-     * corona and stays on canvas — an absolute 1.26-1.38 left four bodies in
-     * forty with zero collectors visible, which is a trait that rolls, reports
-     * and draws nothing (D121).
-     *
-     * Relative, "just clear of the glow" means the same thing on all four
-     * archetypes, which is what the user asked for by asking for them closer.
-     * The band is deliberately NARROW — these sit on one orbit, and a wide
-     * band would scatter them radially and undo the even spacing.
-     *
-     * THE BAND NOW STRADDLES ZERO, WHICH MEANS "IN THE CORONA" RATHER THAN
-     * "JUST ABOVE IT" — the user asked for them moved closer in, and closer
-     * than clear-of-the-glow is inside the glow. The lower end dips slightly
-     * BELOW where the outward layers reached, so the innermost stations sit
-     * with corona in front of and behind them rather than silhouetted on its
-     * outer edge. That is what puts them at the star instead of merely near
-     * it, and with the halved size below they no longer overpower the layer
-     * they are sitting in. */
-    /* HALFWAY INTO THE CORONA, which is the user's third and final call on
-     * where these sit — first "closer", then "deeper", now a specific depth.
-     *
-     * The figure is NEGATIVE because `depthAbove` is measured from wherever
-     * the outward layers actually reached: 0 is the top of the halo and -0.5
-     * would be half a body radius below it. A star's corona runs roughly 0.06
-     * to 0.40 radii thick depending on archetype, so a band of -0.16 to -0.09
-     * lands around the middle of a typical one and stays inside a thin one.
-     *
-     * Stated relative rather than absolute for the reason the original note
-     * below gives, and it matters more at this depth than it did above the
-     * halo: an absolute band that is mid-corona on an old giant would be
-     * underground on a dwarf. */
-    depthAbove: [-0.03, -0.02],
+    /* HALFWAY BETWEEN THE STAR'S SURFACE AND THE MIRRORS' ORBIT (D299), the
+     * user's call after the restack: `depthFrac` takes the band from the
+     * surface up to the capped edge plus `depthAbove`'s first figure — the
+     * mirrors' orbit — and sits the collectors at 48-52% of it. Stated as a
+     * fraction because "halfway to the mirrors" is 0.02 below the halo's
+     * edge on a dwarf and 0.06 below it on a giant (D127: a star's halo runs
+     * 1.06-1.44 body radii, and no absolute band suits every archetype). */
+    depthAbove: [0.025, 0.025],
+    depthFrac: [0.48, 0.52],
+    edgeCap: 1.15,
     arc: [0, 360],
     /* THE COUNT IS THE `repeat` ROLL, NOT THE DENSITY SLIDER. With
      * `spacing: "even"` the placement produces exactly this many anchor
@@ -255,9 +213,14 @@ var CC = CC || {};
      * moving in would have made them loom over the layer instead of sitting
      * in it.
      *
+     * THEN UP AGAIN IN SESSION AE (D299), with the move down to halfway to
+     * the mirrors: +30%, then the user's own hand to 0.072-0.085. Under a
+     * shell they read as its control rods, and at the old size they were
+     * lost in a bright corona.
+     *
      * These numbers reach the canvas undivided: `tiers: 1` + `named` means no
      * tier factor multiplies them. */
-    size: [0.04, 0.05],
+    size: [0.072, 0.085],
     /* Stubbier than a mirror panel: a station is a habitat with mass in it,
      * and the cone needs width at its base to read as a cone.
      *

@@ -256,6 +256,18 @@ cooler and more saturated. That gradient along the disc is the signature look.
 The disc should be **dense** — hundreds of orbital streaks at varying radii and
 brightness. It's the main visual and deserves the element budget.
 
+**The sky behind is lensed** (Phase 9b, Session AG, D304). Every star of the
+starfield is drawn as its two point-lens images about an Einstein radius of
+1.5 horizon radii, just outside the ergosphere: stretched round the hole into
+arcs near it, dots further out. The ring itself is drawn by a deep field of
+faint stars sampled behind the lens only and brightened by their
+magnification (magnification bias) — invisible unlensed, a crowd of arcs
+hugging the shadow. Star by star, not a pixel remap: about 10 ms a render at
+any resolution, against 74 ms at 1080p and 252 ms at 4K for the remap. Only
+the stars bend; a gradient or nebula background stays flat. The umbra that
+darkens the sky round the hole was lightened from 0.92 to 0.5 so the ring
+shows. `js/draw/lens.js`; `hole.lens` on the archetype.
+
 ### Eligible traits
 
 rapid-spin · relativistic-jets · tidal-disruption-event · binary-companion ·

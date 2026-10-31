@@ -96,7 +96,10 @@ var CC = CC || {};
      * The tag is the whole gate, so dropping it removes rings AND debris
      * belts together, which is what the gate exists for. `airless` stays and
      * is what a future airless-specific trait would key off. */
-    tags: ["solid-surface", "solid-interior", "airless"],
+    /* `rounded` gates the built orbital traits, as on the planet: a moon is
+     * round and has an orbit of its own to build in, whatever the ring
+     * argument above says about holding natural material there. */
+    tags: ["solid-surface", "solid-interior", "airless", "rounded"],
     statTemplate: "solid",
 
     /* 400-3,500 km, from the spec. Nearly an order of magnitude below the

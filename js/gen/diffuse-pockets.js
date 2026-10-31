@@ -41,6 +41,10 @@
  *               (draw/details.js hullFill)
  *   round       chance a pocket ignores `stretch` and is a rounder field
  *               (stretch 1 to 1.5) — a belt that is sometimes a patch
+ *   oval        chance a pocket is a FIELD rather than a belt: round to oval
+ *               (stretch 1 to 1.8), its radius grown so it covers the area
+ *               the streak would have, and filled about evenly rather than
+ *               thick in the middle (D303)
  *   loose       chance a pocket's radius is doubled or more: a field now and
  *               then spread thin rather than clustered
  *   elongate    stamped as is: how drawn-out a shard is (1 = the primitive's
@@ -210,6 +214,7 @@ var CC = CC || {};
 
     var roundP = opt(trait, layer, "round", 0);
     var looseP = opt(trait, layer, "loose", 0);
+    var ovalP = opt(trait, layer, "oval", 0);
     /* The liveries, shuffled once, so fleets take different colours. */
     var liveries = paintR ? paintR.slice() : null;
     for (var li = liveries ? liveries.length - 1 : 0; li > 0; li--) {
@@ -221,8 +226,15 @@ var CC = CC || {};
       if (looseP && r() < looseP) base *= lerp(1.8, 2.6, r());
       var st = roll(stretchR, r, 1);
       if (roundP && r() < roundP) st = lerp(1, 1.5, r());
+      var field = false;
+      if (ovalP && r() < ovalP) {
+        var ov = lerp(1, 1.8, r());
+        base *= Math.sqrt(st / ov);
+        st = ov;
+        field = true;
+      }
       var pk = { x: p.x, y: p.y, r: base * (0.8 + 0.4 * r()),
-                 axis: r() * TAU, stretch: st,
+                 axis: r() * TAU, stretch: st, field: field,
                  heading: r() * TAU };
       if (hueR) pk.hue = (r() < 0.5 ? -1 : 1) * roll(hueR, r, 0);
       if (liveries) {
@@ -278,6 +290,13 @@ var CC = CC || {};
         for (var tries = 0; tries < (apart ? 12 : 1); tries++) {
           var u = (r() + r() - 1) * pk.r * pk.stretch;
           var v = (r() + r() - 1) * pk.r;
+          if (pk.field) {
+            /* A field: a disc filled a little thicker toward the middle,
+             * its edge left ragged, stretched along the axis. */
+            var fd = Math.pow(r(), 0.62) * (0.9 + 0.2 * r()), fb = r() * TAU;
+            u = Math.cos(fb) * fd * pk.r * pk.stretch;
+            v = Math.sin(fb) * fd * pk.r;
+          }
           x = pk.x + Math.sin(pk.axis) * u + Math.cos(pk.axis) * v;
           y = pk.y - Math.cos(pk.axis) * u + Math.sin(pk.axis) * v;
           var clash = false;

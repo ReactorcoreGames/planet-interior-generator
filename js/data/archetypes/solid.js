@@ -15,7 +15,11 @@ var CC = CC || {};
     id: "planet",
     label: "Planet",
     family: "solid",
-    tags: ["solid-surface", "solid-interior", "dusty-rings", "orbit-debris"],
+    /* `rounded`: pulled round by its own gravity, so it has a real orbit to
+     * build in and a surface to tether to — the gate for the built orbital
+     * traits (data/traits/orbital-built.js). The asteroid is not. */
+    tags: ["solid-surface", "solid-interior", "dusty-rings", "orbit-debris",
+           "rounded"],
     /* Which stat template writes this body's card — see
      * js/gen/stats/registry.js for why a template is a MINDSET rather than a
      * list of rows. "solid" is the default, stated explicitly here because

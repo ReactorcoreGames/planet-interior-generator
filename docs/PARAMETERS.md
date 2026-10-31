@@ -135,7 +135,7 @@ as Ocean depth and Interior heat: an axis, not two checkboxes.
 | *Core size bias → **Mass class*** | black hole | −100…+100 | `supermassive` / `stellar-mass` | **A `dials` relabel**, log-scaled: ~5 suns at the bottom, ~10⁵ in the middle, ~10⁹ at the top. Horizon size and every derived stat; the picture is a diagram and keeps its scale |
 | *Interior heat → **Operational status*** | machine world | 0–100% (default 55) | `dormant` / `automated` / `hive-populated` | **A `dials` relabel** driving the archetype's `activity` (D264–D266): which lights are on, layer by layer (the plant wakes first, habitation last), emergency red near the bottom, fully dark at 0, the board and reactor dimmed at the low end, busier than the default above 55%, and the sparks and fire on a wound's torn edge |
 | *Cohesion → **Hull integrity*** | machine world | 0–100% (default 45) | `damaged` / `partial-construction` | **A `dials` relabel** driving the archetype's `rupture` (D267–D269): 1–5 wounds torn out of the outer layers from 92% down, to the reactor's rim at 0, with a torn edge, debris and sparks. The Under construction trait swaps the torn edge for a clean one with scaffolding (D273) |
-| **Enclosure** | dyson-structure trait | 0–100% | `dyson-swarm` / `dyson-sphere` | Collector spacing, jitter and arc — scattered swarm → half-built shell → full sphere |
+| ~~**Enclosure**~~ | — | — | `dyson-swarm` / `dyson-sphere` | **Not built** (Phase 9b, D305). A star's built stack is four traits instead — `stellar-collector`, `orbital-mirrors`, `dyson-shell`, `dyson-swarm` — and the half-built sphere is `dyson-shell-unfinished`, the same shell with 1–9 open arcs (15–80% of the circle) rolled per body. A trait has no dial of its own, so the in-between lives in that roll; see TRAIT-SYSTEM.md § Dyson shell |
 
 **Core size bias** (above) also absorbs the gas giant's `oversized-core` /
 `coreless` pair. At the low end the core's boundary softens from a hard edge to
@@ -523,7 +523,7 @@ uses.
 | **Flare Star** | Dwarf star, Star activity 94 — heavy spotting, frequent flares |
 | **Patient Ember** | Dwarf star, quiet and cool — the trillion-year lifespan |
 | **Newborn Star** | Young star — the inverted interior, still surrounded by its debris |
-| **Harvested Star** | Main star + dyson-structure — deliberately ordinary, so the swarm is the subject |
+| **Harvested Star** | Main star + orbital-mirrors + stellar-collector — deliberately ordinary, so what orbits it is the subject |
 
 > Built in Session M. **Starlight is deliberately absent from every stellar
 > preset**: a star declares `starlit: false`, so the control is inert on one by
@@ -569,11 +569,12 @@ Built in Session V — `js/data/presets-compact.js`.
 | **Unfinished World** | Operational status 50, Hull integrity 40 with the Under construction trait — scaffolding, clean edges, crews at work |
 | **Worldship** | Operational status 65, Hull integrity 80, with the Worldship trait — engine cluster on one side, firing |
 | ~~**Planet-Cracker**~~ | **Removed** by the user in Session Z, with the planet-cracker trait |
-| **Half-Built Dyson** | Main star + dyson-structure, Enclosure ~50 |
-| **Coruscant World** | Planet + surface-city at max density + orbital-ring |
+| **Half-Built Dyson** | Main star, Star activity 18, with the Unfinished Dyson Shell (1–9 open arcs, each ending at a rib) over stellar collectors — built in Session AG (D305–D306) |
+| **Fortress World** | Replaces ~~Coruscant World~~, which needed cities (ruled out by D290). A garden world (Ocean depth 48, Interior heat 52, Starlight 46) wearing all three of the planet's orbital traits: orbital ring + elevators, defence network, minefield. Whether they keep something out or in is left open (D306) |
+| **Ringworld Nebula** | Nebula, cloud form, Luminosity source 8 (dark), with the ringworld — the one light in the cloud is the ring's own sun (D306) |
 | **Hollowed Asteroid** | Built as **Hollowed Rock**: Asteroid, Caverns 96, Cohesion 62, mining-station + tunnel-borer (`hollowed-out` retired in U1; it is a position on the Caverns axis since U2) |
 
-The five machine-world presets were built in Session Z — `js/data/presets-machine.js`. Derelict, Hive and Factory ban Under construction and Worldship (`traitsOff`): one would contradict the blurb, the other is the Worldship preset; any other machine trait may roll. Half-Built Dyson and Coruscant World wait for Phase 9b's megastructure traits; Hollowed Asteroid is built (Session U).
+The five machine-world presets were built in Session Z — `js/data/presets-machine.js`. Derelict, Hive and Factory ban Under construction and Worldship (`traitsOff`): one would contradict the blurb, the other is the Worldship preset; any other machine trait may roll. Half-Built Dyson, Fortress World and Ringworld Nebula were built in Session AG — `js/data/presets-built.js` — each naming its traits outright so nothing else rolls; Hollowed Asteroid is built (Session U).
 
 **Presets are not a body type.** A desert world is a planet whose ocean depth is
 zero — which is why "frozen desert with a dying core" or "tidally locked ocean

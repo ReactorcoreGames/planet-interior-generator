@@ -161,7 +161,10 @@ var CC = CC || {};
         plunge: [4, 14],
         marks: 4
       },
-      umbra: { reach: 3.4, strength: 0.92 }
+      umbra: { reach: 3.4, strength: 0.5 },
+      /* The Einstein radius, in horizon radii: the starfield behind is bent
+       * into a ring here (draw/lens.js). */
+      lens: 1.5
     },
 
     dials: {

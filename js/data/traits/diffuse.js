@@ -207,9 +207,13 @@ var CC = CC || {};
    * into the gas round it. */
   var ICE_BELTS = belt("ice-belts", "Ice Belts", "shard", [0.025, 0.04], [6, 80],
                        { pockets: [1, 5], elongate: 0.3, alpha: [0.8, 0.8],
+                         round: 0, oval: 0.5,
                          extras: [{ kind: "frost", size: 1.5, alpha: [0.72, 0.85],
                                     tone: "lighter", blend: "screen", under: true }] });
-  var ROCK_BELTS = belt("rock-belts", "Rock Belts", "chunk", [0.08, 0.12], [10, 60]);
+  /* Ice and rock: half the pockets a round or oval field rather than a
+   * streak (`oval`, D303), so a nebula's belts are not always streaks. */
+  var ROCK_BELTS = belt("rock-belts", "Rock Belts", "chunk", [0.08, 0.12], [10, 60],
+                        { round: 0, oval: 0.5 });
   /* Knots, some tight and some loose: the field's size is rolled per field
    * over a wide range, so one is a hard bright clump and the next a haze. */
   var METAL_BELTS = belt("metal-belts", "Metal Belts", "glint", [0.032, 0.05], [20, 90],

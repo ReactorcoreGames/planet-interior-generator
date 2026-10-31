@@ -41,6 +41,7 @@ CC.Export = (function () {
   var getSettings = null;
   var getName = null;
   var getStats = null;
+  var lensFor = null;
   var drawBackground = null;
 
   var ASPECTS = { "16:9": 16 / 9, "1:1": 1, "4:3": 4 / 3, "3:2": 3 / 2 };
@@ -195,8 +196,11 @@ CC.Export = (function () {
     var canvas = makeCanvas(w, h);
     var ctx = canvas.getContext("2d");
 
+    var bodyAreaW = w - cardW - margin * 2;
+
     /* The background spans the whole frame, so the card sits ON the scene
-     * rather than beside a differently-coloured panel. */
+     * rather than beside a differently-coloured panel. Round a black hole its
+     * stars bend about the body's centre in the region it is rendered into. */
     CC.Canvas.drawBackground(ctx, w, h, merged.background || "solid", {
       color: merged.backgroundColor || "#05070e",
       color2: merged.backgroundColor2,
@@ -204,10 +208,10 @@ CC.Export = (function () {
       stars: merged.stars === undefined ? true : !!merged.stars,
       seed: merged.seed,
       density: merged.starfieldDensity === undefined ? 0.6 : merged.starfieldDensity,
-      scale: merged.nebulaScale === undefined ? 0.5 : merged.nebulaScale
+      scale: merged.nebulaScale === undefined ? 0.5 : merged.nebulaScale,
+      lens: lensFor ? lensFor(bodyAreaW + margin, h, merged) : null
     });
 
-    var bodyAreaW = w - cardW - margin * 2;
     renderTo(ctx, w, h, merged,
              { x: 0, y: 0, width: bodyAreaW + margin, height: h });
 
@@ -391,6 +395,7 @@ CC.Export = (function () {
     getSettings = opts.getSettings;
     getName = opts.getName || null;
     getStats = opts.getStats || null;
+    lensFor = opts.lensFor || null;
 
     /* ui/share.js needs the same two accessors plus the filename helper, and
      * is handed them here rather than reaching for them itself. */

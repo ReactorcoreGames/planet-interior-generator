@@ -46,6 +46,10 @@ var CC = CC || {};
       "The ground. Very little of it is as solid as it looks.");
     add(facts.dust,
       "The wind. It carries enough grit to strip paint in minutes.");
+    /* The built orbital traits (D295): each line leaves the story open, as
+     * the picture does (D290). */
+    add(facts.traits.indexOf("minefield") >= 0,
+      "The mines. Not all of them still answer to anyone.");
     },
 
     notable: function (facts, add) {
@@ -68,6 +72,12 @@ var CC = CC || {};
       "The crust rings like a struck bell after any significant impact.");
     add(facts.traits.indexOf("cratered") >= 0,
       "Nothing has resurfaced here in a very long time. Every impact is still visible.");
+    add(facts.traits.indexOf("orbital-ring") >= 0,
+      "A ring of stations circles the world on tethers to the ground. Its builders left no record of building it.");
+    add(facts.traits.indexOf("defence-network") >= 0,
+      "The gun platforms point both ways. Whether they keep things out or in depends on who you ask.");
+    add(facts.traits.indexOf("minefield") >= 0,
+      "The high orbits are mined. Quarantine or perimeter, the beacons don't say.");
     add(facts.interiorHeat < 0.1,
       "The magnetic field is gone. It stopped some time in the last billion years.");
     add(facts.interiorHeat > 0.85,
@@ -106,6 +116,12 @@ var CC = CC || {};
     add(facts.atmosphere.pressure > 0.4 && facts.atmosphere.pressure < 6,
       "Aerobraking is viable, if you trust your heat shielding.");
     add(facts.gravity > 1.8, "The gravity well is deep. Getting down is easy; getting back up is expensive.");
+    add(facts.traits.indexOf("orbital-ring") >= 0,
+      "Dock at the ring and ride an elevator down. Slower than a lander, and far less frightening.");
+    add(facts.traits.indexOf("defence-network") >= 0,
+      "Broadcast your registry early. The platforms are listening.");
+    add(facts.traits.indexOf("minefield") >= 0,
+      "There is a cleared lane through the minefield. Find out who keeps it clear before you use it.");
     add(facts.landFraction < 0.02, "No dry landing sites. Everything here is liquid or moving.");
     add(facts.hazardScore < 4,
       "Straightforward approach. Plenty of stable ground for landing.");

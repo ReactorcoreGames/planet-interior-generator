@@ -624,10 +624,14 @@ CC.Canvas = (function () {
 
       ctx.globalAlpha = clamp(a, 0, 1);
       ctx.fillStyle = rng() < 0.86 ? "#ffffff" : (rng() < 0.5 ? "#cfe0ff" : "#ffe9c8");
+      /* Round a black hole, each star is drawn as its lensed images
+       * instead (draw/lens.js). */
+      if (opts.lens) { CC.Lens.star(ctx, opts.lens, x, y, Math.max(0.35, r)); continue; }
       ctx.beginPath();
       ctx.arc(x, y, Math.max(0.35, r), 0, TAU);
       ctx.fill();
     }
+    if (opts.lens) CC.Lens.field(ctx, opts.lens, opts.seed, density, unit);
     ctx.restore();
     ctx.globalAlpha = 1;
   }

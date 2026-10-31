@@ -243,51 +243,9 @@ CC.Scene = (function () {
     return out;
   }
 
-  function render(ctx, width, height, body, settings, palette, details) {
-    settings = settings || {};
-
-    /* The palette is normally built by the caller and passed in, so a colour
-     * change can redraw cached geometry without re-running the structure
-     * stage. Built here as a fallback so a render is always possible from
-     * body + settings alone. */
-    if (!palette) {
-      palette = CC.Palette.build(
-        body, CC.Archetypes.get(body.archetype).colorProfile, settings, settings.seed);
-    }
-
-    /* Detail geometry, likewise: normally generated once and cached by the
-     * caller, so dragging a colour slider never re-rolls a position. */
-    if (!details) {
-      details = CC.Details.build(body, settings, settings.seed);
-    }
-
-    /* --- 1. background ---
-     *
-     * `skipBackground` means "something has already painted here; leave it
-     * alone". It is NOT the same as `background: "transparent"`, and the
-     * difference is a real defect that shipped for one round: transparent mode
-     * calls `clearRect`, so a composed export — which paints one starfield
-     * across the whole canvas and then renders the body into a sub-region —
-     * had the body's own render ERASE the stars it was drawn over. The stars
-     * survived only in the strip the body never touched, which read as a
-     * starfield that had mostly failed to draw.
-     *
-     * A caller compositing the body onto an existing scene wants neither a new
-     * background nor a hole punched in the old one. That is a third state, so
-     * it needs its own flag rather than a third background MODE — the modes
-     * are a user-facing control and this is not a choice a user makes. */
-    if (!settings.skipBackground) {
-      CC.Canvas.drawBackground(ctx, width, height, settings.background || "solid", {
-        color: settings.backgroundColor || "#05070e",
-        color2: settings.backgroundColor2,
-        angle: settings.backgroundAngle,
-        stars: settings.stars === undefined ? true : !!settings.stars,
-        seed: settings.seed,
-        density: settings.starfieldDensity === undefined ? 0.6 : settings.starfieldDensity,
-        scale: settings.nebulaScale === undefined ? 0.5 : settings.nebulaScale
-      });
-    }
-
+  /* How far out the picture reaches, measured from the body and its details
+   * alone — no drawing — so `lens` can ask it before a render as well. */
+  function reachOf(body, settings, details) {
     /* HOW FAR OUT THE PICTURE REACHES. This used to size the body — it does
      * not any more (see draw/canvas.js), because letting it do so meant every
      * ringed world was drawn smaller than a bare one. What it is now is a
@@ -403,14 +361,13 @@ CC.Scene = (function () {
       if (pick > extent) extent = pick;
     }
 
-    /* `offsetX` is passed straight through: it shifts the body's centre left to
-     * leave room for the info card, which floats over a full-bleed canvas. The
-     * preview supplies it from CSS; the scene stays ignorant of what the room
-     * is for — see draw/canvas.js.
-     *
-     * Composition, not framing: an export that wants the body centred simply
-     * omits it, which is what `renderTo` does. */
-    var view = CC.Canvas.makeView(width, height, {
+    return { extent: extent, bodyReach: bodyReach };
+  }
+
+  /* The view a render of this body at this size makes: shared by `render`
+   * and by `lens`, so the two cannot disagree about where the hole is. */
+  function viewFor(width, height, body, settings, extent) {
+    return CC.Canvas.makeView(width, height, {
       /* `body.frame` scales it for a body whose surroundings are the
        * picture — a black hole's disc and jets (gen/structure.js). */
       bodyFrac: (settings.bodySize === undefined ? 0.78 : settings.bodySize) *
@@ -430,6 +387,85 @@ CC.Scene = (function () {
       panX: settings.panX,
       panY: settings.panY
     });
+  }
+
+  /* The starfield's lens round a black hole, in frame pixels, or null. The
+   * view has to exist first, which is why the background is painted after it.
+   * Public so a caller that paints the background itself — the composed
+   * export — can bend its stars round the body it is about to render. */
+  function lensFor(body, view) {
+    var L = body.hole && body.hole.lens;
+    return L ? { x: view.cx, y: view.cy, r: view.px(L) } : null;
+  }
+
+  function lens(width, height, body, settings, details) {
+    if (!body.hole || !body.hole.lens) return null;
+    settings = settings || {};
+    details = details || CC.Details.build(body, settings, settings.seed);
+    return lensFor(body, viewFor(width, height, body, settings,
+                                 reachOf(body, settings, details).extent));
+  }
+
+  function render(ctx, width, height, body, settings, palette, details) {
+    settings = settings || {};
+
+    /* The palette is normally built by the caller and passed in, so a colour
+     * change can redraw cached geometry without re-running the structure
+     * stage. Built here as a fallback so a render is always possible from
+     * body + settings alone. */
+    if (!palette) {
+      palette = CC.Palette.build(
+        body, CC.Archetypes.get(body.archetype).colorProfile, settings, settings.seed);
+    }
+
+    /* Detail geometry, likewise: normally generated once and cached by the
+     * caller, so dragging a colour slider never re-rolls a position. */
+    if (!details) {
+      details = CC.Details.build(body, settings, settings.seed);
+    }
+
+    var measured = reachOf(body, settings, details);
+    var extent = measured.extent, bodyReach = measured.bodyReach;
+
+    /* `offsetX` is passed straight through: it shifts the body's centre left to
+     * leave room for the info card, which floats over a full-bleed canvas. The
+     * preview supplies it from CSS; the scene stays ignorant of what the room
+     * is for — see draw/canvas.js.
+     *
+     * Composition, not framing: an export that wants the body centred simply
+     * omits it, which is what `renderTo` does. */
+    var view = viewFor(width, height, body, settings, extent);
+
+    /* --- 1. background ---
+     *
+     * `skipBackground` means "something has already painted here; leave it
+     * alone". It is NOT the same as `background: "transparent"`, and the
+     * difference is a real defect that shipped for one round: transparent mode
+     * calls `clearRect`, so a composed export — which paints one starfield
+     * across the whole canvas and then renders the body into a sub-region —
+     * had the body's own render ERASE the stars it was drawn over. The stars
+     * survived only in the strip the body never touched, which read as a
+     * starfield that had mostly failed to draw.
+     *
+     * A caller compositing the body onto an existing scene wants neither a new
+     * background nor a hole punched in the old one. That is a third state, so
+     * it needs its own flag rather than a third background MODE — the modes
+     * are a user-facing control and this is not a choice a user makes.
+     *
+     * Painted AFTER the view is made, because round a black hole the stars
+     * are lensed about the hole's centre in frame pixels (draw/lens.js). */
+    if (!settings.skipBackground) {
+      CC.Canvas.drawBackground(ctx, width, height, settings.background || "solid", {
+        color: settings.backgroundColor || "#05070e",
+        color2: settings.backgroundColor2,
+        angle: settings.backgroundAngle,
+        stars: settings.stars === undefined ? true : !!settings.stars,
+        seed: settings.seed,
+        density: settings.starfieldDensity === undefined ? 0.6 : settings.starfieldDensity,
+        scale: settings.nebulaScale === undefined ? 0.5 : settings.nebulaScale,
+        lens: lensFor(body, view)
+      });
+    }
 
 
     ctx.save();
@@ -1409,5 +1445,5 @@ CC.Scene = (function () {
     return { view: view, palette: palette, details: details, extent: extent };
   }
 
-  return { render: render, bandFill: bandFill };
+  return { render: render, lens: lens, bandFill: bandFill };
 })();

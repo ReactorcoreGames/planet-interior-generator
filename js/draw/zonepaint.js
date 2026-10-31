@@ -551,8 +551,16 @@ CC.ZonePaint = (function () {
      * that reason — a single unclipped band would pass in front of the body. */
     drawOrbitalHaze(ctx, view, els, colour, sky);
 
-    for (var i = 0; i < els.length; i++) {
-      var e = els[i];
+    /* NATURAL MATERIAL FIRST, THEN ANYTHING BUILT (D297). A ring band is a
+     * translucent haze and a station is solid metal: drawn the other way
+     * round, a city on the far side of a giant was washed out to a ghost by
+     * the bands laid over it. Within each group the order is unchanged. */
+    var order = [];
+    for (var o = 0; o < els.length; o++) if (!els[o].built) order.push(els[o]);
+    for (o = 0; o < els.length; o++) if (els[o].built) order.push(els[o]);
+
+    for (var i = 0; i < order.length; i++) {
+      var e = order[i];
       var alpha = clampUnit(e.alpha * opacity);
       if (alpha <= 0.004) continue;
 

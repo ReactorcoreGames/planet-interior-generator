@@ -612,6 +612,12 @@ var CC = CC || {};
          * the markdown factsheet — all three paint the same stats.lines the
          * on-screen panel shows. */
         getStats: function () { return currentStats; },
+        /* Where the starfield bends round a black hole, for an export that
+         * paints the background itself (draw/lens.js). */
+        lensFor: function (w, h, s) {
+          if (!current) draw();
+          return CC.Scene.lens(w, h, current, s, currentDetails);
+        },
         /* A settings string carries the trait salt, so restoring one has to
          * be able to put it back. */
         setTraitSalt: function (n) { traitSalt = n; }

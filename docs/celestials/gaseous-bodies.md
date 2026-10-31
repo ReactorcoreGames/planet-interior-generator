@@ -123,8 +123,17 @@ radiation-belt
 > coreless giant has no discrete core to draw an edge around. That's the
 > parameter changing the picture structurally, not just scaling a radius.
 
-**Artificial:** gas-miner-platforms · orbital-cities · hab-flotilla ·
-skyhook · orbital-ring
+**Artificial:** gas-miner-platforms · skimmer-tracks · skyhook-cities
+
+> **`skyhook-cities`** (Phase 9b, Session AD, D296) is the giant's space
+> elevator and its one kind of city, as a single trait: 3–11 skyhooks evenly
+> spaced on one orbit just above the skimmers, each a scoop hung mouth-down in
+> the cloud deck on a tether up to a platform, and 1–5 small orbital cities
+> hanging those tethers from higher up on the hooks nearest the sides. One
+> city design per body — wheel, cylinder pair or spire. Gated on `gaseous`; see
+> [MACHINE-WORLDS.md](../MACHINE-WORLDS.md#for-gas-giants-and-ice-giants).
+> hab-flotilla, orbital-ring and orbital-platforms were dropped by the Session
+> AB audit (D289).
 
 ### Stats template
 
@@ -205,7 +214,8 @@ faint regular lattice pattern, unlike anything else in the generator.
 ### Eligible traits
 
 tilted-axis · faint-rings · storm-spots · diamond-rain · supersonic-winds ·
-polar-vortex · debris-belt · aurora · gas-miner-platforms · orbital-platforms
+polar-vortex · debris-belt · aurora · gas-miner-platforms · skimmer-tracks ·
+skyhook-cities
 
 > `tilted-axis` is a zone modifier with `axis: "polar"` and a non-zero `offset`,
 > so its bands sit skewed from the poles and the two hemispheres read

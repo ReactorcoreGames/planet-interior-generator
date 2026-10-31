@@ -230,8 +230,9 @@ var CC = CC || {};
       if (has("embedded-star") || has("protostar-cluster") || (facts.emission && form === "cloud" && lum > 0.75)) {
         why.push("young stars flood it with ultraviolet");
       }
-      if (!why.length) why.push("nothing to hit; the danger is getting lost, " +
-                                "and nobody hearing you call");
+      /* What flying it is like, not the danger: Biggest danger already says
+       * "getting lost", and the two lines used to repeat it (D317). */
+      if (!why.length) why.push("nothing solid to hit, and room to turn in any direction");
 
       var lines = [
         { key: "size", label: "Size",

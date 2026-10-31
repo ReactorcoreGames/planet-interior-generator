@@ -106,7 +106,9 @@ var CC = CC || {};
     add(facts.atmosphere.pressure > 3, "Helium-3 in the upper atmosphere. Easy scooping, hard shipping.");
     add(facts.interiorHeat > 0.8, "Exotic isotopes in the mantle that shouldn't form naturally.");
     add(facts.breathable, "Stable ground and a workable atmosphere - the rarest resources of all.");
-    add(true, "Nothing of obvious value, which is its own kind of useful.");
+    add(facts.hiddenOcean,
+      "A whole ocean of liquid water under the ice, for whoever drills through first.");
+    add(!facts.hiddenOcean, "Nothing of obvious value, which is its own kind of useful.");
     add(facts.tempMin < -60,
       "Crystalline formations that regrow after harvest on a decadal cycle.");
     },

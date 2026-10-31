@@ -225,16 +225,21 @@ var CC = CC || {};
 
       /* The wisps: nested arcs, spacing and height growing outward, each
        * broken into knots so they read as shocked gas, not as rings. */
+      /* HOW MANY FOLLOWS DETAIL DENSITY (D316): 7 at the default, 4 to 9
+       * across the control, packed into the same extent — `ii` is the wisp's
+       * place on the original 0..6 scale, so more wisps are closer, not
+       * further out. */
       ctx.strokeStyle = style;
       ctx.lineCap = "round";
-      var N = 7;
+      var dk = el.detail === undefined ? 0.65 : el.detail;
+      var N = Math.max(3, Math.round(3 + 6.2 * dk));
       for (var i = 0; i < N; i++) {
-        var k = sd * 10 + i;
-        var x = lc + 0.04 + i * 0.11 * (1 + 0.10 * i) + (h(k) - 0.5) * 0.04;
-        var hh = 0.16 + 0.085 * i + h(k + 0.3) * 0.05;
-        var bow = 0.06 + 0.028 * i;
+        var k = sd * 10 + i, ii = i * 6 / (N - 1);
+        var x = lc + 0.04 + ii * 0.11 * (1 + 0.10 * ii) + (h(k) - 0.5) * 0.04;
+        var hh = 0.16 + 0.085 * ii + h(k + 0.3) * 0.05;
+        var bow = 0.06 + 0.028 * ii;
         var fall = Math.pow(1 - i / N, 0.9);
-        ctx.lineWidth = view.lw(2.2 - i * 0.2);
+        ctx.lineWidth = view.lw(2.2 - ii * 0.2);
         var segs = 9;
         for (var j = 0; j < segs; j++) {
           if (h(k * 31 + j) < 0.14) continue;
@@ -254,7 +259,8 @@ var CC = CC || {};
 
       /* Streaks along the equator: the wind itself, leaving. */
       ctx.lineWidth = view.lw(0.8);
-      for (var m = 0; m < 14; m++) {
+      var nStreak = Math.round(5 + 13.8 * dk);
+      for (var m = 0; m < nStreak; m++) {
         var u = h(sd * 50 + m);
         var r0 = lc + u * 1.3, len = 0.05 + h(sd * 70 + m) * 0.14;
         var yy = (h(sd * 90 + m) - 0.5) * (0.10 + u * 0.5);

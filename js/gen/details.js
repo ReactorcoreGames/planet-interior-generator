@@ -65,6 +65,32 @@ CC.Details = (function () {
     return out;
   }
 
+  /* A TRAIT A FORMED BODY ANSWERS WITH ITS OUTLINE (D313): `bite` in a
+   * layer's `absorbs` entry, `{ count, width (degrees), depth }` as [lo, hi]
+   * ranges, turns the trait into scoops out of the body's form — the
+   * asteroid's impact basin as a real hole in the rock rather than a dark
+   * sector of crust. Its own stream, so no other roll moves. */
+  function biteRoll(body, traits, seed) {
+    if (!body.form) return null;
+    var out = [];
+    for (var l = 0; l < body.layers.length; l++) {
+      var abs = body.layers[l].absorbs;
+      if (!abs) continue;
+      for (var i = 0; i < traits.length; i++) {
+        var b = abs[traits[i].id] && abs[traits[i].id].bite;
+        if (!b || CC.TraitRoll.anchorLayer(traits[i], body) !== body.layers[l]) continue;
+        var rng = CC.RNG.stream(seed, "bite/" + traits[i].id);
+        var pick = function (r) { return r[0] + (r[1] - r[0]) * rng(); };
+        var n = Math.round(pick(b.count)), a0 = rng() * Math.PI * 2;
+        for (var k = 0; k < n; k++) {
+          out.push({ angle: a0 + k * (Math.PI * 2 / n) + (rng() - 0.5) * 1.2,
+                     width: pick(b.width) * Math.PI / 180, depth: pick(b.depth) });
+        }
+      }
+    }
+    return out.length ? out : null;
+  }
+
   /* ---- the stage -------------------------------------------------------- */
 
   /* Build every detail element for a body.
@@ -124,8 +150,9 @@ CC.Details = (function () {
      * amplitude, which changes the field every later stage samples, and trait
      * instances are placed against the same angles. */
     var archetype = CC.Archetypes.get(body.archetype);
-    var formFn = body.form ? CC.Form.fn(body.form) : null;
     var traits = CC.TraitRoll.select(archetype, params, seed);
+    var formBites = biteRoll(body, traits, seed);
+    var formFn = body.form ? CC.Form.fn(body.form, formBites) : null;
     /* A trait may switch the archetype's own structure data (`sets`,
      * gen/traitsets.js): every builder below reads the result. */
     archetype = CC.TraitSets.apply(archetype, traits);
@@ -819,6 +846,9 @@ CC.Details = (function () {
     var bore = CC.Bore.build(archetype, body, params, seed, rupture);
 
     return {
+      /* Scoops out of the form an absorbed trait asked for (`biteRoll`);
+       * draw/scene.js hands them to the view's warp. Null on most bodies. */
+      formBites: formBites,
       caves: caves,
       /* Supports spanning the voids under hollow layers (gen/shells.js).
        * Empty on every body without a `gapBelow`. */

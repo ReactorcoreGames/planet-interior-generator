@@ -366,7 +366,7 @@ CC.Scene = (function () {
 
   /* The view a render of this body at this size makes: shared by `render`
    * and by `lens`, so the two cannot disagree about where the hole is. */
-  function viewFor(width, height, body, settings, extent) {
+  function viewFor(width, height, body, settings, extent, details) {
     return CC.Canvas.makeView(width, height, {
       /* `body.frame` scales it for a body whose surroundings are the
        * picture — a black hole's disc and jets (gen/structure.js). */
@@ -376,7 +376,7 @@ CC.Scene = (function () {
       offsetX: settings.offsetX,
       /* The body's form (js/gen/form.js): the warp every boundary and element
        * rides, applied inside view.at. Null on every body that declares none. */
-      form: body.form ? CC.Form.fn(body.form) : null,
+      form: body.form ? CC.Form.fn(body.form, details && details.formBites) : null,
       formRotation: body.rotation || 0,
       /* FRAMING RIDES THROUGH UNTOUCHED, which is what makes an export honour
        * the close-up the user set up on screen: export re-renders through this
@@ -403,7 +403,7 @@ CC.Scene = (function () {
     settings = settings || {};
     details = details || CC.Details.build(body, settings, settings.seed);
     return lensFor(body, viewFor(width, height, body, settings,
-                                 reachOf(body, settings, details).extent));
+                                 reachOf(body, settings, details).extent, details));
   }
 
   function render(ctx, width, height, body, settings, palette, details) {
@@ -434,7 +434,7 @@ CC.Scene = (function () {
      *
      * Composition, not framing: an export that wants the body centred simply
      * omits it, which is what `renderTo` does. */
-    var view = viewFor(width, height, body, settings, extent);
+    var view = viewFor(width, height, body, settings, extent, details);
 
     /* --- 1. background ---
      *
@@ -630,7 +630,7 @@ CC.Scene = (function () {
      * vanish from a breach with no further work. */
     for (i = 1; i < layers.length; i++) {
       if (!layers[i].breach || layers[i].outward || layers[i - 1].outward) continue;
-      var brf = CC.Form.breachFn(layers[i], settings, settings.seed);
+      var brf = CC.Form.breachFn(layers[i], settings, settings.seed, layers[i - 1].strength);
       if (!brf) continue;
       bounds[i] = (function (own, above, rOwn, rAbove, w) {
         return function (a) {

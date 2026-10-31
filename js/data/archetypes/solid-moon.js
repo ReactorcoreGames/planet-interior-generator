@@ -227,7 +227,13 @@ var CC = CC || {};
          * Dark: it is a sea with a lid on it and no sky to reflect. */
         frac: [0.800, 0.850],
         presence: { requires: "ice-shell" },
-        boundary: "perfect"
+        boundary: "perfect",
+        /* THE SEA BREAKS THROUGH A WEAK SHELL (D317). The shell's strength
+         * falls as the body warms toward losing it; drawn at full weight it
+         * was a solid lid under a 78 C equator. As strength drops, open
+         * leads appear, then the shell is floes on the sea. `by: "above"`
+         * reads the shell's strength rather than a setting. */
+        breach: { by: "above", amount: [1.0, 0.0], sectors: 4 }
       },
       {
         role: "crust",

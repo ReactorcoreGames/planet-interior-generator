@@ -156,16 +156,24 @@ var CC = CC || {};
        * small lean, so two bodies at one heat are related, not identical.
        * `sat` is a multiplier: high at both coloured ends, near zero at the
        * white point, where the hue curve steps from amber to blue unseen. */
+      /* THE WHITE POINT IS CREAM, NOT GREY (D316). At 0.5 the sat dip and
+       * the deeper bands' lower value read as a drab grey-beige; the warm
+       * end now holds a cream through 0.5, the unseen amber-to-blue step
+       * moves to 0.525 where sat dips instead, and value lifts either side
+       * of it. Not AT it: with no colour left, value is all that keeps the
+       * core the brightest band, and lifting there dimmed the core. */
       dial: {
         param: "interiorHeat",
         hue: {
-          curve: [[0, 10], [0.28, 24], [0.46, 42], [0.50, 46],
-                  [0.505, 212], [0.75, 218], [1, 226]],
+          curve: [[0, 10], [0.28, 24], [0.46, 40], [0.52, 46],
+                  [0.525, 212], [0.75, 218], [1, 226]],
           amount: 0.90
         },
-        sat: [[0, 5.2], [0.25, 3.8], [0.44, 1.5], [0.50, 0.75],
-              [0.56, 1.2], [0.75, 2.6], [1, 3.6]],
-        val: [[0, 0.80], [0.3, 0.92], [0.6, 1.0]]
+        sat: [[0, 5.2], [0.25, 3.8], [0.44, 1.9], [0.50, 1.6],
+              [0.525, 0.6], [0.56, 1.2], [0.75, 2.6], [1, 3.6]],
+        val: [[0, 0.80], [0.3, 0.92], [0.42, 1.0], [0.48, 1.15],
+              [0.51, 1.15], [0.525, 1.04], [0.545, 1.04], [0.58, 1.12],
+              [0.68, 1.04], [0.78, 1.0]]
       },
       order: ["magnetosphere", "plasma-skin", "iron-lattice", "nuclear-pasta",
               "superfluid", "quark-core"],

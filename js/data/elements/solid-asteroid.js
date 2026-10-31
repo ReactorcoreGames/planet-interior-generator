@@ -121,8 +121,13 @@ var CC = CC || {};
            *
            * The spec's "void pockets between cells: 5-25" is the same claim
            * expressed as a count; as a fraction it survives the cell count
-           * changing underneath it, which it does here by design. */
-          voids: [0.28, 0.03],
+           * changing underneath it, which it does here by design.
+           *
+           * WIDENED (D313): the user wanted Cohesion to be dramatic, a body
+           * at the bottom of the dial nine-tenths hole, a few fragments held
+           * in a void. buildMosaic eases it in (squared), so the default
+           * middle stays mostly rock. */
+          voids: [0.90, 0.03],
           /* 2-4 MATERIALS, verbatim from the spec. */
           materials: [2, 4],
           /* THE JOINT WIDTH at the two ends, in body-space units. Wide enough
@@ -142,7 +147,7 @@ var CC = CC || {};
           voidIce: { param: "starlight", full: 0.08, none: 0.30 },
           /* SOME FRAGMENTS ARE HOT — Interior heat, relabelled Radioactivity
            * on this body (ASTEROID-OVERHAUL §8). A share of the solid cells
-           * leans sickly yellow-green or cold blue-white and, near the top,
+           * leans sickly yellow-green or pink-white and, near the top,
            * glows. See buildMosaic and mosaicFill. */
           mosaicRadio: "interiorHeat",
           depth: [0.0, 1.0],

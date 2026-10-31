@@ -39,10 +39,12 @@ CC.Hole = (function () {
 
   /* The disc's colour at fraction t of the way out: WHITE-HOT AT THE INNER
    * EDGE, cooler and more saturated outward — the spec's signature gradient.
-   * The hue is the body's own, leaned slightly warmer at the hot end. */
+   * The hue is the body's own, leaned slightly warmer at the hot end.
+   * Saturated harder and sooner than it was (D315): the user found the pale
+   * discs short of how violent a feeding hole is. No hue bias — variety stays. */
   function discColour(base, t, a) {
-    var s = lerp(0.12, 0.78, Math.pow(t, 0.8));
-    var v = lerp(1.0, 0.52, t);
+    var s = lerp(0.34, 1.0, Math.pow(t, 0.45));
+    var v = lerp(1.0, 0.70, t);
     var h = base.h + (1 - t) * 10;
     return CC.Color.hsva(h, s, v, clamp(a, 0, 1));
   }

@@ -612,6 +612,10 @@ CC.TraitRoll = (function () {
        * accretion stream follows a field line). Absent on every body that
        * declares no `poles`. See js/gen/compact.js. */
       if (body.poles) made[i].poles = body.poles;
+      /* Detail density, for a one-element trait whose marks are drawn in
+       * its primitive and so never pass the count scaling (the pulsar
+       * wind's wisps, D316). */
+      made[i].detail = density;
       /* Traits are not layer details, so the Flow indicators dropdown does not
        * govern them — it means "how diagrammatic is the circulation", which is
        * a statement about layers. */

@@ -24,15 +24,15 @@ Rules as ever: plain scripts, ≤500 lines per file, no ES modules, no new tests
 - [x] **Open question 1b**: ask the user to look at the bottom edge of a body in the real app (`launch_app_win.bat`) for a straight horizontal cut; it does not reproduce in the harness. Fix if seen, close if not
 - [x] **Open question 4 + opacity** (D308): an atmosphere alpha sweep across a sheet of planets and moons; the user picks the peak alpha, and whether it becomes an opacity control
 
-## AJ — the eye lists and the card notes
+## AJ — the eye lists and the card notes ✅
 
 A crop render per item; the user says keep or change. The user is generally satisfied, so keep is the expected answer.
 
-- [ ] **U1**: the high-Cohesion mosaic reading flat; ice colour and strength; the breach threshold (~0.5 Cohesion)
-- [ ] **U2**: cave tone; the impact basin as a dark sector rather than a dent; exit mouths; mining-station density (6–16); Radioactivity's blue-white
-- [ ] **V**: starquake jaggedness (`jag`); the neutron star's magnetosphere fill disc; faint light-bending arcs and photon ring; violet accretion discs (a warm bias is one line). Lensing is done (D304)
-- [ ] **Y**: the blackbody white point at Surface heat ~0.5; hot-patch size and count; pulsar-wind wisps not reading Detail density
-- [ ] **D286's card notes**: the nebula's Navigation and Biggest danger repeating each other; the ice moon's "Nothing of obvious value" over its hidden ocean; the ice shell drawn at full weight whatever its presence strength
+- [x] **U1** (D313: voids to ~90% at Cohesion 0, glassy ice, depth shade): the high-Cohesion mosaic reading flat; ice colour and strength; the breach threshold (~0.5 Cohesion)
+- [x] **U2** (D314: the basin bites the outline, pink-white radioactivity; caves, mouths, stations kept): cave tone; the impact basin as a dark sector rather than a dent; exit mouths; mining-station density (6–16); Radioactivity's blue-white
+- [x] **V** (D315: saturated discs, no hue bias; the rest kept): starquake jaggedness (`jag`); the neutron star's magnetosphere fill disc; faint light-bending arcs and photon ring; violet accretion discs (a warm bias is one line). Lensing is done (D304)
+- [x] **Y** (D316: a cream white point, the wind reads Detail density; hot patches kept): the blackbody white point at Surface heat ~0.5; hot-patch size and count; pulsar-wind wisps not reading Detail density
+- [x] **D286's card notes** (D317: the nebula fallback reworded, `hiddenOcean`, the shell breaks up): the nebula's Navigation and Biggest danger repeating each other; the ice moon's "Nothing of obvious value" over its hidden ocean; the ice shell drawn at full weight whatever its presence strength
 
 ## AK — the unbuilt controls and the spec drift
 

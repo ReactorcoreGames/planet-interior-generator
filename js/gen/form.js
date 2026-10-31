@@ -86,7 +86,7 @@ CC.Form = (function () {
    * Built once per body as a table: the outline is sampled densely in the
    * shape's own frame, each sample re-expressed as (bearing, radius) about the
    * frame centre, and the radii interpolated onto evenly spaced bearings. */
-  function fn(form) {
+  function fn(form, bites) {
     if (!form) return null;
 
     var N = 2048;
@@ -133,6 +133,23 @@ CC.Form = (function () {
       var bl = bear[lo] - (j === 0 ? TAU : 0);
       var u = bh - bl > 1e-9 ? (a - bl) / (bh - bl) : 0;
       table[bi] = rad[lo] + (rad[hi] - rad[lo]) * u;
+    }
+
+    /* BITES — an impact basin on a body whose shell absorbs it (D313): a
+     * round scoop out of the outline with a low raised lip either side, so
+     * every layer and cell that wears the form lines the hollow. `bites` is
+     * [{ angle, width (half-angle, radians), depth (fraction of radius) }],
+     * rolled in gen/details.js; applied before the normalization so a lip
+     * can never push the body past its frame. */
+    for (var k = 0; bites && k < bites.length; k++) {
+      var bt = bites[k];
+      for (bi = 0; bi < BINS; bi++) {
+        var d = Math.abs((((bi / BINS) * TAU - bt.angle) % TAU + TAU * 1.5) % TAU - TAU / 2);
+        var u2 = d / bt.width, dent = 0;
+        if (u2 < 1) dent = bt.depth * Math.sqrt(1 - u2 * u2);
+        dent -= bt.depth * 0.22 * Math.exp(-Math.pow((u2 - 1) / 0.22, 2));
+        table[bi] *= 1 - dent;
+      }
     }
 
     /* NORMALIZED ABOUT THE SHAPE'S OWN MIDDLE, NOT THE FRAME CENTRE.
@@ -188,10 +205,12 @@ CC.Form = (function () {
    *
    * `breach: { param, amount: [atParam0, atParam1], sectors }`. Returns null
    * when the field is zero everywhere, so the boundary is left untouched. */
-  function breachFn(layer, params, seed) {
+  function breachFn(layer, params, seed, aboveStrength) {
     var b = layer && layer.breach;
     if (!b) return null;
-    var v = params ? params[b.param] : undefined;
+    /* `by: "above"` is driven by the strength of the layer above (the moon's
+     * ocean through a weakening ice shell, D317) rather than a setting. */
+    var v = b.by === "above" ? aboveStrength : (params ? params[b.param] : undefined);
     if (v === undefined) v = 1;
     v = Math.max(0, Math.min(1, v));
     var amt = b.amount[0] + (b.amount[1] - b.amount[0]) * v;

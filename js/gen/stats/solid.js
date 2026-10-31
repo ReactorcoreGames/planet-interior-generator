@@ -222,9 +222,35 @@ var CC = CC || {};
   /* WHAT IS UNDERFOOT is the outermost layer that is not the atmosphere,
    * qualified by what the climate is doing to it. Ocean depth removing the sea
    * changes this line, because it changes which layer that is. */
-  function surfaceOf(body, details, climate) {
+  /* HOW MUCH OF THE SEA THE LID HAS LOST (D317): a weak shell breaks and
+   * the sea shows through. Asks the renderer's own question — the breach
+   * draw/scene.js composes from the same `breachFn` — over 360 bearings. */
+  function openWaterOf(body, settings) {
+    for (var i = 1; i < body.layers.length; i++) {
+      var L = body.layers[i];
+      if (L.role !== "ocean" || !L.breach) continue;
+      var f = CC.Form.breachFn(L, settings, settings.seed, body.layers[i - 1].strength);
+      if (!f) return 0;
+      var open = 0;
+      for (var a = 0; a < 360; a++) if (f(a * Math.PI / 180) > 0.5) open++;
+      return open / 360;
+    }
+    return 0;
+  }
+
+  function surfaceOf(body, details, climate, settings) {
     var lid = lidOverSea(body);
     if (lid) {
+      var open = openWaterOf(body, settings || {});
+      var pct = Math.round(open * 100);
+      if (open >= 0.5) {
+        return "Broken " + lid.name.toLowerCase() + ": floes adrift on open " +
+               "water, about " + pct + "% of the sea uncovered. It is melting.";
+      }
+      if (open >= 0.03) {
+        return lid.name + " cracked open in long leads, with dark water " +
+               "showing through about " + pct + "% of it.";
+      }
       return lid.name + " all the way round, with the ocean sealed beneath " +
              "it. There is no shore anywhere.";
     }
@@ -308,6 +334,9 @@ var CC = CC || {};
         locked: locked, day: day,
         atmosphere: atmosphere, breathable: !!atmosphere.breathable,
         hasOcean: hasOcean, oceanFraction: 1 - landFraction,
+        /* A sea sealed under a shell: not `hasOcean` (no exposed water), but
+         * the card's resource line must not call it worthless (D317). */
+        hiddenOcean: !!climate.subsurface,
         landFraction: landFraction,
         traits: traits,
         /* A dry world with air and an active star has weather that strips
@@ -351,7 +380,7 @@ var CC = CC || {};
         { key: "day", label: "Day length", value: day.text },
         { key: "atmosphere", label: "Atmosphere", value: atmosphere.text },
         { key: "surface", label: "Surface",
-          value: surfaceOf(body, details, climate) },
+          value: surfaceOf(body, details, climate, settings) },
         { key: "notable", label: "Notable", value: CC.Flavour.notableOf(facts, rng) },
         { key: "resources", label: "Resources", value: CC.Flavour.resourceOf(facts, rng) },
         { key: "approach", label: "Approach", value: CC.Flavour.approachOf(facts, rng) },

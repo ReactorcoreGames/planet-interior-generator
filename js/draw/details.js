@@ -813,15 +813,16 @@ CC.DrawDetails = (function () {
     var stoneHue = colour.h + (((34 - colour.h + 540) % 360) - 180) * 0.70;
 
     /* RADIOACTIVE FRAGMENTS (ASTEROID-OVERHAUL §8) — the cells buildMosaic
-     * marked `hot`. A sickly yellow-green or a cold blue-white, one per body
+     * marked `hot`. A sickly yellow-green or a pink-white (D313: blue-white read as ice), one per body
      * so a rock's hot material is one material, and stronger up the range.
      * The glow is the mark that says RADIOACTIVE rather than merely
      * differently coloured, so it only arrives near the top. */
     var rad = el.radioactivity || 0;
     var hotK = clamp((rad - 0.35) / 0.65, 0, 1);
-    var hotHue = ((el.seed || 0) * 7.7 % 1) < 0.6 ? 82 : 192;
-    var hot = CC.Color.hsva(hotHue, 0.24 + hotK * 0.28,
-                            clamp(0.38 + colour.v * 0.25 + hotK * 0.16, 0, 0.88), alpha);
+    var hotHue = ((el.seed || 0) * 7.7 % 1) < 0.6 ? 82 : 332;
+    var pink = hotHue !== 82;
+    var hot = CC.Color.hsva(hotHue, (0.24 + hotK * 0.28) * (pink ? 0.55 : 1),
+                            clamp(0.38 + colour.v * 0.25 + hotK * 0.16 + (pink ? 0.14 : 0), 0, 0.92), alpha);
     var hotGlow = clamp((rad - 0.62) / 0.38, 0, 1);
 
     return {
@@ -857,10 +858,18 @@ CC.DrawDetails = (function () {
                              (0.24 + clamp(colour.v, 0, 1) * 0.42) * (0.09 + 0.21 * t),
                              alpha);
       },
-      /* ICE IN A VOID — pale, cold and faintly blue whatever the rock's hue,
+      /* ICE IN A VOID — pale, cold and blue whatever the rock's hue,
        * because what makes it read as ice is that it is NOT another stone.
-       * Only voids the builder marked `icy` take it (see `voidIce`). */
-      iceFill: CC.Color.hsva(205, 0.11, 0.70, alpha * 0.90),
+       * Only voids the builder marked `icy` take it (see `voidIce`). Bluer
+       * than it was, and glassy: a brighter heart and a bright inner rim,
+       * which is translucence, not a light direction (D313). */
+      iceFill: CC.Color.hsva(202, 0.34, 0.76, alpha * 0.94),
+      iceCore: CC.Color.hsva(196, 0.16, 0.95, alpha * 0.94),
+      iceRim: CC.Color.hsva(190, 0.08, 1.0, alpha * 0.55),
+      /* DENSER TOWARD THE MIDDLE (ASTEROID-OVERHAUL §9's fallback, D313):
+       * the deep fragments take a shade, so a monolith's big slabs are not
+       * one even field. Strongest on a tight body; rubble has its voids. */
+      depthShade: 0.06 + 0.34 * coh * coh,
       hot: hot,
       hotGlow: hotGlow > 0
         ? CC.Color.hsva(hotHue, 0.55, 0.92, alpha * hotGlow * 0.42) : null,

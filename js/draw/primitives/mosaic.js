@@ -164,6 +164,8 @@ var CC = CC || {};
 
     var sites = el.sites;
     var mats = style.materials;
+    var maxR = 0;
+    for (var mr = 0; mr < sites.length; mr++) maxR = Math.max(maxR, sites[mr].radius || 0);
     /* The cut-face texture, or null on a canvas that cannot build one — the
      * fragments are then simply flat. Scaled with the body (texels per pixel
      * follow view.scale), so it is the same rock at every resolution. */
@@ -220,14 +222,25 @@ var CC = CC || {};
          * and that difference is most of what says it is not another stone. */
         if (s.icy && style.iceFill) {
           traceInset(ctx, poly, c, inset * 0.7);
-          ctx.fillStyle = style.iceFill;
+          if (style.iceCore) {
+            var ig = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.r);
+            ig.addColorStop(0, style.iceCore);
+            ig.addColorStop(1, style.iceFill);
+            ctx.fillStyle = ig;
+          } else ctx.fillStyle = style.iceFill;
           ctx.fill();
           if (tex) {
             ctx.save();
             ctx.clip();
             CC.RockTexture.lay(ctx, tex, c, s.shine, texScale,
-                               style.grainAlpha * 0.8, 0);
+                               style.grainAlpha * 0.5, 0);
             ctx.restore();
+          }
+          if (style.iceRim) {
+            traceInset(ctx, poly, c, inset * 0.7 + Math.max(0.8, c.r * 0.08));
+            ctx.strokeStyle = style.iceRim;
+            ctx.lineWidth = Math.max(0.6, c.r * 0.035);
+            ctx.stroke();
           }
           continue;
         }
@@ -291,6 +304,12 @@ var CC = CC || {};
        * separate them by line. */
       ctx.fillStyle = m.body;
       ctx.fill();
+      /* Denser toward the middle (D313): a shade by depth, not by light. */
+      if (style.depthShade && maxR > 0) {
+        var dk = 1 - s.radius / maxR;
+        ctx.fillStyle = "rgba(0,0,0," + (style.depthShade * dk).toFixed(3) + ")";
+        ctx.fill();
+      }
 
       if (tex) {
         ctx.save();

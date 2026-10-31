@@ -754,7 +754,10 @@ CC.ElemGen = (function () {
      * zero — a fragment with no voids at all is a disc of tiles, and a couple
      * of pockets is what keeps it reading as rock. */
     var vr = recipe.voids || [0.30, 0.02];
-    var voidChance = lerp(vr[0], vr[1], coh);
+    /* Eased, not linear (D313): the loose end is now nine-tenths hole, and a
+     * straight line would put half the default body in voids. Squared, the
+     * middle of the dial is a quarter and the drama is at the bottom. */
+    var voidChance = vr[1] + (vr[0] - vr[1]) * (1 - coh) * (1 - coh);
 
     /* HOW MANY MATERIALS. The spec asks for 2-4, "enough variation to read as
      * different materials, not enough to look like confetti". Rolled per body

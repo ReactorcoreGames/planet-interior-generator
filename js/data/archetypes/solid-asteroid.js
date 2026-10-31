@@ -141,14 +141,13 @@ var CC = CC || {};
          * turns both up rather than laying a second crater mechanism over
          * them. See `absorbedScale` in gen/details.js. */
         absorbs: {
-          cratered: { craters: 2.6, elements: { "arc-band": 1.9 } }
-        },
-        /* AN IMPACT BASIN SPANS THE WHOLE BAND. Authored for a planet's crust
-         * at 18-100% of its depth; here the shell's real edges wander past
-         * any fixed fraction of it, and the basin's own circular inner edge
-         * showed as a ruled line across the crust. Reaching past both edges
-         * lets the band clip (draw/scene.js, unfrosted damage) shape it. */
-        traitDepth: { "impact-basin": [-1.0, 1.4] }
+          cratered: { craters: 2.6, elements: { "arc-band": 1.9 } },
+          /* AND THE IMPACT BASIN IS A BITE OUT OF THE ROCK (D313). As a dark
+           * sector of crust it read as a shadow; on a body this small the hit
+           * that nearly finished it takes a scoop out of the outline, and the
+           * shell lines the hollow. See `biteRoll` in gen/details.js. */
+          "impact-basin": { bite: { count: [1, 2.4], width: [20, 34], depth: [0.18, 0.28] } }
+        }
       },
       {
         /* THE MOSAIC, AND IT RUNS TO THE CENTRE.
@@ -196,7 +195,7 @@ var CC = CC || {};
     dials: {
       "interior-heat": {
         label: "Radioactivity",
-        title: "How radioactive the rock is. Below about a third, nothing shows; above it, a growing share of the fragments are hot material - sickly green or cold blue-white - and near the top they glow. Asteroids only; on other bodies this is Interior heat."
+        title: "How radioactive the rock is. Below about a third, nothing shows; above it, a growing share of the fragments are hot material - sickly green or pink-white - and near the top they glow. Asteroids only; on other bodies this is Interior heat."
       }
     },
 

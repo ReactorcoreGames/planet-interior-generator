@@ -24,7 +24,9 @@
 
 **Closed in Session AG (D304–D306)**: the black hole's starfield lensed star by star (about 10 ms a render, against 74–252 ms for a pixel remap), an unfinished Dyson shell with open arcs, and three presets — Fortress World (replacing Coruscant World, which needed cities), Half-Built Dyson and Ringworld Nebula. See [session-ag-close-9b.md](../progress/session-ag-close-9b.md).
 
-### 9c — final clean-up pass (next; 9b is complete)
+### 9c — final clean-up pass (under way, Sessions AH–AN)
+
+**Audited in Session AH (D307–D308)** and split into one block per session; the checklist is [phase-9c-cleanup.md](phase-9c-cleanup.md).
 
 A last pass over the whole generator once the megastructures are in: does everything land together, on every family, with every trait, in the composed export? The user's eye leads; the open "for the user's eye" lists in the session write-ups are its agenda.
 

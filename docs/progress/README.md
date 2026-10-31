@@ -42,8 +42,10 @@
 
 | [session-af-nebula-megastructures.md](session-af-nebula-megastructures.md) | D302–D303 — Phase 9b on the nebula: one ringworld round its own sun, sunk in the gas with veils across it and its sun lighting the cloud, shrunk 60% on the user's review and placed liberally; and ice and rock belts as round or oval fields half the time (`oval`), filled evenly with the streak's area (Session AF) |
 
-| [session-ag-close-9b.md](session-ag-close-9b.md) | D304– — Phase 9b closed: the starfield lensed round a black hole star by star, its ring drawn by the faint stars the lens brightens, at a tenth of a pixel remap's cost; the presets; the cross-cutting docs (Session AG) |
+| [session-ag-close-9b.md](session-ag-close-9b.md) | D304–D306 — Phase 9b closed: the starfield lensed round a black hole star by star, its ring drawn by the faint stars the lens brightens, at a tenth of a pixel remap's cost; the presets; the cross-cutting docs (Session AG) |
+
+| [session-ah-cleanup.md](session-ah-cleanup.md) | D307–D308 — Phase 9c's audit: Phase 9b committed; every preset, family and trait rendered together (Ringed Giant without its rings, built traits rolling into natural presets, two ring geometries on one planet); the 23 files over 500 lines, five of them one function each; the spec drift; 9c split into sessions AI–AN from a checklist; atmosphere height left rolled, its opacity the open lever (Session AH) |
 
 Sessions are listed oldest first. `session-f.md` is a stub left where Session F used to be; it points at the three F files above.
 
-Decision numbers (`D#`) are referenced from code comments and other docs. To find a specific one, `grep -rn "D42" docs/progress/` is faster than opening each file. The next free number is **D307**.
+Decision numbers (`D#`) are referenced from code comments and other docs. To find a specific one, `grep -rn "D42" docs/progress/` is faster than opening each file. The next free number is **D309**.

@@ -31,7 +31,7 @@ The architecture is designed so later phases slot in without rework: archetypes 
 | 9a — The `machine-world` archetype | ✅ (Session Z) | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
 | 8 — Overlay, scale, polish | ✅ (Session AA; framing built early, Session I) | [roadmap/phase-8-polish.md](roadmap/phase-8-polish.md) |
 | 9b — Megastructure traits | ✅ (Sessions AB–AG) | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
-| **9c — Final clean-up pass** | ⬜ **next** | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
+| **9c — Final clean-up pass** | 🔶 **under way** (AH–AN) | [roadmap/phase-9c-cleanup.md](roadmap/phase-9c-cleanup.md) |
 | 10 — Release | ⬜ | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
 
 **The rows are in build order, not number order** (D246). The phase numbers are kept so existing references stay valid.
@@ -41,7 +41,7 @@ The architecture is designed so later phases slot in without rework: archetypes 
 
 ## Current status
 
-**Phases 0–8, 9a and 9b are complete**, along with the climate system (Session F) and framing (Session I, pulled forward from Phase 8). **Next: 9c, the final clean-up pass.**
+**Phases 0–8, 9a and 9b are complete**, along with the climate system (Session F) and framing (Session I, pulled forward from Phase 8). **Next: 9c, the final clean-up pass**, under way from a checklist (Session AH, D307).
 
 **Phase 7 is complete:**
 

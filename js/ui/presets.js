@@ -102,7 +102,7 @@ CC.PresetGallery = (function () {
      * mechanism, so the interface shows what the preset asked for and the user
      * can immediately untick it. */
     if (CC.TraitPicker) {
-      CC.TraitPicker.setExcluded(preset.traitsOff || []);
+      CC.TraitPicker.setExcluded(CC.Presets.offList(preset));
       CC.TraitPicker.setSelection(preset.traits || []);
     }
 

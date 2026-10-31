@@ -138,7 +138,7 @@ var CC = CC || {};
       add(facts.traits.indexOf("helium-rain") >= 0,
         "Helium separating out and raining inward - a sorting process no " +
         "refinery could match, happening for free.");
-      add(facts.traits.indexOf("ring-system") >= 0,
+      add(facts.traits.indexOf("ringlet-system") >= 0,
         "The rings. Clean ice in gravel-sized pieces, already in orbit and " +
         "already broken up.");
       add(facts.hasMetallicH && facts.interiorHeat > 0.6,

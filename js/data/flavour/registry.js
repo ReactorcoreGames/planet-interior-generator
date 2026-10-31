@@ -72,15 +72,18 @@ CC.Flavour = (function () {
    * that guards them. Kept here rather than duplicated per file so a fix
    * lands once. */
   function universal(which, facts, add) {
+    /* Either kind of ring: a giant's is `ringlet-system`, a rocky world's
+     * `ring-system`, and checking only the second left giants silent (D309). */
+    var ringed = facts.traits.indexOf("ring-system") >= 0 ||
+      facts.traits.indexOf("ringlet-system") >= 0;
     if (which === "danger") {
       add(facts.radiation > 0.62,
         "Radiation. Stellar flares, without warning and without a safe interval.");
-      add(facts.traits.indexOf("debris-belt") >= 0 ||
-          facts.traits.indexOf("ring-system") >= 0,
+      add(facts.traits.indexOf("debris-belt") >= 0 || ringed,
         "Whatever falls out of orbit next. The sky here is not empty.");
     } else if (which === "notable") {
       add(facts.sunless, "There is no sun. The only light is what you brought.");
-      add(facts.traits.indexOf("ring-system") >= 0,
+      add(ringed,
         "It's bright enough at midnight to read by, from ring-light alone.");
       add(facts.day && facts.day.slow,
         "A day here lasts longer than most expeditions.");
@@ -88,7 +91,7 @@ CC.Flavour = (function () {
       add(facts.family !== "machine",
         "Sensors are useless here. So is long-range communication.");
     } else if (which === "approach") {
-      add(facts.traits.indexOf("ring-system") >= 0,
+      add(ringed,
         "The ring system makes a clean approach vector hard to find.");
       add(facts.traits.indexOf("debris-belt") >= 0,
         "Debris in orbit. Not all of it is natural.");

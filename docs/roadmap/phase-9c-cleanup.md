@@ -14,9 +14,11 @@ Rules as ever: plain scripts, ≤500 lines per file, no ES modules, no new tests
 
 ## AI — the bugs and the picture decisions
 
-- [ ] **A. Ringed Giant's rings.** `ring-system` → `ringlet-system` in `js/data/presets.js`, and the inert `traitsOff: ["ring-system"]` on the six giant presets corrected or dropped; the star presets' inert bans dropped. Render Ringed Giant on p1–p3. Ask whether a generic preset-id check belongs in `doccheck` (it would be mechanical and generic over archetypes, but only if asked)
-- [ ] **B. Built traits in natural presets**, decided with the **Artificial traits allowed** checkbox: a checkbox, natural presets banning built traits, or leave as is
-- [ ] **C. The orbital ring against the ring system**: face-on circle beside a tilted ellipse on one planet. Render the pair and ask: exclude one from the other, tilt the orbital ring to the ring plane, or accept
+*Part one done ([session-ai-fixes.md](../progress/session-ai-fixes.md), D309–D311): A fixed (D309), B natural presets ✕ their built traits (D310), C accepted as is; Trait count widened to 0–8 (D311). D onward continue in part two.*
+
+- [x] **A. Ringed Giant's rings.** `ring-system` → `ringlet-system` in `js/data/presets.js`, and the inert `traitsOff: ["ring-system"]` on the six giant presets corrected or dropped; the star presets' inert bans dropped. Render Ringed Giant on p1–p3. Ask whether a generic preset-id check belongs in `doccheck` (it would be mechanical and generic over archetypes, but only if asked)
+- [x] **B. Built traits in natural presets**, decided with the **Artificial traits allowed** checkbox: a checkbox, natural presets banning built traits, or leave as is
+- [x] **C. The orbital ring against the ring system**: face-on circle beside a tilted ellipse on one planet. Render the pair and ask: exclude one from the other, tilt the orbital ring to the ring plane, or accept
 - [ ] **D. The grey disc round some machine worlds** (seed p2 of Derelict, Hive, Worldship). Identify what draws it, render, ask
 - [ ] **E. Under construction with Overgrown.** Render, ask whether they exclude each other
 - [ ] **Open question 1b**: ask the user to look at the bottom edge of a body in the real app (`launch_app_win.bat`) for a straight horizontal cut; it does not reproduce in the harness. Fix if seen, close if not
@@ -36,7 +38,7 @@ A crop render per item; the user says keep or change. The user is generally sati
 
 - [ ] **Tertiary hue** (PARAMETERS.md ⬜): build or strike
 - [ ] **Accent hue** (⬜): the machine world's accent colour exists (D252) with no control; build the slider or strike
-- [ ] **Artificial traits allowed**: record whatever AI decided
+- [ ] **Artificial traits allowed**: strike it — natural presets ✕ their built traits instead (D310)
 - [ ] **The four Randomize settings** (scope, archetype pool, respect locks, auto-randomize on load): build, strike or record each
 - [ ] The defaults table's **Composition ⬜ P8** row struck (D286 removed it)
 - [ ] **The preset tables** against `js/data/presets*.js`: drop Coreless Giant and Superionic Ice Giant or mark them unbuilt; add Ringed, Industrial, Ice Giant, Diamond Sea, Prismatic, the four moon, three asteroid and nebula presets under their real names; the stale ⬜ P7 rows replaced

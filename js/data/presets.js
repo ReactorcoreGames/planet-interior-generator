@@ -299,7 +299,7 @@ CC.Presets = (function () {
         "contrast": 118
       },
       traits: ["great-storm", "storm-belts"],
-      traitsOff: ["ring-system"]
+      traitsOff: ["ringlet-system"]
     },
     {
       id: "hot-jupiter",
@@ -323,7 +323,7 @@ CC.Presets = (function () {
         "contrast": 96
       },
       traits: ["violent-banding"],
-      traitsOff: ["ring-system"]
+      traitsOff: ["ringlet-system"]
     },
     {
       id: "ringed-giant",
@@ -344,7 +344,7 @@ CC.Presets = (function () {
         "brightness": 112,
         "contrast": 88
       },
-      traits: ["ring-system"],
+      traits: ["ringlet-system"],
       traitsOff: ["great-storm", "violent-banding"]
     },
     {
@@ -391,7 +391,7 @@ CC.Presets = (function () {
         "contrast": 104
       },
       traits: ["helium-rain"],
-      traitsOff: ["ring-system"]
+      traitsOff: ["ringlet-system"]
     },
     {
       id: "diamond-sea",
@@ -415,7 +415,7 @@ CC.Presets = (function () {
         "contrast": 112
       },
       traits: ["diamond-rain"],
-      traitsOff: ["ring-system"]
+      traitsOff: ["ringlet-system"]
     },
     {
       id: "prismatic-giant",
@@ -439,7 +439,7 @@ CC.Presets = (function () {
         "contrast": 124
       },
       traits: ["prismatic-ice"],
-      traitsOff: ["ring-system"]
+      traitsOff: ["ringlet-system"]
     },
 
     /* ================================================================== *
@@ -492,7 +492,7 @@ CC.Presets = (function () {
         "brightness": 104,
         "contrast": 108
       },
-      traitsOff: ["ring-system", "debris-belt", "flare-storms"]
+      traitsOff: ["flare-storms"]
     },
     {
       id: "angry-star",
@@ -515,7 +515,7 @@ CC.Presets = (function () {
         "contrast": 112
       },
       traits: ["prominences", "starspot-clusters", "flare-storms"],
-      traitsOff: ["ring-system", "debris-belt"]
+      traitsOff: []
     },
     {
       id: "red-giant",
@@ -539,7 +539,7 @@ CC.Presets = (function () {
         "contrast": 116
       },
       traits: ["shed-shells", "dust-formation"],
-      traitsOff: ["ring-system"]
+      traitsOff: []
     },
     {
       id: "dying-giant",
@@ -561,7 +561,7 @@ CC.Presets = (function () {
         "contrast": 124
       },
       traits: ["engulfed-planet", "dredge-up", "pulsating", "shed-shells"],
-      traitsOff: ["ring-system"]
+      traitsOff: []
     },
     {
       id: "flare-star",
@@ -584,7 +584,7 @@ CC.Presets = (function () {
         "contrast": 110
       },
       traits: ["heavy-spotting", "flare-storms", "prominences"],
-      traitsOff: ["ring-system", "starspot-clusters"]
+      traitsOff: ["starspot-clusters"]
     },
     {
       id: "patient-ember",
@@ -606,7 +606,7 @@ CC.Presets = (function () {
         "brightness": 88,
         "contrast": 104
       },
-      traitsOff: ["ring-system", "debris-belt", "flare-storms"]
+      traitsOff: ["flare-storms"]
     },
     {
       id: "newborn-star",
@@ -935,5 +935,27 @@ CC.Presets = (function () {
     return LIST.filter(function (p) { return p.archetype === a; });
   }
 
-  return { all: all, get: get, forArchetype: forArchetype, register: register };
+  /* WHAT A PRESET BARS FROM THE ROLL: its own `traitsOff`, and on a preset
+   * that names no traits, every built trait too (D310). A preset describing
+   * a natural body should not hand back a station; it rolls only natural
+   * traits, and the bars show as the picker's ✕ marks, so a click undoes
+   * one. Not on an archetype with no natural traits (the machine world),
+   * whose roll would be left empty, and not on a preset that names its
+   * traits, which does not roll. Plain Randomize is untouched: built traits
+   * keep their third of the weight there (D291). */
+  function offList(preset) {
+    var off = (preset.traitsOff || []).slice();
+    if (preset.traits && preset.traits.length) return off;
+    var arch = CC.Archetypes.get(preset.archetype);
+    var pool = arch ? CC.Traits.eligible(arch) : [];
+    var built = pool.filter(function (t) {
+      return (t.tags || []).indexOf("artificial") >= 0;
+    });
+    if (built.length === pool.length) return off;
+    built.forEach(function (t) { if (off.indexOf(t.id) < 0) off.push(t.id); });
+    return off;
+  }
+
+  return { all: all, get: get, forArchetype: forArchetype, register: register,
+           offList: offList };
 })();

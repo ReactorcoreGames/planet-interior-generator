@@ -319,7 +319,7 @@ No manual per-layer colour picker — seed + these nudges is the decided approac
 
 | Control | Type | Status | Notes |
 |---|---|---|---|
-| **Trait count** | slider | ✅ | 0–4, default 2. How many traits Randomize gives a body |
+| **Trait count** | slider | ✅ | 0–8 (D311), default 2. How many traits Randomize gives a body |
 | **Trait list** | filtered checkbox list | ✅ | Generated from `data/traits.js`. Only shows traits compatible with the current archetype and already-selected traits |
 | **Exclude from Randomize** | ✕ per trait | ✅ | A trait row is **tri-state**: ticked forces it on, ✕ bars Randomize from ever picking it, neither leaves it free to roll. Deliberately not a lock — "keep this value" and "never pick this" are different instructions |
 | **Artificial traits allowed** | checkbox | ⬜ P9 | Allow megastructures on natural bodies. Arrives with the machine worlds |

@@ -31,7 +31,7 @@ CC.Palette = (function () {
   "use strict";
 
   var M = CC.Math;
-  var clamp = M.clamp, lerp = M.lerp;
+  var clamp = M.clamp;
 
   /* ---- the light and the heat ------------------------------------------- */
 

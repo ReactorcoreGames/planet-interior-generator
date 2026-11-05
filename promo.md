@@ -29,8 +29,7 @@ Favour places where posts stay findable, as you asked:
 1. **The itch.io page**, which is the home for everything. The tags and the description do the long-term work there.
 2. **GitHub**, with the description and topics below. It reaches people searching for procedural generators.
 3. **Your catalog and Linktree**, as a new entry at the top.
-4. **Subreddits**, which spike and then fade, though good posts do turn up in searches later. Post one a week rather than all in one day.
-5. **The YouTube trailer**, which comes later. It has the longest life of any of these, because video search keeps surfacing it.
+4. **The YouTube trailer**, which comes later. It has the longest life of any of these, because video search keeps surfacing it.
 
 ### Tactics
 
@@ -43,11 +42,11 @@ Hashtags, for anywhere they're used: #worldbuilding #proceduralgeneration #scifi
 
 ## Business model: an honest view
 
-**The model:** free in the browser, $5 or more for the offline zip, with the source public on GitHub.
+**The model:** free in the browser, a paid offline zip, with the source public on GitHub. The price is your call, so nothing here suggests one.
 
 **My view: keep it, but treat the sale as support rather than as a lock.** The tool's first job here is to bring in traffic: the free version removes all friction, the images people post advertise it, and everyone who comes through sees your other work.
 
-**What the paid copy actually offers:** the same app, as a tidy zip that opens with a double-click and doesn't depend on itch.io being up or the page staying online. It also includes guide.md, promo.md and the promo images, but nothing that makes the tool itself better. Anyone comfortable with GitHub can get the code for free, and the licence lets them use it.
+**What the paid copy actually offers:** the same app, as a tidy zip that opens with a double-click and doesn't depend on itch.io being up or the page staying online. It also includes guide.md and the promo images, but nothing that makes the tool itself better. Anyone comfortable with GitHub can get the code for free, and the licence lets them use it.
 
 **So don't pitch it as exclusive.** A buyer who later finds the free GitHub copy will feel tricked if the page implied otherwise. Pitch it for what it is, in this order:
 
@@ -57,9 +56,8 @@ Hashtags, for anywhere they're used: #worldbuilding #proceduralgeneration #scifi
 
 **What to expect:** most users will never pay, and only a small share of the rest will, mostly out of goodwill. I have no sales data for this page, so I won't guess at a number. Your itch.io analytics will show the real ratio. If it matters to you, compare page views with purchases a month after launch.
 
-**Three levers, if you want more later:**
+**Two levers, if you want more later:**
 
-- **Keep the $5 minimum for now.** Name-your-own-price with a floor lets people pay more, and a lower floor would give up income without clearly gaining buyers. Revisit it if the analytics show lots of download-page visits and few purchases.
 - **Don't publish zips on GitHub's Releases tab.** That keeps the paid zip the one-click option, without hiding anything, since the code remains public.
 - **A real paid extra would strengthen the offer**, such as a pack of high-resolution images ready to use. This is optional, and only worth doing if sales justify it.
 
@@ -122,6 +120,94 @@ Every image is drawn by the tool's own code on your computer, not by an image mo
 **The offline copy is the same tool in a zip**, ready to keep: unzip it, double-click index.html and it runs with no internet and no install. It's yours whatever happens to this page, and buying it is the best way to support my work. The source is also public on GitHub if you'd like to read how it works: https://github.com/ReactorcoreGames/planet-interior-generator
 
 Tested on Firefox. If another browser misbehaves, tell me in the comments and I'll try to fix it.
+
+## Links
+
+- Everything I do: https://linktr.ee/reactorcore
+- My other releases: https://reactorcore.itch.io/
+- Discord: https://discord.gg/UdRavGhj47
+
+Enjoy!
+
+-Reactorcore
+```
+
+### Tags
+
+astronomy, generative-art, illustration, offline, planet-generator, Procedural Generation, Sci-fi, Space, ttrpg, worldbuilding
+
+(These are today's tags with one change: `tool` becomes `ttrpg`, because the page's type already says it's a tool and game masters are a core audience. I can't check itch's tag list from here, so if `ttrpg` isn't suggested as you type it, use `tabletop`.)
+
+### Devlog post: what's new in v4.0
+
+The description above doesn't look back, so the changes since v3.2 go here.
+
+```markdown
+# Celestial Cutaway v4.0
+
+The beta is over. This is the finished release, and the offline zip now holds the current version rather than the older ones.
+
+**Five new kinds of body, for 14 in all**
+- Neutron star, pulsar and black hole, whose starfield now bends around it
+- Nebula, with pillars, rifts, hidden stations and mining flotillas
+- Machine world: a built planet with reactors, shafts and hull wounds, and an Operational status slider that takes it from dead and dark to a busy hive
+
+**Megastructures**
+- Planets and moons: orbital rings with space elevators, defence networks, minefields
+- Gas and ice giants: skyhooks and orbital cities
+- Stars: Dyson shells, unfinished shells and Dyson swarms
+- Nebulae: a ringworld
+
+**The asteroid, rebuilt from the ground up**, with caves, tunnel borers and new shapes.
+
+**New ways to present a body**
+- Layer labels that name every band of the cut
+- A scale bar with a size comparison, from a person to the Oort cloud
+
+**Easier to use**
+- Your settings are remembered between visits, with a Reset to defaults button
+- A full keyboard map: press ? to see it
+- Randomize can now land on any kind of body, and you can lock whole sections
+- New controls for atmosphere opacity, and tertiary and accent hues
+- Help now has a proper walkthrough
+
+Plus many fixes and a long polish pass across every body type. Enjoy!
+
+-Reactorcore
+```
+
+## GitHub
+
+### Description
+
+Generate detailed cross-section illustrations of planets, stars, black holes, nebulae and machine worlds, with lore cards. Runs in the browser in plain JavaScript, with no install.
+
+### Topics
+
+procedural-generation
+worldbuilding
+generative-art
+planet-generator
+space
+sci-fi
+ttrpg
+canvas
+javascript
+astronomy
+
+## YouTube
+
+Not written yet. This comes with the trailer session.
+
+## Marketing targets to look into
+
+I haven't checked any of these, so confirm each one still takes submissions like this.
+
+- **AlternativeTo:** a free listing under planet or worldbuilding generators. It's permanent, and people browse it when they're looking for exactly this.
+- **Cartographers' Guild (forum):** a long-running community for map and setting artists. Post in its software or resources area, with several images.
+- **"Awesome" lists on GitHub:** community lists of procedural generation and tabletop tools. A one-line entry stays findable for years.
+- **YouTubers who cover worldbuilding and tabletop tools:** send them the trailer once it exists. A short, specific email works best.
+- **Show HN on Hacker News:** the angle is the plain-script, no-build Canvas 2D engineering. It's a one-day spike rather than a persistent listing, and the licence will come up, so be ready to explain it.
 
 ## Links
 

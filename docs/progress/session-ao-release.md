@@ -38,6 +38,6 @@ The user looked at Help in the real app: layout and reading are fine, with the s
 
 **The itch description showcases the app as it is today**, as the user asked, with nothing about earlier versions. The changes since v3.2 are in a separate devlog post in `promo.md`, written from `git log 8d5a54f..HEAD` and the session logs, since the user said they would need one.
 
-**D330: `promo.md` is written to be read in public.** It goes in the public repo, and step 5 ships it in both zips, so buyers will read its business section. That section therefore says only what can be said openly: the paid copy is the same app, and the pitch is support, permanence and convenience, in that order. The user may still prefer to keep the strategy private, which is an open question for them before step 5.
+**One tag changed in the suggested list:** `tool` becomes `ttrpg`, since the page's type already says it is a tool. The user approved it. The label D325 rules out appears nowhere in the three files.
 
-**One tag changed in the suggested list:** `tool` becomes `ttrpg`, since the page's type already says it is a tool. Subreddits and the extra places are marked unverified, as the brief says. The label D325 rules out appears nowhere in the three files.
+**D330: `promo.md` is internal, under the user's updated brief.** It does not ship in the zips. The earnings-share notice and the Reddit posts are gone, replaced by five unchecked marketing targets, and no price is stated or advised, though the business section still says what the paid copy offers. Step 5's list is changed to match.

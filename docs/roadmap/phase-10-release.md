@@ -48,7 +48,7 @@ A short custom licence in plain language (D325), brought to the user for a yes o
 - **The itch copy replaces a live page** (D324). The current text is `docs/current itchio description for CC.md`, and it must stop saying WIP, beta, "later I want to add" and that the offline zip holds only legacy versions. Say what is new since v3.2 by reading `git log 8d5a54f..HEAD` and the session logs. The page lists nine archetypes, so the neutron star, pulsar, black hole, nebula and machine world are new, along with the asteroid rework, the megastructures and more. Its tags today are astronomy, generative-art, illustration, offline, planet-generator, Procedural Generation, Sci-fi, Space, tool, worldbuilding; its downloads are $5 or more, on a name-your-own-price basis. Author: Don't make it read like a changelog, I'll need a changelog devlog post separately anyway - the itch description should be totally rewritten to showcase the program as it is today without bothering with anything that came before.
 - **The business-model section gives its honest view of the chosen model**: free in the browser, paid offline, with the source public on GitHub. Say what the paid copy actually offers a buyer given that, and how to pitch it.
 - **Do not write the "open source" label anywhere** (D325). Do not write the YouTube copy yet: it comes with the trailer session.
-- **Reddit.** The brief's note stands: subreddits and their rules cannot be checked from here, so mark them unverified and do not try.
+- **Marketing targets.** The brief now asks for up to five places to look into, kept simple, and no Reddit posts: subreddits cannot be checked from here. No earnings-share notice and no assumed prices.
 
 ## Step 4 — `promo/`, wholly new
 
@@ -66,7 +66,7 @@ The part the user cares most about, judged by looking. This step may well run to
 
 - [ ] Finished
 
-`build_release.bat` exists and copies a flat `dist/`. It needs the `dist/celestial-cutaway/` root, `LICENSE`, `guide.md`, `promo.md` and `promo/`, then two identical zips, `celestial-cutaway-v4.0.zip` and `celestial-cutaway-v4.0-offline.zip` (D324). It stays a copy with no compile step; PowerShell's `Compress-Archive` adds no dependency. It ends in `pause`, so feed it input when you run it yourself.
+`build_release.bat` exists and copies a flat `dist/`. It needs the `dist/celestial-cutaway/` root, `LICENSE`, `guide.md` and `promo/`, **but not `promo.md`, which is internal**, then two identical zips, `celestial-cutaway-v4.0.zip` and `celestial-cutaway-v4.0-offline.zip` (D324). It stays a copy with no compile step; PowerShell's `Compress-Archive` adds no dependency. It ends in `pause`, so feed it input when you run it yourself.
 
 - **The catch to bring the user:** itch's HTML5 docs require an `index.html` in the zip but do not say whether it may sit inside a folder, and the brief's layout puts it in one. Have them test the browser zip on the page in a way that does not disturb the live version. If it does not run, recommend the smallest change, such as the same contents without the root folder in the browser zip, and ask.
 - itch's limits: 1,000 files, 500 MB extracted, 200 MB per file, 240 characters per path. **Filenames are case-sensitive there**, and Windows hides a mismatch, so compare every script tag and asset reference with the tree exactly. Report the zip's file count and size.

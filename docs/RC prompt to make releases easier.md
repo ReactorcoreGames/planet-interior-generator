@@ -22,11 +22,11 @@ After those are done, I'll want a build_release.bat that would take the existing
 --- (any project materials go here, with subfolders if they're necessary - for less than 10 project-specific files the structure can be kept flat)
 --- promo/ (a folder contains 1-5 or more screenshots + a 630x500px itch io thumbnail and a 1280x720px cover image, latter both featuring big font sizes only, as much as dense visual detail as possible. Claude can create all of these mentioned materials with whatever tools it has at its disposal, resulting in PNG/JPG (depending on which will result in a smaller more efficient filesize))
 --- guide.md
---- promo.md
+--- promo.md (actually omit this from the release zip - its meant as an internal document after all.)
 --- readme.md
 
 #### Rules for writing docs
-- Do NOT artificially do wordwrap lines yourself. It makes copy pasting test infuriating because I keep needing to fix the lines afterwards. Just let them be full without newlining them after some arbitrary lenght.
+- Do NOT artificially do wordwrap lines yourself. It makes copy pasting text infuriating because I keep needing to fix the lines afterwards. Just let them be full without newlining them after some arbitrary lenght.
 - For the promo.md doc, first write the marketing strategy/tactics/locations/ideas stuff first, then give me easy copypastas for:
 -- itch.io
 --- Name of project
@@ -40,11 +40,9 @@ After those are done, I'll want a build_release.bat that would take the existing
 --- youtube video title
 --- youtube video description + my links
 --- youtube video tags (comma separated)
--- reddit posts (a few options, each tailored to the subreddit. Before suggesting a subreddit, go check it out if they exist and their rules allow us here. NOTE: In another session we discovered that we actually can't check this via Claude - they're blocked from doing it.)
---- 3-5X options/avenues with EITHER title + post (tell me where and how I can weave the link to a post) OR title + (link provided by me, either to youtube video trailer or the actual release page).
--- maybe some other place(s) you think would be good to release the project in - up to 3 extra places. Skip if not applicable.
+-- hints for marketing targets I could look into - upto 5 places, be it websites, youtubers, or portals. Skip if not applicable. You cannot access reddit because they blocked AI/bots, so anything else but that, unless you can atleast gleam from a web search for subreddit titles+description, if its active or not, then sure fine. Generally keep it simple, since I have a whole different project where I will do actual marketing in.
 -- generally I want to post my projects into persistent places where people will organically find them while they browse/look for what they want or think what they know what the want.
--- in the promo.md, add a notice to the end user to help spread/promote the project. If the project is a paid project and the user can bring paying customers, tell them to contact me via email with proof and I will share my earnings with them based on the impact they've had, even over 50% of the revenue if I see they were pivotal in bringing all those customers - after all other deductions and cuts though. The business model for this depends on per project basis, so you would suggest an appropriate model for how they can help and how I can reward them as a freelancer, since I'm not a corporate/legal entity, just a guy with a laptop making stuff and hoping to earn enough to pay rent.
+-- generally never assume pricing, especially any specific sums or amounts. I usually decide if a thing is gonna be free, open source, paid or tiered - and the price might start initially small for early users but increase later once more established.
 
 ### Phase 3 - Project folder cleanup for cleaner future maintenance
 

@@ -49,6 +49,8 @@ Two small departures: `orbital.js` and `primitives.js` were split before `preset
 
 The real browser. jsdom and the renders cover the code, but `main.js`'s `init` moved, and layout-dependent defects do not show in the harness. Worth opening the app once.
 
+Author: I opened in the real browser and looks ok, I think it works.
+
 ## Files
 
 - `js/draw/film-zones.js`, `frostpaint.js`, `frost.js`, from `js/draw/film.js`

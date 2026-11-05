@@ -74,7 +74,9 @@ Move code, change no pixel. Before the first split, render a fixed set (every ar
 
 Re-measure line counts at the start: AI–AK may have moved some files over or under 500.
 
-## AM — the five stage refactors
+## AM — the five stage refactors ✅
+
+*Done ([session-am-refactors.md](../progress/session-am-refactors.md), D323): all five refactored into stages, byte-identical across 310 renders. Where a row did not fit the code, that log says what was done instead; the table below is the plan as written.*
 
 The same byte-for-byte check, against AL's reference renders. Each function's numbered passes become stage functions sharing one state object; the original function keeps the order of the passes and nothing else.
 

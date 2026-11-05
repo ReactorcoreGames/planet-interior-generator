@@ -52,6 +52,8 @@
 | [session-ak-controls-drift.md](session-ak-controls-drift.md) | D318–D321 — Phase 9c block AK: the unbuilt controls and the spec drift: the Tertiary and Accent hue offsets, `hides` on an archetype, Randomize inside a body's hue range and across the archetypes, section locks, the preset tables and stale comments |
 | [session-al-splits.md](session-al-splits.md) | D322 — Phase 9c block AL: the eighteen straightforward file splits, byte-identical across 310 renders; the split files attach to the source's namespace; where the table did not fit the code, including `gaseous-built.js` to keep the trait roll's order (Session AL) |
 
+| [session-am-refactors.md](session-am-refactors.md) | D323 — Phase 9c block AM: the five stage refactors, byte-identical across 310 renders: each long function now keeps the order of its passes, each pass a stage function sharing one state object, and no file in `js/` is over 500 lines; where the table did not fit the code, including `palette.js` and `placeOne` cut by pass rather than by role or placement kind (Session AM) |
+
 Sessions are listed oldest first. `session-f.md` is a stub left where Session F used to be; it points at the three F files above.
 
-Decision numbers (`D#`) are referenced from code comments and other docs. To find a specific one, `grep -rn "D42" docs/progress/` is faster than opening each file. The next free number is **D323**.
+Decision numbers (`D#`) are referenced from code comments and other docs. To find a specific one, `grep -rn "D42" docs/progress/` is faster than opening each file. The next free number is **D324**.

@@ -15,7 +15,12 @@
  *      inner radius from the next survivor down
  *
  * Splitting it that way is what makes removal clean: nothing downstream has to
- * know that an ocean was ever a possibility. */
+ * know that an ocean was ever a possibility.
+ *
+ * `build` keeps the order of the passes and nothing else: each is a stage
+ * function below, and all of them share one state object. Presence, thickness
+ * and the layer record are in gen/structure-resolve.js, the wobble table and
+ * the proportional wobble in gen/structure-wobble.js; both attach here. */
 
 var CC = CC || {};
 
@@ -29,210 +34,7 @@ CC.Structure = (function () {
    * a sub-pixel sliver at preview size and a visual artefact at export size. */
   var MIN_THICKNESS = 0.012;
 
-  /* How much wobble each boundary character means, as a fraction of body
-   * radius. Multiplied by the Boundary irregularity control. */
-  var WOBBLE = {
-    "perfect":       0.000,
-    "near-perfect":  0.004,
-    "slight":        0.010,
-    "irregular":     0.028,
-    "heavy":         0.065,
-    "extreme":       0.140,
-    "soft-gradient": 0.000
-  };
-
-  /* ---- presence ------------------------------------------------------- */
-
-  /* Returns { present, strength }.
-   *
-   * `strength` is 0..1 and is how *established* the layer is. A layer that has
-   * only just crossed its threshold comes in at low strength, which downstream
-   * stages use to fade it in rather than pop it in. Unconditional layers are
-   * always at full strength. */
-  function resolvePresence(layer, params, rng, optionalChance, placedRoles,
-                           climateSpec) {
-    var p = layer.presence;
-
-    /* Form 1: unconditional. */
-    if (p === undefined || p === null) return { present: true, strength: 1 };
-
-    /* Form 2: a probability roll, scaled by the Optional layers slider. */
-    if (typeof p === "number") {
-      var chance = p * optionalChance;
-      return { present: rng() < chance, strength: 1 };
-    }
-
-    /* Form 4: DEPENDENT ON ANOTHER LAYER.
-     *
-     * `presence: { requires: "ice-shell" }` — present only when the named
-     * layer was itself placed. The moon's subsurface ocean is the first user
-     * and the reason the form exists: that ocean is not a thing the body might
-     * independently have, it is a consequence of having a lid. Rolling it
-     * separately would produce a moon with an ocean and no shell — an
-     * uncovered sea on an airless body, which is not a picture that means
-     * anything.
-     *
-     * Resolved against what has ALREADY been placed, which works because the
-     * stack is walked outermost-first and a layer can only depend on something
-     * above it. That is not a coincidence: a dependency the other way would be
-     * "this lid exists because there is a sea under it", which is backwards.
-     *
-     * It consumes no random number, exactly like the parameter form, so adding
-     * or removing a dependent layer never reshuffles the layers below it. */
-    if (p.requires !== undefined) {
-      var host = placedRoles && placedRoles[p.requires];
-      return host ? { present: true, strength: 1 }
-                  : { present: false, strength: 0 };
-    }
-
-    /* Form 5: GOVERNED BY HOW COLD THE BODY IS.
-     *
-     * `presence: { colder: 0.42, fade: 0.14 }` — present only while the body's
-     * climate baseline is below the threshold. The moon's ice shell is the
-     * first user, and it is not a convenience: A SHELL OF ICE IS THE EVIDENCE
-     * THAT THE BODY IS COLD. Rolling it independently of the temperature
-     * produced ice-shelled moons at 610 C, which is a picture contradicting
-     * itself in the most direct way available — the card said the surface was
-     * hot enough to melt lead and the render drew a sheet of ice over it.
-     *
-     * Measured before this existed: only 11% of ice moons actually showed the
-     * thing the branch is for, a frozen shell over a liquid sea. The other 89%
-     * were warm bodies wearing a lid.
-     *
-     * IT ASKS THE REAL FUNCTION. `CC.Climate.baseline` is exported for exactly
-     * this — a caller that reimplements "how warm is this body" agrees with
-     * itself and not with the renderer, which has cost this project two rounds
-     * already (D27, D35). The archetype's own climate spec is passed in, so a
-     * body that declines starlight is scored the way it declines it.
-     *
-     * `fade` gives the usual soft entry: a shell that has only just formed
-     * comes in at low strength rather than popping into existence as the
-     * Starlight slider crosses a line. */
-    if (p.colder !== undefined) {
-      if (!CC.Climate || !CC.Climate.baseline) return { present: true, strength: 1 };
-      var warmth = CC.Climate.baseline(params, climateSpec);
-      var fadeBand = p.fade === undefined ? 0 : p.fade;
-      if (warmth >= p.colder) return { present: false, strength: 0 };
-      return {
-        present: true,
-        /* Coldest is most established, so the ramp runs the other way from
-         * the parameter form's. */
-        strength: fadeBand > 0
-          ? smoothstep(p.colder, p.colder - fadeBand, warmth) : 1
-      };
-    }
-
-    /* Form 6: ONE OF A SET OF STRUCTURES, NAMED BY A SETTING.
-     *
-     * `presence: { param, is: ["remnant", ...], dflt, chance }` — present
-     * only while the named setting is one of the listed values. The nebula is
-     * the first user: a planetary nebula or a supernova remnant is EMPTY IN
-     * THE MIDDLE, which no value of any slider expresses, so the archetype
-     * declares both stacks and the Nebula form setting picks one. The moon's
-     * branch is rolled; this one is chosen, because the user asked for the
-     * hollow ones by name.
-     *
-     * `chance` adds an optional roll on top, scaled by Optional layers. The
-     * roll is consumed whatever the setting says, so switching form never
-     * reshuffles the layers below. */
-    if (p.is !== undefined) {
-      var sv = params[p.param];
-      if (sv === undefined) sv = p.dflt;
-      var roll = p.chance !== undefined ? rng() : 0;
-      if (p.is.indexOf(sv) < 0) return { present: false, strength: 0 };
-      if (p.chance !== undefined && roll >= p.chance * optionalChance) {
-        return { present: false, strength: 0 };
-      }
-      return { present: true, strength: 1 };
-    }
-
-    /* Form 3: governed by a parameter. */
-    var v = params[p.param];
-    if (v === undefined) return { present: true, strength: 1 };
-
-    var above = p.above === undefined ? 0 : p.above;
-    var fade = p.fade === undefined ? 0 : p.fade;
-
-    if (v <= above) return { present: false, strength: 0 };
-    return {
-      present: true,
-      strength: fade > 0 ? smoothstep(above, above + fade, v) : 1
-    };
-  }
-
-  /* ---- thickness ------------------------------------------------------ */
-
-  /* A layer's outer radius. Rolled layers only — parameter-driven layers are
-   * resolved separately, once the layer they sit on has been placed.
-   *
-   * A layer may omit `frac` entirely, which means "take whatever is left". The
-   * innermost layer of a stack is the usual case — an asteroid's mosaic
-   * interior is the whole body minus its two shells — and pass 2 gives it its
-   * outer radius from the layer above. */
-  function resolveOuter(layer, params, rng, variation, placedRoles) {
-    var f = layer.frac;
-
-    /* A STACK MAY GENUINELY BRANCH, AND THE BRANCH IS DATA.
-     *
-     * `frac_when: { "ice-shell": [lo, hi] }` — when the named layer was
-     * placed, this layer takes the given range instead of its own. The moon is
-     * the first and so far only user: with an ice shell the crust is a sea
-     * floor at 0.70-0.775, and without one it IS the surface at 0.90-0.945.
-     * Those are not the same layer at a different thickness, they are the same
-     * material in two different places, and no slider interpolates between
-     * them — which is TRAIT-SYSTEM.md's third test coming out the other way
-     * for once.
-     *
-     * The roll is consumed identically either way, so which branch a body took
-     * never reshuffles the layers below it.
-     *
-     * Only one substitution applies; the first matching key wins. A stack
-     * needing two independent branches would be saying something this form
-     * cannot express, and should say it as two archetypes. */
-    if (layer.frac_when && placedRoles) {
-      for (var key in layer.frac_when) {
-        if (!Object.prototype.hasOwnProperty.call(layer.frac_when, key)) continue;
-        if (placedRoles[key]) { f = layer.frac_when[key]; break; }
-      }
-    }
-
-    if (!f) return null;
-    var lo = f[0], hi = f[1];
-    var mid = (lo + hi) / 2;
-
-    /* Layer thickness variation: 0 pins every layer to its mid-range, 100
-     * uses the full authored range. */
-    var spread = (hi - lo) / 2 * variation;
-    var out = mid + (rng() * 2 - 1) * spread;
-
-    /* A named control may push the roll within the layer's range — Core size
-     * bias is the first user. Applied after the roll so the bias reads as
-     * "bigger than it would have been", not as a re-roll. */
-    if (layer.bias && params[layer.bias] !== undefined) {
-      var b = clamp(params[layer.bias], -1, 1);
-      out = b >= 0 ? lerp(out, hi, b * 0.85) : lerp(out, lo, -b * 0.85);
-    }
-
-    /* Parameters may nudge the layer — the crust thinning as the interior
-     * heats up, and again as a deepening ocean drowns it. Declared as a list
-     * so a layer can answer to more than one axis, which is the normal case
-     * once Cohesion and Operational status arrive. */
-    var mods = layer.modulate;
-    if (mods) {
-      if (!Array.isArray(mods)) mods = [mods];
-      for (var m = 0; m < mods.length; m++) {
-        var mv = params[mods[m].param];
-        /* `curve` bends the response: a black hole's inner horizon barely
-         * moves until the spin is high and then races outward, and a linear
-         * nudge cannot say that. Absent everywhere else, so 1. */
-        if (mv !== undefined) {
-          out += mods[m].amount * (mods[m].curve ? Math.pow(clamp(mv, 0, 1), mods[m].curve) : mv);
-        }
-      }
-    }
-
-    return clamp(out, 0.02, 2.0);
-  }
+  /* ---- the stages ----------------------------------------------------- */
 
   /* The outermost layer that is genuinely part of the body — not an outward
    * falloff like an atmosphere, and not the layer doing the asking. */
@@ -244,29 +46,17 @@ CC.Structure = (function () {
     return null;
   }
 
-  /* ---- the stack ------------------------------------------------------ */
-
-  function build(archetype, params, seed) {
-    var rng = CC.RNG.stream(seed, "structure");
-
-    var variation = params.thicknessVariation === undefined ? 0.7 : params.thicknessVariation;
-    var optionalChance = params.optionalLayers === undefined ? 0.75 : params.optionalLayers;
-    var irregularity = params.boundaryIrregularity === undefined ? 1 : params.boundaryIrregularity;
-
-    /* --- pass 1: presence, and the outer radius of every rolled layer --- */
-    var placed = [];
-    var byRole = {};
-    var deferred = [];
-
-    /* WHICH ROLES HAVE BEEN PLACED SO FAR, for the two dependent forms:
-     * `presence: { requires }` and `frac_when`. Filled as the walk proceeds,
-     * which is why both can only ever look OUTWARD — see resolvePresence. */
-    var placedRoles = {};
+  /* --- pass 1: presence, and the outer radius of every rolled layer --- */
+  function rollLayers(st) {
+    var archetype = st.archetype, params = st.params, rng = st.rng;
+    var placed = st.placed, byRole = st.byRole, placedRoles = st.placedRoles;
+    var deferred = st.deferred;
+    var optionalChance = st.optionalChance, variation = st.variation;
 
     for (var i = 0; i < archetype.stack.length; i++) {
       var spec = archetype.stack[i];
-      var pres = resolvePresence(spec, params, rng, optionalChance, placedRoles,
-                                 archetype.climate || null);
+      var pres = CC.Structure.resolvePresence(spec, params, rng, optionalChance,
+                                              placedRoles, archetype.climate || null);
 
       /* A parameter-driven layer measures itself against a layer that may not
        * be placed yet, so it waits. It consumes no random numbers either way,
@@ -276,7 +66,7 @@ CC.Structure = (function () {
        * left" — which pass 1c resolves. */
       var relative = spec.frac && !Array.isArray(spec.frac);
       var outer = relative ? 0
-                           : resolveOuter(spec, params, rng, variation, placedRoles);
+                           : CC.Structure.resolveOuter(spec, params, rng, variation, placedRoles);
 
       /* The roll above is consumed whether or not the layer survives, so
        * removing a layer never reshuffles the layers below it. Determinism
@@ -284,162 +74,27 @@ CC.Structure = (function () {
        * of whether the world happened to have an atmosphere. */
       if (!pres.present) continue;
 
-      /* A LAYER MAY DECLARE THAT A PARAMETER SOFTENS ITS EDGE.
-       *
-       * `boundarySoftens: { param, below, to }` — when the named parameter
-       * falls under `below`, the layer takes the `to` boundary character
-       * instead of its own. A giant's Core size bias is the first user: at
-       * the low end the core shrinks until it has no discrete edge to draw,
-       * so the boundary becomes a gradient rather than a line. That is the
-       * parameter changing the picture STRUCTURALLY rather than only scaling
-       * a radius, which is the argument gaseous-bodies.md makes for cutting
-       * `coreless` as a trait.
-       *
-       * A general layer property, resolved here once for any archetype that
-       * declares one — not a family check. */
-      var character = spec.boundary || "near-perfect";
-      var soften = spec.boundarySoftens;
-      if (soften) {
-        var sv = params[soften.param];
-        if (sv !== undefined && sv < soften.below) character = soften.to;
-      }
-
-      var layer = {
-        role: spec.role,
-        /* What the overlay prints (js/data/layernames.js): the spec's own
-         * name if the archetype gave one, else the shared table's. */
-        name: spec.name || CC.LayerNames.of(spec.role),
-        outer: outer,
-        inner: 0,
-        strength: pres.strength,
-        boundary: character,
-        /* `wobbleScale` LETS A LAYER LAND BETWEEN TWO TABLE ENTRIES.
-         *
-         * The WOBBLE table is a vocabulary of six named characters and that is
-         * the right shape for it — a layer should say what KIND of edge it has
-         * rather than picking a number. But the steps are wide (`heavy` 0.065,
-         * `extreme` 0.140, better than a factor of two apart), and the
-         * asteroid genuinely wants a value between them: at `heavy` its
-         * silhouette reads too round and at `extreme` the wobble compounds
-         * with the terrain until the dust film throws detached lobes clear of
-         * the body.
-         *
-         * A multiplier rather than a seventh name, because the character is
-         * still `heavy` — this is the same KIND of edge, more of it. Adding a
-         * name between the two would have made the vocabulary finer for every
-         * body to solve one body's calibration. */
-        wobble: (WOBBLE[character] === undefined ? WOBBLE["near-perfect"]
-                                                 : WOBBLE[character]) *
-                irregularity * (spec.wobbleScale === undefined ? 1
-                                                               : spec.wobbleScale),
-        /* HOW ANGULAR THE WOBBLE IS, as opposed to how large. A boundary that
-         * got its shape by fracturing has flat faces meeting at corners rather
-         * than a smooth undulation, and no amount of amplitude produces that
-         * from fBm — see `boundaryFn` in draw/boundary.js. 0 on every layer that
-         * does not ask, which is all of them but the asteroid's. */
-        boundaryFacet: spec.boundaryFacet || 0,
-        /* WHOSE SHAPE THIS BOUNDARY WEARS. Names another role, so two
-         * boundaries on the same broken fragment rise and fall together and
-         * cannot cross. See `boundaryFn` in draw/boundary.js. */
-        boundaryShare: spec.boundaryShare || null,
-        /* How many lobes the wobble puts round the body. See `boundaryFn`. */
-        boundaryFreq: spec.boundaryFreq || 0,
-        /* Where this layer's edge breaks up through the one above, driven by
-         * a parameter. See `breachFn` in js/gen/form.js. */
-        breach: spec.breach || null,
-        outward: !!spec.outward,
-        /* How much of an outward layer's depth is carried at near-full
-         * opacity before the taper starts. Undefined leaves draw/layers.js's
-         * default. See the note at the fillOutward call in draw/scene.js. */
-        fadeHold: spec.fadeHold,
-        luminous: !!spec.luminous,
-        /* HOW MUCH A LUMINOUS LAYER DARKENS TOWARD ITS OWN LIMB.
-         *
-         * A GENERAL PROPERTY OF AN EMITTING LAYER, not a fact about a
-         * photosphere. Anything that glows is brightest where you look
-         * straight down into it and dimmer where you look obliquely through
-         * cooler, higher material — a fusing surface, a lava sea, an
-         * incandescent shell. Declared here so any future emitting body gets
-         * it without a role name reaching draw/ (see draw/scene.js
-         * `paintLimbDarkening`).
-         *
-         * 0 or undefined means "flat", which is what every existing family
-         * already is, so this cannot change a render that does not ask for
-         * it. */
-        limbDarkening: spec.limbDarkening,
-        /* Wobble expressed as a proportion of the layer's own thickness. See
-         * the resolution pass near the end of `build` for why it cannot be
-         * settled here. */
-        wobbleRel: spec.wobbleRel,
-        /* Per-kind count/size multipliers for this layer's shared element
-         * recipes — how one archetype says its version of a shared role is
-         * louder or quieter. See gen/details.js. */
-        elementScale: spec.elementScale,
-        /* An archetype's own terrain field for this layer, overriding the
-         * role's shared one. A moon's cratered surface and a planet's
-         * continents are different fields rather than one field at two
-         * amplitudes — see gen/details.js. Undefined on every layer that
-         * existed before the moon. */
-        reliefSpec: spec.reliefSpec,
-        /* Traits this layer answers with its OWN marks rather than hosting
-         * the trait's. See `absorbedScale` in gen/details.js. */
-        absorbs: spec.absorbs,
-        /* Per-trait depth overrides within this layer. See `placeOne` in
-         * gen/traitroll.js. */
-        traitDepth: spec.traitDepth,
-        /* A number, or a [lo, hi] range rolled from the layer's OWN stream
-         * so rolling it never reshuffles anything else. A translucent region
-         * (the nebula) is the first user of the range form. */
-        opacity: spec.opacity === undefined ? 1
-          : Math.min(spec.opacityBy ? 0.95 : 1, (Array.isArray(spec.opacity)
-              ? lerp(spec.opacity[0], spec.opacity[1],
-                     CC.RNG.stream(seed, "structure/opacity/" + spec.role)())
-              : spec.opacity) *
-          /* `opacityBy: { param, scale }` — a curve multiplier over a named
-           * parameter, capped at 0.95. A dark nebula's regions are near-opaque
-           * dust; an emission nebula's are thin glowing gas. */
-          (spec.opacityBy && params[spec.opacityBy.param] !== undefined
-            ? M.curve(spec.opacityBy.scale, clamp(params[spec.opacityBy.param], 0, 1)) : 1)),
-        /* A soft-edged region: see draw/feather.js. Absent everywhere else. */
-        feather: spec.feather || 0,
-        ride: !!spec.ride,
-        /* The region's centre, moved off the body's (draw/feather.js). Rolled
-         * from the layer's own stream; null on every layer that declares
-         * none. */
-        drift: spec.drift ? (function (d, r) {
-          var dist = lerp(d[0], d[1], r()) * irregularity;
-          var dir = r() * Math.PI * 2;
-          return { x: Math.sin(dir) * dist, y: -Math.cos(dir) * dist };
-        })(spec.drift, CC.RNG.stream(seed, "structure/drift/" + spec.role)) : null,
-        shell: !!spec.shell,
-        relative: !!relative,
-        /* An optional ceiling on how thick this layer may end up. See the
-         * pass above for why a `frac` range cannot express it. */
-        maxThickness: spec.maxThickness,
-        /* The authored range, kept so the `maxThickness` pass can tell how far
-         * a layer was ever allowed to grow. */
-        fracRange: Array.isArray(spec.frac) ? spec.frac : null,
-        fill: !spec.frac,
-        /* Peak-to-trough height of this layer's surface terrain, if it has
-         * any. Carried through the stack so the surface calculation below can
-         * leave room for peaks; the field itself is generated later. */
-        relief: spec.relief || 0
-      };
+      var layer = CC.Structure.makeLayer(spec, pres, outer, relative, st);
       placed.push(layer);
       byRole[spec.role] = layer;
       /* Recorded for the dependent forms below this one in the stack. */
       placedRoles[spec.role] = true;
       if (relative) deferred.push({ layer: layer, spec: spec });
     }
+  }
 
-    /* --- pass 1b: layers positioned relative to another layer ---
-     *
-     * Resolved innermost-outward, so a chain resolves in one go: the ocean
-     * settles onto the crust, then the atmosphere settles onto the ocean.
-     * `over: "surface"` is the reserved name for "whatever the outermost
-     * non-outward layer turned out to be", which is how an atmosphere sits on
-     * the sea of an ocean world and on the rock of a desert one without
-     * either case being special. */
+  /* --- pass 1b: layers positioned relative to another layer ---
+   *
+   * Resolved innermost-outward, so a chain resolves in one go: the ocean
+   * settles onto the crust, then the atmosphere settles onto the ocean.
+   * `over: "surface"` is the reserved name for "whatever the outermost
+   * non-outward layer turned out to be", which is how an atmosphere sits on
+   * the sea of an ocean world and on the rock of a desert one without
+   * either case being special. */
+  function settleRelative(st) {
+    var placed = st.placed, byRole = st.byRole, deferred = st.deferred;
+    var params = st.params, seed = st.seed;
+    var i;
     for (i = deferred.length - 1; i >= 0; i--) {
       var d = deferred[i];
       var f = d.spec.frac;
@@ -514,36 +169,44 @@ CC.Structure = (function () {
         : f.depth;
       d.layer.outer = host.outer + thickness;
     }
+  }
 
-    /* --- pass 1c: the innermost layer may omit `frac` ---
-     *
-     * `frac` is a layer's own outer radius, and each layer runs inward until
-     * the next one starts. The innermost layer always runs to the centre, so
-     * it needs only a top — and that is exactly where the layer above ends.
-     *
-     * This is what lets the asteroid's mosaic interior be declared without a
-     * range: it is "everything inside the shells", and an explicit number
-     * would only have to be kept in sync with them. Note this means the layer
-     * above must be authored as a band with real thickness, since the fill
-     * layer starts at that layer's *inner* edge. */
+  /* --- pass 1c: the innermost layer may omit `frac` ---
+   *
+   * `frac` is a layer's own outer radius, and each layer runs inward until
+   * the next one starts. The innermost layer always runs to the centre, so
+   * it needs only a top — and that is exactly where the layer above ends.
+   *
+   * This is what lets the asteroid's mosaic interior be declared without a
+   * range: it is "everything inside the shells", and an explicit number
+   * would only have to be kept in sync with them. Note this means the layer
+   * above must be authored as a band with real thickness, since the fill
+   * layer starts at that layer's *inner* edge. */
+  function fillOmitted(st) {
+    var placed = st.placed;
+    var i;
     for (i = 0; i < placed.length; i++) {
       if (placed[i].outer !== null) continue;
       placed[i].outer = (i === 0) ? 1.0 : placed[i - 1].outer;
     }
+  }
 
-    /* A LAYER MAY CAP HOW THICK IT IS ALLOWED TO GET.
-     *
-     * `frac` bounds where a layer's OUTER edge sits; its thickness is whatever
-     * is left between it and the next layer down, which no range can control.
-     * That is usually right — a layer should absorb the slack — and it fails
-     * when the layer beneath is optional or small: an ice giant's `icy-mantle`
-     * rolled 79% of the radius as one near-featureless band whenever
-     * `superionic` was absent, which is a cutaway with nothing to cut.
-     *
-     * `maxThickness` raises the layer's FLOOR rather than lowering its
-     * ceiling, so the layer keeps the position `frac` gave it and the space it
-     * gives up goes to whatever is inside it. Applied before the ordering pass
-     * so the clamps below still see a consistent stack. */
+  /* A LAYER MAY CAP HOW THICK IT IS ALLOWED TO GET.
+   *
+   * `frac` bounds where a layer's OUTER edge sits; its thickness is whatever
+   * is left between it and the next layer down, which no range can control.
+   * That is usually right — a layer should absorb the slack — and it fails
+   * when the layer beneath is optional or small: an ice giant's `icy-mantle`
+   * rolled 79% of the radius as one near-featureless band whenever
+   * `superionic` was absent, which is a cutaway with nothing to cut.
+   *
+   * `maxThickness` raises the layer's FLOOR rather than lowering its
+   * ceiling, so the layer keeps the position `frac` gave it and the space it
+   * gives up goes to whatever is inside it. Applied before the ordering pass
+   * so the clamps below still see a consistent stack. */
+  function capThickness(st) {
+    var placed = st.placed;
+    var i;
     for (i = 0; i < placed.length; i++) {
       var cap = placed[i].maxThickness;
       if (!cap || placed[i].outward) continue;
@@ -570,12 +233,16 @@ CC.Structure = (function () {
         }
       }
     }
+  }
 
-    /* --- pass 2: enforce ordering, drop slivers, assign inner radii --- */
+  /* --- pass 2: enforce ordering, drop slivers, assign inner radii --- */
 
-    /* Outer radii must decrease monotonically inward. Parameter-driven layers
-     * and bias pushes can violate that (a maxed core bias against an unlucky
-     * mantle roll), so clamp rather than trusting the rolls. */
+  /* Outer radii must decrease monotonically inward. Parameter-driven layers
+   * and bias pushes can violate that (a maxed core bias against an unlucky
+   * mantle roll), so clamp rather than trusting the rolls. */
+  function enforceOrder(st) {
+    var placed = st.placed;
+    var i;
     for (i = 1; i < placed.length; i++) {
       var above = placed[i - 1];
       if (above.outward) continue;      /* the atmosphere sits outside the surface */
@@ -597,7 +264,12 @@ CC.Structure = (function () {
         placed[i].outer = above.outer - gap;
       }
     }
+  }
 
+  /* Drop the slivers, and hand each survivor its inner radius. */
+  function dropSlivers(st) {
+    var placed = st.placed;
+    var i;
     var layers = [];
     for (i = 0; i < placed.length; i++) {
       /* The innermost layer runs to the centre; every other layer stops at
@@ -630,23 +302,28 @@ CC.Structure = (function () {
       layers[i].inner = (i === layers.length - 1) ? 0 : layers[i + 1].outer;
       layers[i].thickness = layers[i].outer - layers[i].inner;
     }
+    st.layers = layers;
+  }
 
-    /* The visible edge of the body: the outermost layer that isn't drawn as
-     * an outward falloff. The scale bar and stats measure against this.
-     *
-     * A layer's TERRAIN PEAKS count toward the surface even when the layer
-     * sits below another. A mountain rising through a shallow sea is the
-     * body's true outer edge at that angle, and an island is exactly that
-     * case. Ignoring relief here means renormalization (below) scales every
-     * peak to just under the sea's flat top, so terrain can never break the
-     * surface and no coastline can ever form — which is precisely how the
-     * first attempt at D15 failed. */
-    /* The surface is the body's TRUE OUTERMOST POINT, which is not always the
-     * outermost layer. A buried layer's terrain peaks can rise through the
-     * layer above — an island breaking a shallow sea — and then the peak is
-     * the real edge while the sea's flat top sits just below it. Both must be
-     * accounted for, or renormalization scales the peaks to just under the
-     * sea and no coastline can ever form (the first attempt at D15). */
+  /* The visible edge of the body: the outermost layer that isn't drawn as
+   * an outward falloff. The scale bar and stats measure against this.
+   *
+   * A layer's TERRAIN PEAKS count toward the surface even when the layer
+   * sits below another. A mountain rising through a shallow sea is the
+   * body's true outer edge at that angle, and an island is exactly that
+   * case. Ignoring relief here means renormalization (below) scales every
+   * peak to just under the sea's flat top, so terrain can never break the
+   * surface and no coastline can ever form — which is precisely how the
+   * first attempt at D15 failed. */
+  /* The surface is the body's TRUE OUTERMOST POINT, which is not always the
+   * outermost layer. A buried layer's terrain peaks can rise through the
+   * layer above — an island breaking a shallow sea — and then the peak is
+   * the real edge while the sea's flat top sits just below it. Both must be
+   * accounted for, or renormalization scales the peaks to just under the
+   * sea and no coastline can ever form (the first attempt at D15). */
+  function findSurface(st) {
+    var layers = st.layers;
+    var i;
     var surface = 1.0;
     var foundSurface = false;
     for (i = 0; i < layers.length; i++) {
@@ -656,15 +333,20 @@ CC.Structure = (function () {
       if (!foundSurface) { surface = peak; foundSurface = true; }
       else if (peak > surface) surface = peak;
     }
+    st.surface = surface;
+  }
 
-    /* Rescale so the surface sits exactly at 1.0.
-     *
-     * Layers are authored as fractions of body radius, but adding an ocean on
-     * top of the crust pushes the surface past 1.0, which would make an ocean
-     * world render fractionally larger than a desert one at identical
-     * settings. Normalizing here keeps "1.0 means the surface" true for
-     * everything downstream — stats, the scale bar and every detail element
-     * measure against a surface that is always 1.0. */
+  /* Rescale so the surface sits exactly at 1.0.
+   *
+   * Layers are authored as fractions of body radius, but adding an ocean on
+   * top of the crust pushes the surface past 1.0, which would make an ocean
+   * world render fractionally larger than a desert one at identical
+   * settings. Normalizing here keeps "1.0 means the surface" true for
+   * everything downstream — stats, the scale bar and every detail element
+   * measure against a surface that is always 1.0. */
+  function renormalize(st) {
+    var layers = st.layers, surface = st.surface;
+    var i;
     if (surface > 0 && Math.abs(surface - 1) > 1e-9) {
       var k = 1 / surface;
       for (i = 0; i < layers.length; i++) {
@@ -676,57 +358,32 @@ CC.Structure = (function () {
          * whenever an ocean was added or removed. */
         layers[i].relief *= k;
       }
-      surface = 1.0;
+      st.surface = 1.0;
     }
+  }
 
-    /* ---- WOBBLE MEASURED AGAINST THE LAYER'S OWN THICKNESS -------------
-     *
-     * `WOBBLE` above is a fraction of the BODY radius, which is the right
-     * unit for a mantle or a crust: those are statements about how uneven a
-     * planet is. It is the wrong unit for a fringe. A chromosphere is a few
-     * percent of the radius thick, so a body-radius wobble either does
-     * nothing to it or swallows it whole, and there is no setting in between.
-     *
-     * `wobbleRel: { base, peak, driver }` says the other thing: this
-     * boundary is wavy by a proportion OF ITSELF. 0.10 at the calm end, 0.50
-     * at the violent end — half the layer's own thickness — which is the
-     * user's calibration taken directly. Because it is a proportion, a wide
-     * layer wobbles further in absolute terms than a narrow one from the same
-     * figure, and that is wanted: a corona's edge should heave where a
-     * chromosphere's ripples.
-     *
-     * `driver` names the parameter that moves it between `base` and `peak`.
-     * On a star that is `starActivity` — one axis, more consumers (D27), not
-     * a second violence dial.
-     *
-     * RESOLVED HERE, AFTER RENORMALIZATION, because thickness is not known
-     * until then and this is a proportion OF thickness. Computing it earlier
-     * would calibrate it against a number that is about to move (D75/D119).
-     * It REPLACES the character's body-radius figure rather than adding to
-     * it, so a layer declares one or the other and never both silently. */
-    for (i = 0; i < layers.length; i++) {
-      var wr = layers[i].wobbleRel;
-      if (!wr) continue;
-      var base = wr.base === undefined ? 0.10 : wr.base;
-      var peakW = wr.peak === undefined ? 0.50 : wr.peak;
-      var dv = wr.driver === undefined ? 1 : params[wr.driver];
-      if (dv === undefined) dv = 1;
-      var frac = lerp(base, peakW, clamp(dv, 0, 1));
-      /* Still scaled by Boundary irregularity, which is the user's global
-       * "how ragged is everything" control and must keep meaning that. */
-      layers[i].wobble = frac * layers[i].thickness * irregularity;
-      layers[i].wobbleFrac = frac;
-    }
-
-    /* HOLLOW LAYERS — voids raised under any layer declaring `gapBelow`, and
-     * the access shafts cut through `shafted` ones (js/gen/shells.js). After
-     * renormalization, because a gap is a body-space width. */
+  /* HOLLOW LAYERS — voids raised under any layer declaring `gapBelow`, and
+   * the access shafts cut through `shafted` ones (js/gen/shells.js). After
+   * renormalization, because a gap is a body-space width. */
+  function hollow(st) {
+    var layers = st.layers, archetype = st.archetype;
+    var params = st.params, seed = st.seed;
+    var i;
     var specByRole = {};
     for (i = 0; i < archetype.stack.length; i++) specByRole[archetype.stack[i].role] = archetype.stack[i];
     var shafts = CC.Shells.apply(layers, specByRole, archetype, params, seed);
     for (i = 0; i < layers.length; i++) {
       layers[i].slots = CC.Shells.slotsFor(layers[i], shafts);
     }
+    st.shafts = shafts;
+  }
+
+  /* The built body: the layers, and what the whole body carries. */
+  function finish(st) {
+    var archetype = st.archetype, params = st.params, seed = st.seed;
+    var layers = st.layers, surface = st.surface, shafts = st.shafts;
+    var byRole = st.byRole, irregularity = st.irregularity;
+    var i;
 
     /* How far out the picture reaches, so the view can leave room. */
     var extent = 1.0;
@@ -778,10 +435,44 @@ CC.Structure = (function () {
     };
   }
 
+  /* ---- the stack ------------------------------------------------------ */
+
+  function build(archetype, params, seed) {
+    var st = {
+      archetype: archetype,
+      params: params,
+      seed: seed,
+      rng: CC.RNG.stream(seed, "structure"),
+      variation: params.thicknessVariation === undefined ? 0.7 : params.thicknessVariation,
+      optionalChance: params.optionalLayers === undefined ? 0.75 : params.optionalLayers,
+      irregularity: params.boundaryIrregularity === undefined ? 1 : params.boundaryIrregularity,
+      placed: [],
+      byRole: {},
+      deferred: [],
+      /* WHICH ROLES HAVE BEEN PLACED SO FAR, for the two dependent forms:
+       * `presence: { requires }` and `frac_when`. Filled as the walk proceeds,
+       * which is why both can only ever look OUTWARD — see resolvePresence. */
+      placedRoles: {},
+      layers: null,
+      surface: 1.0,
+      shafts: null
+    };
+
+    rollLayers(st);
+    settleRelative(st);
+    fillOmitted(st);
+    capThickness(st);
+    enforceOrder(st);
+    dropSlivers(st);
+    findSurface(st);
+    renormalize(st);
+    CC.Structure.relativeWobble(st);
+    hollow(st);
+    return finish(st);
+  }
+
   return {
     build: build,
-    resolvePresence: resolvePresence,
-    WOBBLE: WOBBLE,
     MIN_THICKNESS: MIN_THICKNESS
   };
 })();

@@ -54,7 +54,7 @@
 
 | [session-am-refactors.md](session-am-refactors.md) | D323 — Phase 9c block AM: the five stage refactors, byte-identical across 310 renders: each long function now keeps the order of its passes, each pass a stage function sharing one state object, and no file in `js/` is over 500 lines; where the table did not fit the code, including `palette.js` and `placeOne` cut by pass rather than by role or placement kind (Session AM) |
 
-| [session-an-close-9c.md](session-an-close-9c.md) | D324–D328 — Phase 9c closed: ARCHITECTURE.md's file layout from the real tree, checked against `index.html`; the load-order idiom with its three exceptions; stale references to deleted and split files; the user's release decisions (free in the browser and paid offline, the GPL v3, v4.0, `old wip/`, branding in Help); and the prompt for Phase 10 (Session AN) |
+| [session-an-close-9c.md](session-an-close-9c.md) | D324–D328 — Phase 9c closed: ARCHITECTURE.md's file layout from the real tree, checked against `index.html`; the load-order idiom with its three exceptions; stale references to deleted and split files; the user's release decisions (free in the browser and paid offline, a custom licence, v4.0, `old wip/`, branding in Help); and the plan for Phase 10 (Session AN) |
 
 Sessions are listed oldest first. `session-f.md` is a stub left where Session F used to be; it points at the three F files above.
 

@@ -94,4 +94,4 @@ The same byte-for-byte check, against AL's reference renders. Each function's nu
 
 - [x] ARCHITECTURE.md § File layout rewritten from the real tree
 - [x] PROGRESS.md, ROADMAP.md, phase-9-10.md and the checklist mark 9c complete
-- [x] Write the prompt for Phase 10, the release (the user's release prompt is [RC prompt to make releases easier.md](../RC%20prompt%20to%20make%20releases%20easier.md))
+- [x] Write the plan for Phase 10, the release, [phase-10-release.md](phase-10-release.md) (the user's release prompt is [RC prompt to make releases easier.md](../RC%20prompt%20to%20make%20releases%20easier.md))

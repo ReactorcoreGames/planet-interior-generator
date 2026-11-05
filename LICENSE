@@ -1,0 +1,55 @@
+Celestial Cutaway Licence
+
+Copyright (c) 2026 Reactorcore - https://linktr.ee/reactorcore
+
+This is a plain-language licence written by an independent developer, not by a lawyer, and it is not legal advice. It covers Celestial Cutaway's code and files, except the third-party libraries listed at the end.
+
+
+IMAGES YOU GENERATE
+
+Everything you generate with this tool is yours: images, info cards and factsheets. Use them for anything, including commercial games, books and art. No attribution is needed.
+
+
+WHAT YOU MAY DO WITH THE CODE
+
+You may use the tool, read the code, change it and learn from it, for free. You may keep modified copies for yourself, and you may fork the repository on GitHub to work on it.
+
+
+ATTRIBUTION
+
+Anything you release that includes or is built from this code must credit "Reactorcore" with the link https://linktr.ee/reactorcore somewhere a user can find it, such as a credits screen, an about page or the readme.
+
+
+SELLING OR REDISTRIBUTING THE CODE
+
+You may sell, or share publicly, something that includes this code only if you have drastically modified it, so that the result is a different product and not this tool with changes. Attribution still applies.
+
+These count as drastically modified:
+- A different kind of tool or a game, such as a city map generator built on this rendering code.
+- A game or app that uses parts of this code as one component among its own systems.
+- A rewrite in which most of the body types, the generation or the interface are your own work.
+
+These do not count:
+- Selling or re-uploading this tool as it is, or under another name.
+- Changing the name, colours, branding, presets or interface and otherwise releasing the same tool.
+- Adding a few body types, traits or features to the same tool.
+
+If you are unsure, email reactorcoregames@gmail.com and ask.
+
+
+NO WARRANTY
+
+This software is provided "as is", without warranty of any kind. The author is not liable for any claim, damages or other liability arising from its use.
+
+
+THIRD-PARTY LIBRARIES
+
+The files in lib/ are not covered by this licence and keep their own licences, which allow use and redistribution, including in this tool.
+
+lib/simplex-noise.js - simplex-noise 2.4.0, MIT licence, Copyright (c) 2018 Jonas Wagner. The full licence is at the top of that file.
+
+lib/delaunay.js - d3-delaunay 6.0.4, which includes delaunator. ISC licence, Copyright 2018-2021 Observable, Inc., 2021 Mapbox:
+
+Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.

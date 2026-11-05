@@ -19,3 +19,13 @@
 **Checks.** 310/310 renders byte-identical, the real page identical through jsdom, `npm test` passes. `no-undef` reports only `SimplexNoise`, the vendored library's global. The harness does not cover layout: Help has four more link cards in its narrowest column, so the user was asked to look at it in the real app.
 
 **Files:** `index.html`, `style.css`, `js/ui/help.js`, `package.json`, `CLAUDE.md`. `docs/current itchio description for CC.md` stays uncommitted: step 3 reads it and step 6 moves it.
+
+The user looked at Help in the real app: layout and reading are fine, with the six link cards in one column.
+
+## Step 2 — the `LICENSE`
+
+**The custom licence is in the repo root** (D325), wording approved by the user, and `package.json` points at it. The step's terms are all there: free to use, read and change; attribution to Reactorcore with the link; selling or redistributing only if drastically modified, with examples each way; generated images belong to whoever made them, with no attribution needed. It says it is not legal advice.
+
+**Beyond the step's list, each shown to the user first:** a no-warranty clause; plain wording that sharing an unmodified copy for free is not allowed either, which follows from "commercial use or redistribution" and keeps free re-uploads from undercutting the paid copy; forking on GitHub is allowed, since GitHub's terms permit it on a public repo; and the full ISC notice for `lib/delaunay.js`, because ISC requires it in all copies and that file carries only a short copyright line. The MIT notice is already in `lib/simplex-noise.js`. The user turned down allowing free sharing of modified versions.
+
+**Shipping it in both zips is step 5's work:** `build_release.bat` does not copy `LICENSE` yet.

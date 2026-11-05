@@ -35,7 +35,7 @@ The one step that changes app code, since these would ship.
 
 ## Step 2 — the `LICENSE`
 
-- [ ] Finished
+- [x] Finished
 
 A short custom licence in plain language (D325), brought to the user for a yes on its wording: free to use, read and change; attribution required (Reactorcore, with the link); commercial use or redistribution only if drastically modified, with examples of what does and does not count, and no reselling it as it is; generated images belong to whoever made them, with no attribution needed. Note the vendored libraries' own licences (`lib/README.md`). Say plainly that it is not legal advice. It goes in the repo root and ships in both zips. Set `"license": "SEE LICENSE IN LICENSE"` in `package.json`.
 
@@ -45,7 +45,7 @@ A short custom licence in plain language (D325), brought to the user for a yes o
 
 - **`README.md` is still v1's**: four body types, fixed palettes, `script.js`. Rewrite it whole. Keep the capitalised name, because GitHub and `build_release.bat` use it; `guide.md` and `promo.md` are lower-case as the brief says.
 - **Every number in the copy is counted from the data**, not taken from the docs or from memory: archetypes, presets, traits, controls. Load the scripts the way `test/sheet.mjs` does. Every feature claimed must be one the user can find in the app.
-- **The itch copy replaces a live page** (D324). The current text is `docs/current itchio description for CC.md`, and it must stop saying WIP, beta, "later I want to add" and that the offline zip holds only legacy versions. Say what is new since v3.2 by reading `git log 8d5a54f..HEAD` and the session logs. The page lists nine archetypes, so the neutron star, pulsar, black hole, nebula and machine world are new, along with the asteroid rework, the megastructures and more. Its tags today are astronomy, generative-art, illustration, offline, planet-generator, Procedural Generation, Sci-fi, Space, tool, worldbuilding; its downloads are $5 or more, on a name-your-own-price basis.
+- **The itch copy replaces a live page** (D324). The current text is `docs/current itchio description for CC.md`, and it must stop saying WIP, beta, "later I want to add" and that the offline zip holds only legacy versions. Say what is new since v3.2 by reading `git log 8d5a54f..HEAD` and the session logs. The page lists nine archetypes, so the neutron star, pulsar, black hole, nebula and machine world are new, along with the asteroid rework, the megastructures and more. Its tags today are astronomy, generative-art, illustration, offline, planet-generator, Procedural Generation, Sci-fi, Space, tool, worldbuilding; its downloads are $5 or more, on a name-your-own-price basis. Author: Don't make it read like a changelog, I'll need a changelog devlog post separately anyway - the itch description should be totally rewritten to showcase the program as it is today without bothering with anything that came before.
 - **The business-model section gives its honest view of the chosen model**: free in the browser, paid offline, with the source public on GitHub. Say what the paid copy actually offers a buyer given that, and how to pitch it.
 - **Do not write the "open source" label anywhere** (D325). Do not write the YouTube copy yet: it comes with the trailer session.
 - **Reddit.** The brief's note stands: subreddits and their rules cannot be checked from here, so mark them unverified and do not try.

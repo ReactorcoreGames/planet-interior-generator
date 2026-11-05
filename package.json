@@ -1,6 +1,6 @@
 {
   "name": "celestial-cutaway",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "private": true,
   "description": "Offline generator for stylized interior cross-sections of celestial bodies.",
   "type": "module",

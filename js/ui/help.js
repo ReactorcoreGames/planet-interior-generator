@@ -5,11 +5,8 @@
  * those reads better with room. It is sized off the viewport rather than off a
  * fixed pixel width so a large screen gets a large panel.
  *
- * MOST OF THE PROSE IS A PLACEHOLDER. The "how to use it" half cannot settle
- * until the body families and their controls do, so what is here is honest
- * about being early rather than describing an app that does not exist yet. The
- * SHELL — open, close, focus, escape, layout — is finished; only the words
- * inside #help-usage are meant to be rewritten later. */
+ * The words live in index.html. This file is the shell: open, close, focus,
+ * escape, and the keyboard list. */
 
 var CC = CC || {};
 

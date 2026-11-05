@@ -130,6 +130,7 @@ not.
   features. Overshot in scope, undershot on visual density. **Superseded.**
 - **v3** — full redesign from the spec set above. Plain scripts, one style,
   trait grammar, generative colour, high visual density.
+- **v4** — the same codebase as v3, finished and released. Fourteen body types (adds the neutron star, pulsar, black hole, nebula and machine world, with the asteroid reworked), megastructures such as Dyson shells and ringworlds, layer labels and a scale bar, saved settings, the full keyboard map, every file split to ≤500 lines. Free in the browser, paid offline, under a custom licence.
 
 v2 code worth raiding: seeded RNG + value noise, HSV colour maths, the flare
 ribbon geometry, layer-stack distribution. Everything else re-derive.

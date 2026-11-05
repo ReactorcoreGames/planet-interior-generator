@@ -1122,16 +1122,6 @@ body.modal-open { overflow: hidden; }
 }
 .help-col p strong { color: var(--ink); }
 
-/* Marked as provisional so it reads as a known gap rather than as thin
- * writing. Removed when the walkthrough is written. */
-.help-placeholder {
-  padding: 9px 12px;
-  border-left: 2px solid var(--accent-dim);
-  background: #1f1a30;
-  border-radius: 0 var(--radius) var(--radius) 0;
-  font-style: italic;
-}
-
 .help-list {
   margin: 0;
   padding-left: 18px;

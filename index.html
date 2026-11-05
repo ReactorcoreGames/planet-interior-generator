@@ -18,7 +18,7 @@
     <!-- THE INFO CARD. It floats over the preview rather than taking a third
          grid column, because the render is the thing and the card annotates
          it. Every line is read off the same values that drew the picture — see
-         js/gen/stats.js. Toggled by the Labels & Info section, and by `I`. -->
+         js/gen/stats/. Toggled by the Labels & Info section, and by `I`. -->
     <aside id="info-panel" aria-label="Body information"></aside>
 
     <div id="preview-meta">
@@ -77,7 +77,7 @@
       </button>
     </div>
 
-    <!-- Accordion. Multi-open; each section scrolls inside itself. -->
+    <!-- Accordion. Multi-open; the panel has the one scrollbar and sections do not scroll inside themselves (D8). -->
     <div id="panel-scroll">
 
       <!-- ---------- BODY ---------- -->
@@ -453,8 +453,8 @@
                     title="Roll a new set of traits, keeping the seed, colours and structure exactly as they are.">Re-roll traits</button>
           </div>
 
-          <!-- The trait list is built from data/traits.js at runtime, so
-               adding a trait stays a single edit to that file. Incompatible
+          <!-- The trait list is built from js/data/traits/ at runtime, so
+               adding a trait stays a single edit to the data. Incompatible
                traits are HIDDEN rather than greyed — a long list of
                unavailable options is noise (TRAIT-SYSTEM.md).
 
@@ -720,11 +720,7 @@
      WIDE ON PURPOSE. This is the one place the app explains itself, and an
      explanation crammed into a 400px column reads like a legal notice. It
      takes most of the viewport and lays its body out in columns on a wide
-     screen, collapsing to one column when there is no room.
-
-     The prose under "Using it" is a PLACEHOLDER until the remaining phases
-     land — the controls it would describe are still moving. Everything else
-     here is finished. -->
+     screen, collapsing to one column when there is no room. -->
 <div id="help-overlay" class="overlay" role="dialog" aria-modal="true"
      aria-labelledby="help-title" hidden>
   <div id="help-panel" class="modal">
@@ -762,21 +758,40 @@
 
       <section class="help-col help-usage" id="help-usage">
         <h2>Using it</h2>
-        <p class="help-placeholder">
-          A proper walkthrough lands once the remaining body families are
-          finished &mdash; the controls are still moving, and a guide written
-          now would be wrong by the time you read it. The short version:
+        <p>
+          The picture redraws as soon as you change anything, and your settings
+          are still there next time you visit. Hover over any control to see
+          what it does.
         </p>
         <ul class="help-list">
-          <li><strong>Randomize</strong> rolls a new world. Start there and
-              press it until something catches your eye.</li>
-          <li><strong>Locks</strong> (the padlock beside a control) tell
-              Randomize to leave that setting alone, so you can roll everything
-              except the parts you liked.</li>
-          <li><strong>Presets</strong> set several controls at once without
-              touching your seed, so you can compare treatments of one world.</li>
-          <li><strong>Export</strong> saves a PNG &mdash; the body alone, the
-              body with its info card, or the card by itself.</li>
+          <li><strong>Roll a body.</strong> Press <strong>Randomize</strong>
+              until something catches your eye. It can land on any kind of body,
+              from planets and stars to black holes, nebulae and machine
+              worlds.</li>
+          <li><strong>Or choose one.</strong> <strong>Archetype</strong> picks
+              the kind of body, and <strong>Presets</strong> set several controls
+              at once for a named look. A preset keeps your seed, so you can
+              compare looks on the same body.</li>
+          <li><strong>Keep what you like.</strong> The padlock beside a control
+              tells Randomize to leave it alone, so you can re-roll everything
+              else. Randomize settings can lock a whole section at once.</li>
+          <li><strong>Adjust it.</strong> Structure, Colour and Detail hold the
+              sliders. Under <strong>Traits</strong>, tick a feature to force it
+              on, or click &times; so that Randomize never picks it.</li>
+          <li><strong>Annotate it.</strong> <strong>Labels &amp; Info</strong>
+              turns on the info card, the layer names and the scale bar.</li>
+          <li><strong>Frame it.</strong> Scroll over the picture to zoom in for
+              a close-up, and drag to move around. <strong>Output</strong> sets
+              the background, shape and resolution, and can reset the
+              framing.</li>
+          <li><strong>Export it.</strong> The <strong>Export</strong> menu saves
+              a PNG of what you see, the body with its info card, the card alone
+              or a square image of the body. It can also save a text factsheet
+              or copy the picture.</li>
+          <li><strong>Come back to it.</strong> The same seed and settings always
+              draw the same body. Choose <strong>Copy seed + settings as
+              text</strong> from the Export menu, and paste that text into the
+              Seed box to bring the body back.</li>
         </ul>
         <h3 id="help-keys-title">Keyboard</h3>
         <ul class="help-keys" id="help-keys"></ul>
@@ -785,29 +800,47 @@
       <section class="help-col help-brand">
         <h2>Reactorcore</h2>
         <p>
-          Made by <strong>Reactorcore Games</strong>. If this was useful, the
-          rest of the workshop is worth a look.
+          Made by <strong>Reactorcore</strong>. If this was useful, the rest of
+          the workshop is worth a look.
         </p>
         <div class="brand-links">
-          <a class="brand-link" href="https://reactorcore.itch.io/" target="_blank" rel="noopener noreferrer">
+          <a class="brand-link" href="https://reactorcore.itch.io/celestial-cutaway-planet-interior-generator" target="_blank" rel="noopener noreferrer">
             <span class="brand-icon">&#9733;</span>
-            <span><strong>itch.io</strong><em>Games and tools</em></span>
+            <span><strong>itch.io</strong><em>This tool&rsquo;s page</em></span>
           </a>
-          <a class="brand-link" href="https://github.com/ReactorcoreGames" target="_blank" rel="noopener noreferrer">
+          <a class="brand-link" href="https://github.com/ReactorcoreGames/planet-interior-generator" target="_blank" rel="noopener noreferrer">
             <span class="brand-icon">&#9881;</span>
-            <span><strong>GitHub</strong><em>Source, including this</em></span>
+            <span><strong>GitHub</strong><em>This tool&rsquo;s source</em></span>
+          </a>
+          <a class="brand-link" href="https://linktr.ee/reactorcore" target="_blank" rel="noopener noreferrer">
+            <span class="brand-icon">&#10022;</span>
+            <span><strong>Linktree</strong><em>Everything I do</em></span>
+          </a>
+          <a class="brand-link" href="https://reactorcoregames.github.io/" target="_blank" rel="noopener noreferrer">
+            <span class="brand-icon">&#9776;</span>
+            <span><strong>Catalog</strong><em>All my releases</em></span>
+          </a>
+          <a class="brand-link" href="https://www.patreon.com/ReactorcoreGames" target="_blank" rel="noopener noreferrer">
+            <span class="brand-icon">&#9998;</span>
+            <span><strong>Blog</strong><em>On Patreon</em></span>
+          </a>
+          <a class="brand-link" href="https://discord.gg/UdRavGhj47" target="_blank" rel="noopener noreferrer">
+            <span class="brand-icon">&#9742;</span>
+            <span><strong>Discord</strong><em>Come and talk</em></span>
           </a>
         </div>
+        <p class="help-fine">Email: reactorcoregames@gmail.com</p>
         <p class="help-fine">
-          Images you generate are yours to use. The generator itself is open &mdash;
-          plain HTML, CSS and JavaScript, no build step. Open the folder and read it.
+          Images you generate are yours to use. The source is there to read: plain
+          HTML, CSS and JavaScript with no build step. What you may do with the
+          code is set out in the LICENSE file.
         </p>
       </section>
 
     </div>
 
     <footer class="modal-foot">
-      <span class="help-version">v3 &middot; in development</span>
+      <span class="help-version">v4.0</span>
       <button id="help-dismiss" class="big-btn primary modal-ok">Get started</button>
     </footer>
 

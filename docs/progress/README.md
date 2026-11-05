@@ -56,6 +56,8 @@
 
 | [session-an-close-9c.md](session-an-close-9c.md) | D324–D328 — Phase 9c closed: ARCHITECTURE.md's file layout from the real tree, checked against `index.html`; the load-order idiom with its three exceptions; stale references to deleted and split files; the user's release decisions (free in the browser and paid offline, a custom licence, v4.0, `old wip/`, branding in Help); and the plan for Phase 10 (Session AN) |
 
+| [session-ao-release.md](session-ao-release.md) | D329– — Phase 10, the release, one section per step. Step 1: Help's real walkthrough, v4.0, the links and the licence wording, stale comments (Session AO) |
+
 Sessions are listed oldest first. `session-f.md` is a stub left where Session F used to be; it points at the three F files above.
 
-Decision numbers (`D#`) are referenced from code comments and other docs. To find a specific one, `grep -rn "D42" docs/progress/` is faster than opening each file. The next free number is **D329**.
+Decision numbers (`D#`) are referenced from code comments and other docs. To find a specific one, `grep -rn "D42" docs/progress/` is faster than opening each file. The next free number is **D330**.

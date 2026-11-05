@@ -20,7 +20,7 @@
 
 ## Step 1 — the app itself
 
-- [ ] Finished
+- [x] Finished
 
 The one step that changes app code, since these would ship.
 
@@ -59,7 +59,7 @@ The part the user cares most about, judged by looking. This step may well run to
 - The set: 16:9 screenshots of striking bodies across the families; montages and collages showing the range; **screenshots stamped with large advertising text**, each selling one feature in a layperson's words; the 630×500 itch thumbnail and the 1280×720 cover, in big type over dense detail. JPG or PNG, whichever is smaller for each.
 - **Sell what is visible at a glance**: the fourteen body types, Dyson spheres and ringworlds, the info cards with their lore, the close-ups, the layer labels and scale bar.
 - `test/sheet.mjs` and `@napi-rs/canvas` give full renders at any size, and `all` interleaves every family. Scripts stay in `test/_tmp/`. The harness cannot show the interface, so ask the user for a real screenshot of the GUI if one should be in the set.
-- Work in rounds: first a spread of candidate bodies to pick from, then the stamped and composed images, with more candidates than are needed. `archive/Celestial Cutaway v3.2 release promo pics/` is reference for what the user chose before; none of it is reused.
+- Work in rounds: first a spread of candidate bodies to pick from, then the stamped and composed images, with more candidates than are needed. `archive/Celestial Cutaway v3.2 release promo pics/` is reference for what the user chose before; none of it is reused. (Author veto: No, disregard that archive folder in favor of a totally new lineup of screenshots decided by you. The ones I did there were mostly placeholders I rushed to throw in. We can have some that are typical screenshots of different planets and GUI sections, plus infocard renders as a collage, and maybe a row of columns collage of different planet/celestials stitched together, plus anything else that would be cool.)
 - Keep the renders' seeds and settings in the log, so the trailer session can reuse the same bodies.
 
 ## Step 5 — the zips: the brief's Phase 2

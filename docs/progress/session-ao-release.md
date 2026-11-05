@@ -29,3 +29,15 @@ The user looked at Help in the real app: layout and reading are fine, with the s
 **Beyond the step's list, each shown to the user first:** a no-warranty clause; plain wording that sharing an unmodified copy for free is not allowed either, which follows from "commercial use or redistribution" and keeps free re-uploads from undercutting the paid copy; forking on GitHub is allowed, since GitHub's terms permit it on a public repo; and the full ISC notice for `lib/delaunay.js`, because ISC requires it in all copies and that file carries only a short copyright line. The MIT notice is already in `lib/simplex-noise.js`. The user turned down allowing free sharing of modified versions.
 
 **Shipping it in both zips is step 5's work:** `build_release.bat` does not copy `LICENSE` yet.
+
+## Step 3 — the text
+
+**`README.md` is rewritten whole, and `guide.md` and `promo.md` are new.** All three follow the brief's layout and carry its links. The YouTube copy waits for the trailer session, and the promo images for step 4.
+
+**The numbers were counted from the loaded scripts**, by a throwaway probe that loads them the way `test/sheet.mjs` does: 14 archetypes, 58 presets, 72 trait entries, 36 sliders and 10 dropdowns. Ring System and Research Station each appear twice, once per family, so the copy says **70 traits**, the number of names a user can see. Features were checked against `index.html` and the stat templates, not the specs.
+
+**The itch description showcases the app as it is today**, as the user asked, with nothing about earlier versions. The changes since v3.2 are in a separate devlog post in `promo.md`, written from `git log 8d5a54f..HEAD` and the session logs, since the user said they would need one.
+
+**D330: `promo.md` is written to be read in public.** It goes in the public repo, and step 5 ships it in both zips, so buyers will read its business section. That section therefore says only what can be said openly: the paid copy is the same app, and the pitch is support, permanence and convenience, in that order. The user may still prefer to keep the strategy private, which is an open question for them before step 5.
+
+**One tag changed in the suggested list:** `tool` becomes `ttrpg`, since the page's type already says it is a tool. Subreddits and the extra places are marked unverified, as the brief says. The label D325 rules out appears nowhere in the three files.

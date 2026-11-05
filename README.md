@@ -1,46 +1,64 @@
-# planet-interior-generator
+# Celestial Cutaway
 
-Web app to create cool planet interior illustrations for world building, scifi, etc.
+**Slice open a planet, a star or a black hole, and see what's inside.**
 
-## Celestial Cutaway
+Celestial Cutaway is a browser tool that draws detailed cross-section illustrations of celestial bodies, from the atmosphere down to the core. It's for worldbuilders, game masters, sci-fi writers and indie game developers who need a place worth setting a story in: a picture, plus enough believable detail to riff on.
 
-A fully offline, single-folder web app that generates stylized 2D
-cross-section illustrations of a celestial body's interior. No build
-step, no server, no network — just open `index.html` in a browser
-(double-click works via `file://`).
+Press one button and you get a new body, with a card of facts to match. Change anything and the picture redraws straight away. Then save it as an image, which is yours to use, commercially included.
 
-## Features
+**Use it free in your browser, or buy the offline copy:** https://reactorcore.itch.io/celestial-cutaway-planet-interior-generator
 
-- **One shared rendering engine** draws concentric interior layers whose
-  boundaries are perturbed by seeded value noise + sine harmonics, so
-  every stratum looks organic rather than like a perfect target. The
-  engine is parameterized by a *body profile*; nothing is reimplemented
-  per body type.
-- **Four body types**, each just a profile fed to that engine:
-  - *Rocky / Terrestrial* — solid glowing core, banded mantle strata,
-    thin speckled crust, optional ocean/ice arcs, atmospheric haze.
-  - *Gas Giant* — swirled/banded cloud-realms, no crust, optional
-    tilted multi-band ring, deep bright core.
-  - *Young Star* — brilliant convective core with radial spokes,
-    turbulent plasma shells, corona glow, limb flares.
-  - *Old Star (Red Giant)* — small fierce core wrapped in bloated,
-    translucent, wispy exhaled shells with a dim corona.
-- **UI**: live 16:9 preview, body-type selector, seed, per-type palette
-  choices, boundary-wobble and layer-richness sliders, name field,
-  adjustable export resolution (default 720 px vertical), and a
-  **Randomize** button with 🔒 lock checkboxes so any parameter can be
-  held fixed while the rest re-roll.
-- **Lore panel**: a flavor-text stat card (age, temperament, strata
-  count, seas/rings/flares, a closing quote) generated from the same
-  seed and reflecting the body's actual generated features.
-- **Two export modes** (both scale from the chosen resolution):
-  - 16:9 PNG — cutaway illustration plus the lore panel on the right.
-  - 1:1 PNG — the body alone on a fully transparent background.
+## What it makes
 
-## Files
+**14 kinds of body:** planet, moon, asteroid, gas giant, ice giant, young star, main sequence star, old giant star, dwarf star, neutron star, pulsar, black hole, nebula and machine world.
 
-- `index.html` — page structure and controls
-- `style.css` — UI styling
-- `script.js` — RNG/noise, profiles, the shared engine, lore, exports
+- **70 traits** you can force on or ban, from Diamond Rain and Magma Chambers to Dyson Shells, Ringworlds, Orbital Minefields and Worldship drives.
+- **58 presets**, each a named starting point, such as Hot Jupiter, Feeding Black Hole, Pillars of Creation or Derelict Machine World.
+- **36 sliders and 10 dropdowns**, shown or hidden to suit the body. Lock any setting and re-roll the rest.
+- **An info card** that describes the body you're looking at: its size, what's worth mining, its biggest danger and how to approach it.
+- **Layer labels and a scale bar**, with a size comparison when one fits, from a person to the Oort cloud.
+- **Close-ups**: zoom in and drag to frame any part of the body.
+- **Exports**: a PNG up to 2160 px tall in four shapes, the body with its card, the card alone, a square image of the body, or a text factsheet. The background can be transparent.
+- **Repeatable results**: the same seed and settings always draw the same body, and you can copy them as text to keep or share.
 
-No external libraries.
+Every image is drawn by the tool's own code on your computer, not by an image model. Nothing is uploaded, there's no account, and it works with the network unplugged.
+
+## Running it
+
+Open `index.html` in a browser. Double-clicking it is enough: there's nothing to install or build. [guide.md](guide.md) explains the rest in a few minutes.
+
+## The source
+
+This is plain HTML, CSS and JavaScript with no build step, so what you read is exactly what runs. To run it from GitHub, download or clone the repository and open `index.html`.
+
+The tests are for development only, and the app doesn't need them. They use Node: `npm install`, then `npm test`.
+
+## Licence
+
+**Images you generate are yours**, for anything, with no attribution needed.
+
+The code is source-available under a short custom licence, not a standard one. You may use it, read it and change it for free. You may sell or publicly share something that includes it only if you've drastically modified it into a different product, with credit to Reactorcore. [LICENSE](LICENSE) has the exact terms and examples, plus the licences of the two bundled libraries.
+
+## Contact
+
+reactorcoregames@gmail.com
+
+---
+
+Check out everything else I do: ✨🚀
+
+https://linktr.ee/reactorcore
+
+https://reactorcore.itch.io/
+
+-Reactorcore
+
+---
+
+My other links:
+
+- Home/Links: https://linktr.ee/reactorcore
+- Releases: https://reactorcore.itch.io
+- Blog: https://www.patreon.com/ReactorcoreGames
+- Discord: https://discord.gg/UdRavGhj47
+- Catalog: https://reactorcoregames.github.io/

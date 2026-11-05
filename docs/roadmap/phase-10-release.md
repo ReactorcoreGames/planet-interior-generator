@@ -54,7 +54,7 @@ A short custom licence in plain language (D325), brought to the user for a yes o
 
 - [ ] Finished
 
-The part the user cares most about, judged by looking. This step may well run to more than one session.
+The part the user cares most about, judged by looking. This step may well run to more than one session (Author: hopefully not, most likely taking screenshots with some stamps and making a few collages should be doable in one session I reckon). 
 
 - The set: 16:9 screenshots of striking bodies across the families; montages and collages showing the range; **screenshots stamped with large advertising text**, each selling one feature in a layperson's words; the 630×500 itch thumbnail and the 1280×720 cover, in big type over dense detail. JPG or PNG, whichever is smaller for each.
 - **Sell what is visible at a glance**: the fourteen body types, Dyson spheres and ringworlds, the info cards with their lore, the close-ups, the layer labels and scale bar.

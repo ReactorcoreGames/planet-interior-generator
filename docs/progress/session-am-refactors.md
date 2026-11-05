@@ -44,7 +44,7 @@ Comments that named a moved thing's old home were corrected: 81 lines across 49 
 
 ## Not checked
 
-The real browser. jsdom and the renders cover the code, and nothing in `main.js` or the panel moved this time, but the script tags did: 19 new files. Worth opening the app once.
+The real browser. jsdom and the renders cover the code, and nothing in `main.js` or the panel moved this time, but the script tags did: 17 new files. Worth opening the app once.
 
 ## Files
 
@@ -62,7 +62,7 @@ The real browser. jsdom and the renders cover the code, and nothing in `main.js`
 >
 > The block has three items. **ARCHITECTURE.md § File layout, rewritten from the real tree**: list `js/` as it now stands, including the split files from AL and AM and the load-order idiom they share (the source file first, its split files straight after, attached to its namespace), and check every path against `index.html`'s script tags, so that the doc cannot name a file that does not exist. **PROGRESS.md, ROADMAP.md, phase-9-10.md and the checklist mark 9c complete.** **Write the prompt for Phase 10, the release**: the user's release prompt is docs/RC prompt to make releases easier.md; read it and build the prompt on it rather than restating it.
 >
-> No code should change in this session. If one does, `sh test/_tmp/_alstep.sh <files>` runs the line counts, `no-undef`, the 310 renders against `shots/al/ref/`, the real page through jsdom, and `npm test`; if `shots/al/ref/` has been cleared, regenerate it with `node test/_tmp/_albase.mjs ref` and `node test/_tmp/_alpage.mjs hash > shots/al/page-ref.json` before touching anything. Also ask the user to open the app once in the real browser if they have not since AM: 19 script tags were added, and the harness does not cover layout.
+> No code should change in this session. If one does, `sh test/_tmp/_alstep.sh <files>` runs the line counts, `no-undef`, the 310 renders against `shots/al/ref/`, the real page through jsdom, and `npm test`; if `shots/al/ref/` has been cleared, regenerate it with `node test/_tmp/_albase.mjs ref` and `node test/_tmp/_alpage.mjs hash > shots/al/page-ref.json` before touching anything. Also ask the user to open the app once in the real browser if they have not since AM: 17 script tags were added, and the harness does not cover layout.
 >
 > **How to run each step: lead with your recommendation.** The docs are mechanical, so do them and show me a short summary, with no questions unless something is ambiguous: a claim in a doc you cannot square with the code, or a checklist item that may not be done. When you do bring me something, read the code first and bring: what it is in one or two lines, **"Recommend: …"** with the reason, and the alternatives in a line each (the recommended one first). I should be able to answer "yes" or pick a letter; don't leave me with an open "keep or change?". Then tick the checklist, commit and push.
 >

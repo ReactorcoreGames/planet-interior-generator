@@ -29,3 +29,6 @@ desktop.ini
 # named harness in test/ instead — a probe that mattered twice belongs in
 # the suite, and one that mattered once belongs in the bin.
 test/_tmp/
+
+# The trailer: the music is not ours to publish, and the video is a generated file
+trailer/

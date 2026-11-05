@@ -57,7 +57,8 @@
 | [session-an-close-9c.md](session-an-close-9c.md) | D324–D328 — Phase 9c closed: ARCHITECTURE.md's file layout from the real tree, checked against `index.html`; the load-order idiom with its three exceptions; stale references to deleted and split files; the user's release decisions (free in the browser and paid offline, a custom licence, v4.0, `old wip/`, branding in Help); and the plan for Phase 10 (Session AN) |
 
 | [session-ao-release.md](session-ao-release.md) | D329–D337 — Phase 10, the release (complete), one section per step. Step 1: Help's real walkthrough, v4.0, the links and the licence wording, stale comments. Step 2: the `LICENSE`. Step 3: the text. Step 4: `promo/`. Step 5: the zips (Session AO) |
+| [session-ap-trailer.md](session-ap-trailer.md) | D338–D340 — the YouTube trailer: real renders frame by frame, the music played straight through, 1080p final; the cut, and the music's licence (Session AP) |
 
 Sessions are listed oldest first. `session-f.md` is a stub left where Session F used to be; it points at the three F files above.
 
-Decision numbers (`D#`) are referenced from code comments and other docs. To find a specific one, `grep -rn "D42" docs/progress/` is faster than opening each file. The next free number is **D330**.
+Decision numbers (`D#`) are referenced from code comments and other docs. To find a specific one, `grep -rn "D42" docs/progress/` is faster than opening each file. The next free number is in [PROGRESS.md](../PROGRESS.md).

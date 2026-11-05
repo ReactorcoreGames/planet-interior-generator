@@ -66,4 +66,4 @@ Also asked for: a wholly new `promo/` (screenshots, montages and collages, scree
 
 ## The next session (Session AO)
 
-The release runs as six steps, one session each, from [phase-10-release.md](../roadmap/phase-10-release.md). The prompt for each is: "Read docs/roadmap/phase-10-release.md and do Session AO, step 1." (then 2, and so on).
+The release runs as six steps, one session each, from [phase-10-release.md](../../old%20wip/docs-roadmap/phase-10-release.md). The prompt for each is: "Read docs/roadmap/phase-10-release.md and do Session AO, step 1." (then 2, and so on).

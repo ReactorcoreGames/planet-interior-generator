@@ -10,11 +10,13 @@
 
 **Built and released: v4.0.** Phases 0–10 are complete. Fourteen body types, megastructures, labels and scale bar, saved settings, the keyboard map; every file in `js/` is at most 500 lines. The release (Session AO) made `LICENSE`, `README.md`, `guide.md`, `promo.md`, `promo/` and the two zips, and publishing them is the user's. See [session-ao-release.md](progress/session-ao-release.md).
 
-**Next:** the YouTube trailer, in a session of its own. Its prompt is at the bottom of [session-ao-release.md](progress/session-ao-release.md). After that, only what the user asks for.
+**The trailer is made too** (Session AP): `trailer/celestial-cutaway-trailer-1080p.mp4`, gitignored, with its copy in `promo.md`. See [session-ap-trailer.md](progress/session-ap-trailer.md).
 
-**Last updated:** 2026-11-05, Session AO step 6: the clean-up (D337).
+**Next:** only what the user asks for.
 
-**Next free decision number: D338.**
+**Last updated:** 2026-11-05, Session AP: the YouTube trailer (D338–D340).
+
+**Next free decision number: D341.**
 
 ---
 
@@ -60,6 +62,7 @@ One line per completed block of work. The ticked items behind each are in [progr
 | Phase 9c — the five stage refactors, no pixel changed | AM | D323 | [session-am-refactors.md](progress/session-am-refactors.md) |
 | Phase 9c closed — the file layout from the real tree, stale references, the release decisions, the Phase 10 prompt (Phase 9c complete) | AN | D324–D328 | [session-an-close-9c.md](progress/session-an-close-9c.md) |
 | Phase 10 — the release, v4.0: Help, `LICENSE`, the text, `promo/`, the zips, the clean-up (Phase 10 complete) | AO | D329–D337 | [session-ao-release.md](progress/session-ao-release.md) |
+| The YouTube trailer and its copy | AP | D338–D340 | [session-ap-trailer.md](progress/session-ap-trailer.md) |
 | Phase 9a — the machine world (Phase 9a complete): stages (a)–(b) — the machine world's stack; void and shaft walls, accent hue, materials, metallic colour, cellgrid, even spacing, platforms, fixtures, pulses, containment, conduits, capacitors; stage (c) — Operational status, hull wounds, the torn edge, debris and sparks; stage (d) — trait `sets`, Under construction, blast doors, shaft covers, overgrowth, the bore cannon, the worldship drive, the stat card, flavour, Star activity, presets | Z | D248–D281 | [session-z-machine-world.md](progress/session-z-machine-world.md) |
 
 ---

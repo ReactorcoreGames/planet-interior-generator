@@ -53,6 +53,7 @@ launch_app_win.bat    starts a local server for dev; never shipped
 build_release.bat     copies shippable files into dist/ and makes the zips
 dist/                 generated; gitignored
 shots/                generated renders; gitignored, cleared freely
+trailer/              the YouTube video and its music; gitignored, never shipped
 old wip/              v1/v2 code, finished plans; gitignored
 ```
 
@@ -69,7 +70,7 @@ Dev dependencies (`node_modules/`) are **allowed for testing only**, and are git
 - **jsdom** loads the real `index.html` and drives the UI, catching crashes and broken wiring.
 - **@napi-rs/canvas** is a real rasterizer, so renders can be produced and checked by eye.
 - **Stub canvas** (`test/stubcanvas.mjs`, no deps) records every 2D call and flags NaN geometry, malformed colours, and unbalanced save/restore.
-- **Headless Edge** shows the real GUI and has the real font metrics, so anything with text or the interface comes from it (D331). `test/_tmp/_aoedge.mjs` drives it.
+- **Headless Edge** shows the real GUI and has the real font metrics, so anything with text or the interface comes from it (D331). It runs over its debugging port with a throwaway profile and nothing installed; write a small driver for it under `test/_tmp/` when needed.
 
 **Keep the suite small.** `npm test` takes about 30 seconds. A check earns its place only if it is **mechanically true-or-false** *and* **generic over `CC.Archetypes.ids()`**, so adding a body family adds no test code. Tests that encode judgement cause false corrections: a future session "fixes" working code to satisfy a stale opinion. **Whether the output looks good is the user's call, made by looking at the app.** Do not add tests unless asked, and do not resurrect `sweep.mjs`, `stats.mjs` or `composed.mjs`. See PROGRESS.md → Test suite.
 

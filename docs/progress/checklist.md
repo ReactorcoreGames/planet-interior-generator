@@ -200,7 +200,7 @@ The ticked items, block by block, are in [phase-9c-cleanup.md](../../old%20wip/d
 
 ### Phase 10 — the release ✅ (Session AO)
 
-The ticked steps are in [phase-10-release.md](../roadmap/phase-10-release.md).
+The ticked steps are in [phase-10-release.md](../../old%20wip/docs-roadmap/phase-10-release.md).
 
 - [x] **AO** Help and v4.0, `LICENSE`, the text, `promo/`, the zips, the clean-up (D329–D337)
 

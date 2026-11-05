@@ -32,7 +32,7 @@ The architecture is designed so later phases slot in without rework: archetypes 
 | 8 — Overlay, scale, polish | ✅ (Session AA; framing built early, Session I) | `old wip/docs-roadmap/phase-8-polish.md` |
 | 9b — Megastructure traits | ✅ (Sessions AB–AG) | `old wip/docs-roadmap/phase-9-10.md` |
 | 9c — Final clean-up pass | ✅ (Sessions AH–AN) | `old wip/docs-roadmap/phase-9c-cleanup.md` |
-| 10 — Release | ✅ (Session AO) | [roadmap/phase-10-release.md](roadmap/phase-10-release.md) |
+| 10 — Release | ✅ (Session AO) | `old wip/docs-roadmap/phase-10-release.md` |
 
 **The rows are in build order, not number order** (D246). The phase numbers are kept so existing references stay valid.
 | Out of scope, risk notes, session boundaries | | [roadmap/scope-and-risk.md](roadmap/scope-and-risk.md) |
@@ -56,6 +56,6 @@ The architecture is designed so later phases slot in without rework: archetypes 
 2. ✅ **8 — overlay, scale bar, polish**, including the per-type stat templates, over the full set of archetypes. Done in Session AA (D282–D288, [session-aa-polish.md](progress/session-aa-polish.md)): the layer-name overlay, the scale bar, the stat-template pass, persistence and Reset to defaults, the full keyboard map.
 3. ✅ **9b — megastructure traits.** Audited and the list set by the user in Session AB (D289–D290); built one family per session, AC–AF; closed in Session AG with the black hole's lensing, three presets and the unfinished Dyson shell (D304–D306). See [progress/session-ab-megastructures.md](progress/session-ab-megastructures.md) and [progress/session-ag-close-9b.md](progress/session-ag-close-9b.md).
 4. ✅ **9c — a final clean-up pass**, so everything lands together. Audited in Session AH (D307–D308) and worked through a checklist, AI–AN: the bugs and picture decisions, the eye lists, the unbuilt controls and spec drift, every file over 500 lines split with no pixel changed, and the docs. See `old wip/docs-roadmap/phase-9c-cleanup.md`.
-5. ✅ **10 — release.** v4.0, Session AO ([session-ao-release.md](progress/session-ao-release.md)). The user's release-prep prompt is [RC prompt to make releases easier.md](RC%20prompt%20to%20make%20releases%20easier.md), and the steps built on it are in [roadmap/phase-10-release.md](roadmap/phase-10-release.md). Releasing later is fine: machine worlds and megastructures are intended parts of the generator, not extras.
+5. ✅ **10 — release.** v4.0, Session AO ([session-ao-release.md](progress/session-ao-release.md)). The user's release-prep prompt is [RC prompt to make releases easier.md](RC%20prompt%20to%20make%20releases%20easier.md), and the steps built on it are in `old wip/docs-roadmap/phase-10-release.md`. Releasing later is fine: machine worlds and megastructures are intended parts of the generator, not extras.
 
 Finished planning docs (the Phase 6 polish docs, the Phase 7 prompt, the asteroid overhaul, the climate plan) are in the gitignored `old wip/docs-archive/`, and in git history up to commit 302550a. They are records of design reasoning, not open work.

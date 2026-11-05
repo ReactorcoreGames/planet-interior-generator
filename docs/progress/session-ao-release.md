@@ -1,6 +1,6 @@
 # Session AO — the release, v4.0
 
-*Phase 10, one section per step. Checklist: [phase-10-release.md](../roadmap/phase-10-release.md).*
+*Phase 10, one section per step. Checklist: [phase-10-release.md](../../old%20wip/docs-roadmap/phase-10-release.md).*
 
 ## Step 1 — the app itself
 

@@ -29,7 +29,7 @@ Favour places where posts stay findable, as you asked:
 1. **The itch.io page**, which is the home for everything. The tags and the description do the long-term work there.
 2. **GitHub**, with the description and topics below. It reaches people searching for procedural generators.
 3. **Your catalog and Linktree**, as a new entry at the top.
-4. **The YouTube trailer**, which comes later. It has the longest life of any of these, because video search keeps surfacing it.
+4. **The YouTube trailer.** It has the longest life of any of these, because video search keeps surfacing it.
 
 ### Tactics
 
@@ -241,7 +241,54 @@ astronomy
 
 ## YouTube
 
-Not written yet. This comes with the trailer session.
+### Title
+
+Celestial Cutaway - Planet Interior Generator | Trailer
+
+### Description
+
+```text
+Celestial Cutaway is a planetary interior art generator. It generates detailed cross-section illustrations of planets, stars, black holes, nebulae and machine worlds, from the outer sky down to the core. Every result comes with its own fact card.
+
+Free in your browser, with an offline copy on itch.io:
+https://reactorcore.itch.io/celestial-cutaway-planet-interior-generator
+
+USE THE IMAGES, EVEN COMMERCIALLY
+- Game assets and backdrops
+- TTRPG handouts and session props
+- Worldbuilding and lore visuals
+- Framed art and wallpapers
+- Backgrounds for posters, video, any media
+The images are yours. No credit needed.
+
+WHAT'S IN IT
+- 14 body types, 58 presets, 70 traits and 36 sliders
+- Megastructures: Dyson shells, orbital rings, skyhook cities and ringworlds
+- Machine worlds and worldships
+- Labelled cutaway diagrams with a scale bar
+- Zoom in 20x and export up to 4K
+
+Every image is drawn by the tool's own code on your computer, not by an image model. No account, and nothing is uploaded.
+
+Source on GitHub: https://github.com/ReactorcoreGames/planet-interior-generator
+
+LINKS
+Everything I do: https://linktr.ee/reactorcore
+My other releases: https://reactorcore.itch.io
+Catalog: https://reactorcoregames.github.io/
+Blog: https://www.patreon.com/ReactorcoreGames
+Discord: https://discord.gg/UdRavGhj47
+```
+
+### Tags
+
+celestial cutaway, planet interior generator, planet generator, procedural generation, procedural art, generative art, worldbuilding, worldbuilding tool, ttrpg, ttrpg tools, tabletop rpg, game master tools, sci-fi, science fiction, space art, planet cross section, cutaway illustration, game assets, indie game dev, dyson sphere, megastructures, black hole, nebula, free browser tool
+
+### Thumbnail and music
+
+`promo/01-cover-1280x720.jpg` is the right size for the thumbnail.
+
+The music is "The Coming Storm" by Ethan Meixsell, from the YouTube Audio Library. Its licence allows use in monetized videos and requires no attribution, so the description doesn't credit it. YouTube may add its own credit.
 
 ## Marketing targets to look into
 
@@ -250,7 +297,7 @@ I haven't checked any of these, so confirm each one still takes submissions like
 - **AlternativeTo:** a free listing under planet or worldbuilding generators. It's permanent, and people browse it when they're looking for exactly this.
 - **Cartographers' Guild (forum):** a long-running community for map and setting artists. Post in its software or resources area, with several images.
 - **"Awesome" lists on GitHub:** community lists of procedural generation and tabletop tools. A one-line entry stays findable for years.
-- **YouTubers who cover worldbuilding and tabletop tools:** send them the trailer once it exists. A short, specific email works best.
+- **YouTubers who cover worldbuilding and tabletop tools:** send them the trailer. A short, specific email works best.
 - **Show HN on Hacker News:** the angle is the plain-script, no-build Canvas 2D engineering. It's a one-day spike rather than a persistent listing, and the licence will come up, so be ready to explain it.
 
 ## Links

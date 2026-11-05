@@ -632,7 +632,7 @@ Also:
 
 ## File layout
 
-*Written from the real tree in Session AN. Everything listed exists, and each folder's scripts are in the order they load. **`index.html` is the single source of truth for the file list:** `test/domtest.mjs` reads its `<script src>` tags and `build_release.bat` copies `js/` and `lib/` wholesale, so adding a file means adding its tag and nothing else.*
+*Written from the real tree in Session AN. Everything listed exists, and each folder's scripts are in the order they load. **`index.html` is the single source of truth for the file list:** `test/domtest.mjs` reads its `<script src>` tags and `build_release.bat` copies `js/` and the scripts in `lib/` wholesale, so adding a file means adding its tag and nothing else.*
 
 ```
 index.html  style.css  favicon.ico

@@ -31,7 +31,7 @@ Open `index.html` in a browser. Double-clicking it is enough: there's nothing to
 
 This is plain HTML, CSS and JavaScript with no build step, so what you read is exactly what runs. To run it from GitHub, download or clone the repository and open `index.html`.
 
-The tests are for development only, and the app doesn't need them. They use Node: `npm install`, then `npm test`.
+The tests are for development only, and the app doesn't need them. They're in the GitHub repository, not the zip, and use Node: `npm install`, then `npm test`.
 
 ## Licence
 

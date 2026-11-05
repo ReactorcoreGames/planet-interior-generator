@@ -481,19 +481,8 @@ CC.Frosting = (function () {
      * The planet's is `frostLand`, which is its second; an archetype with a
      * different set gets the first non-aquatic zone that is not the snowline,
      * which is the same thing said generically. */
-    out.film = out[ordinaryKey(keys, zones)];
+    out.film = out[CC.Frosting.ordinaryKey(keys, zones)];
     return out.film;
-  }
-
-  /* Which zone stands for "the ordinary surface of this body" — the one the
-   * `film` alias points at. The first that is neither the snowline nor
-   * underwater; the first of all of them if every zone is one of those. */
-  function ordinaryKey(keys, zones) {
-    for (var i = 0; i < keys.length; i++) {
-      var z = zones[keys[i]] || {};
-      if (!z.snow && !z.aquatic) return keys[i];
-    }
-    return keys[0];
   }
 
   return {

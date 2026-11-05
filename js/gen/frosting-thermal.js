@@ -18,6 +18,17 @@ var CC = CC || {};
     return out;
   }
 
+  /* Which zone stands for "the ordinary surface of this body" — the one the
+   * `film` alias points at. The first that is neither the snowline nor
+   * underwater; the first of all of them if every zone is one of those. */
+  function ordinaryKey(keys, zones) {
+    for (var i = 0; i < keys.length; i++) {
+      var z = zones[keys[i]] || {};
+      if (!z.snow && !z.aquatic) return keys[i];
+    }
+    return keys[0];
+  }
+
   /* Shortest signed hue rotation from `from` to `to`, in degrees. Lets a
    * colour be pulled a FRACTION of the way toward another without travelling
    * the long way round the wheel — the same reasoning as gen/palette.js's
@@ -116,4 +127,5 @@ var CC = CC || {};
   }
 
   CC.Frosting.addThermalVariants = addThermalVariants;
+  CC.Frosting.ordinaryKey = ordinaryKey;
 })();

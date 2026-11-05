@@ -1,4 +1,4 @@
-/* Presets — the moon and the ice moon.
+/* Presets — the moon.
  *
  * Split out of js/data/presets.js, which passed the 500-line rule. Registered
  * into CC.Presets, which must load first; values are in the DOM control's own

@@ -18,7 +18,7 @@
  *
  * WHO READS WHAT:
  *
- *   hue     the light's own colour, in degrees. gen/palette.js casts it over
+ *   hue     the light's own colour, in degrees. gen/palette-hue.js casts it over
  *           the outer layers, falling off with depth, so a red-dwarf world is
  *           ruddy at the surface and unchanged at the core.
  *   cast    how strongly that colour reaches the body's materials. It must

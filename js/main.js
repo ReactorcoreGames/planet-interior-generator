@@ -50,7 +50,7 @@ var CC = CC || {};
 
   /* Re-roll traits without touching anything else.
    *
-   * The salt rides in `settings.traitSalt`, which gen/traitroll.js folds into
+   * The salt rides in `settings.traitSalt`, which gen/traitselect.js folds into
    * its stream key — so the traits change while the seed, the structure, the
    * palette and every layer detail stay byte-identical. That separation is
    * the whole point of the per-stage RNG streams. */
@@ -73,7 +73,7 @@ var CC = CC || {};
   /* The outermost body-space radius the last render reached, which is what the
    * pan clamp bounds travel by. Cached from the render rather than recomputed,
    * because it folds in the atmosphere bulge and the outward traits that only
-   * draw/scene.js measures. */
+   * draw/scene-outward.js measures. */
   var currentExtent = 1;
 
   /* Bumped by "Re-roll traits", which needs to produce a different roll from

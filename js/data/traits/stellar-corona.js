@@ -23,7 +23,7 @@ var CC = CC || {};
    * IT HAD TO BE FLAT AND HARD-EDGED, which is the part worth recording,
    * because it means the implementation could not have been rescued by
    * softening it. The corona is composited with `screen` (ATMOSPHERE_BLEND in
-   * draw/scene.js), and under `screen` dark paint is very nearly a NO-OP: the
+   * draw/scene-outward.js), and under `screen` dark paint is very nearly a NO-OP: the
    * operation can only ever add light. A flat opaque wedge was the only dark
    * mark that showed at all; a soft one would have been invisible, which is
    * exactly D121s `dust-formation` failure — dark specks on a fading halo,
@@ -68,7 +68,7 @@ var CC = CC || {};
    * is now both halves of what a coronal hole is: less corona, and a visible
    * outflow through the gap.
    *
-   * THE PLACEMENT GRAMMAR DOES BOTH AT ONCE. gen/traitroll.js hands the
+   * THE PLACEMENT GRAMMAR DOES BOTH AT ONCE. gen/traitplace.js hands the
    * sectors it just rolled to the ordinary placement pass, so the rays land
    * INSIDE the holes rather than being scattered independently — a hole whose
    * wind blew somewhere else would read as two unrelated features. */
@@ -130,7 +130,7 @@ var CC = CC || {};
     /* AND IT LEAVES THE PICTURE, which no other trait in the generator does.
      *
      * Spanning traits are clipped to the body's extent so nothing escapes into
-     * open space (draw/scene.js) — correct for a prominence that returns, a
+     * open space (draw/scene-surface.js) — correct for a prominence that returns, a
      * flare that disperses, a plume that falls back. All of those belong to
      * the star. The wind out of a coronal hole is the one mark whose content
      * is that it does NOT: clipped, it stopped dead at the halo's edge in a
@@ -168,7 +168,7 @@ var CC = CC || {};
     alpha: [0.55, 0.85],
 
     /* AND THE FIELD THAT LET IT OUT — the diagrammatic half, at the same
-     * bearings. See `companion` in gen/traitroll.js for why this is one trait
+     * bearings. See `companion` in gen/traitfinish.js for why this is one trait
      * with two marks rather than two traits: the wind and the field are the
      * same feature seen twice, and a version where they landed independently
      * would read as two unrelated things happening near each other.
@@ -187,7 +187,7 @@ var CC = CC || {};
     companion: {
       element: "field-lines",
       /* MULTIPLIERS ON THE PARENT INSTANCE, not ranges — that is what the
-       * companion mechanism takes (see gen/traitroll.js). One field-line mark
+       * companion mechanism takes (see gen/traitfinish.js). One field-line mark
        * per wind ray, at the same bearing, which is the coincidence the whole
        * mechanism is for.
        *

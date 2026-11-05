@@ -124,7 +124,7 @@ var CC = CC || {};
      *
      * IT CANNOT BE ABSORBED BY RENORMALIZATION. gen/structure.js puts the
      * surface at exactly 1.0 at the END of `build`, while the zones are
-     * constructed later in gen/details.js — so the swell moves the drawn edge
+     * constructed later in gen/details-traits.js — so the swell moves the drawn edge
      * past 1.0 after the fact and nothing upstream can take it back. An
      * angular sea level already does exactly this; the frosting and the
      * atmosphere floor both cope by measuring the real per-bearing top rather
@@ -434,7 +434,7 @@ var CC = CC || {};
      *
      * Archetype data rather than a role check, so any layer that is
      * substantial-then-fading can say so. Carried on the layer by
-     * gen/structure.js. */
+     * gen/structure-resolve.js. */
     /* ATMOSPHERE OPACITY (D312) scales the air alone: the fill's peak,
      * its haze and sub-bands, and its zone tint. 1 is the tuned look; past
      * 1 the peak clips to opaque further out, which is what reads as a

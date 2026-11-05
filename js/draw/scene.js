@@ -95,7 +95,7 @@ CC.Scene = (function () {
   function bandFill(ctx, view, layer, colour) {
     var r1 = view.px(layer.outer);
     var r0 = view.px(Math.max(0, layer.inner));
-    /* A VOID IS ONE FLAT COLOUR — see `void` in gen/palette.js. No shading:
+    /* A VOID IS ONE FLAT COLOUR — see `void` in gen/palette-layer.js. No shading:
      * a gradient on nothing reads as a surface. */
     if (colour.flat) return colour.hex;
     if (r1 - r0 < 2) return colour.hex;

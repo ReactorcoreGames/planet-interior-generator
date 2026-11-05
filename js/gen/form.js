@@ -139,7 +139,7 @@ CC.Form = (function () {
      * round scoop out of the outline with a low raised lip either side, so
      * every layer and cell that wears the form lines the hollow. `bites` is
      * [{ angle, width (half-angle, radians), depth (fraction of radius) }],
-     * rolled in gen/details.js; applied before the normalization so a lip
+     * rolled in gen/details-traits.js; applied before the normalization so a lip
      * can never push the body past its frame. */
     for (var k = 0; bites && k < bites.length; k++) {
       var bt = bites[k];

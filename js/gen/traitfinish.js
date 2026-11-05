@@ -28,7 +28,7 @@ var CC = CC || {};
        * Spanning traits are clipped to the body's extent so nothing escapes
        * into open space — right for every mark that belongs to the star. A
        * coronal hole's wind is the exception whose whole content is that it
-       * does not come back, and draw/scene.js gives it a second unclipped
+       * does not come back, and draw/scene-surface.js gives it a second unclipped
        * pass.
        *
        * STAMPED HERE RATHER THAN DECLARED ON THE RECIPE, and that distinction
@@ -40,7 +40,7 @@ var CC = CC || {};
        * correctly three files away. Anything the renderer must see that is not
        * already part of the recipe format belongs on this loop. */
       made[i].escapes = trait.escapes;
-      /* SEATED ON THE DRAWN SURFACE — see `seatOn` in draw/scene.js. Stamped
+      /* SEATED ON THE DRAWN SURFACE — see `seatOn` in draw/scene-surface.js. Stamped
        * here for the same D159 reason as `escapes`. */
       made[i].seat = trait.seat;
       /* SOMETHING SOMEBODY BUILT, drawn over the natural orbital material

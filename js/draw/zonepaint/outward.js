@@ -49,7 +49,7 @@ var CC = CC || {};
    * on that same 0.26 squash looked obviously right — and rendered as a grey
    * disc lying behind nothing at all, with the rocks scattered clear of it
    * across the whole frame. The reason is that scattered orbital instances are
-   * placed on FULL-CIRCLE angles (`anchorAngles` in gen/traitroll.js), not on
+   * placed on FULL-CIRCLE angles (`anchorAngles` in gen/traitanchor.js), not on
    * the ring plane: a debris belt is a spherical shell in this renderer, not a
    * disc. Matching the ring's projection was matching the wrong trait.
    *
@@ -214,8 +214,8 @@ var CC = CC || {};
      * That is why ringed giants all looked alike no matter what colour the
      * world was: the mark was not merely desaturated by its tone, it was
      * reading a role that had nothing to do with it. `orbit` is the role these
-     * elements actually carry (gen/traitroll.js gives them a synthetic layer
-     * of that name) and gen/palette.js now builds a real entry for it, derived
+     * elements actually carry (gen/traitanchor.js gives them a synthetic layer
+     * of that name) and gen/palette-bands.js now builds a real entry for it, derived
      * from the body's outermost solid layer — ring debris is made of the world
      * it orbits, so it keeps that tint.
      *

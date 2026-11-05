@@ -175,7 +175,7 @@ var CC = CC || {};
                              sheen: 0.35 },
         /* `heatValue`: Operational status is these two layers' lightness —
          * a derelict's heart is cold metal, a busy one burns (the neutron
-         * star's Surface heat is the precedent; gen/palette.js). */
+         * star's Surface heat is the precedent; gen/palette-value.js). */
         computation:       { sat: [0.22, 0.42], val: [0.40, 0.56],
                              incandescent: true, accentHue: 0.85,
                              heatValue: [0.45, 1.0, 0.45] },

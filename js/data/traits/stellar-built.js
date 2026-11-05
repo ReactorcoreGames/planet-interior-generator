@@ -148,7 +148,7 @@ var CC = CC || {};
     arc: [0, 360],
     /* THE COUNT IS THE `repeat` ROLL, NOT THE DENSITY SLIDER. With
      * `spacing: "even"` the placement produces exactly this many anchor
-     * points, and traitroll.js raises the count to match them — which is how
+     * points, and traitplace.js raises the count to match them — which is how
      * "between 1 and 12 at random" is said in this grammar without a new
      * field. `density` below is therefore a floor that the placement
      * overrides, not the figure in charge.
@@ -189,7 +189,7 @@ var CC = CC || {};
      * TIER_SIZE[0] = 1.00 and THE AUTHORED SIZE IS THE DRAWN SIZE. Checked
      * before authoring the numbers: `named` does NOT cap the instance count at
      * one (it selects tiers and waives the tier alpha penalty; the count is
-     * computed separately in traitroll.js), which is what makes it usable for
+     * computed separately in traitplace.js), which is what makes it usable for
      * a trait that is 2-12 objects rather than one headline feature. */
     tiers: 1,
     named: true,
@@ -238,7 +238,7 @@ var CC = CC || {};
     /* `{1, 1}` IS "EXTENT, NOT COUNT" — the same thing an ice cap declares,
      * and it is what actually makes the `repeat` roll the number of stations.
      *
-     * traitroll.js takes the density figure and then raises it to the number
+     * traitplace.js takes the density figure and then raises it to the number
      * of anchor points, never lowers it. So `{2, 12}` did NOT mean "two to
      * twelve": at the default Detail density it computed about eight, and
      * eight beat almost every repeat roll — measured across eighty bodies the

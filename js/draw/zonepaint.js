@@ -35,7 +35,7 @@ CC.ZonePaint = (function () {
   function clampUnit(v) { return v < 0 ? 0 : (v > 1 ? 1 : v); }
   function smoothFrac(t) { t = clampUnit(t); return t * t * (3 - 2 * t); }
 
-  /* Must match the blend draw/scene.js gives an outward layer: a screened
+  /* Must match the blend draw/scene-outward.js gives an outward layer: a screened
    * layer tinted with source-over compositing inverts at the limb. */
   var ATMOSPHERE_BLEND = "screen";
 

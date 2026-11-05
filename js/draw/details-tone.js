@@ -32,7 +32,7 @@ var CC = CC || {};
   /* Apply an element's angular-zone perturbation to its layer's band colour.
    *
    * ZONES PERTURB, THEY DO NOT REPLACE. What arrives on the element is an HSV
-   * *delta* resolved in gen/details.js — never a colour and never a zone name.
+   * *delta* resolved in gen/details-instances.js — never a colour and never a zone name.
    * Adding it to whatever the layer rolled is what makes one zone recipe work
    * on a rocky planet, a gas giant and a star alike: a blue world's hot face
    * comes out a hot BLUE, because the blue is the layer's and only the "hot"

@@ -153,7 +153,7 @@ var CC = CC || {};
          * ported: at the low end the boundary character softens, because a
          * coreless giant has no discrete core to draw an edge around. That is
          * `boundarySoftens` below — a general layer property, not a gas-giant
-         * branch, and gen/structure.js resolves it for any layer that
+         * branch, and gen/structure-resolve.js resolves it for any layer that
          * declares one. */
         frac: [0.070, 0.155],
         boundary: "near-perfect",
@@ -191,7 +191,7 @@ var CC = CC || {};
                           climateLean: cloudDeck([38, 56], [14, 32]) },
         /* THE BANDED LAYER, and the strongest climate response in the body.
          *
-         * `bandContrast` is read by gen/palette.js and published on the
+         * `bandContrast` is read by gen/palette-layer.js and published on the
          * colour so the alternating zone/belt bands separate by an authored
          * amount rather than by whatever `tone` happens to give. A cold giant
          * bands hard; a hot one's bands wash out as the deck sinks, which is

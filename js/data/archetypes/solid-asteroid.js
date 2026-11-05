@@ -105,7 +105,7 @@ var CC = CC || {};
         role: "outer-shell",
         frac: [0.960, 1.000],
         boundary: "heavy",
-        /* Between two table entries; see `wobbleScale` in gen/structure.js. */
+        /* Between two table entries; see `wobbleScale` in gen/structure-resolve.js. */
         wobbleScale: 1.5,
         /* Flat faces meeting at corners — a fragment's outline. High, not 1:
          * at the very top the outline reads as a drawn polygon. */
@@ -139,13 +139,13 @@ var CC = CC || {};
          * already has two crater marks — the craters in its terrain, which
          * notch the silhouette, and its field of impact pits — so the trait
          * turns both up rather than laying a second crater mechanism over
-         * them. See `absorbedScale` in gen/details.js. */
+         * them. See `absorbedScale` in gen/details-traits.js. */
         absorbs: {
           cratered: { craters: 2.6, elements: { "arc-band": 1.9 } },
           /* AND THE IMPACT BASIN IS A BITE OUT OF THE ROCK (D313). As a dark
            * sector of crust it read as a shadow; on a body this small the hit
            * that nearly finished it takes a scoop out of the outline, and the
-           * shell lines the hollow. See `biteRoll` in gen/details.js. */
+           * shell lines the hollow. See `biteRoll` in gen/details-traits.js. */
           "impact-basin": { bite: { count: [1, 2.4], width: [20, 34], depth: [0.18, 0.28] } }
         }
       },

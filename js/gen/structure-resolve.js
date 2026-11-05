@@ -279,7 +279,7 @@ var CC = CC || {};
       outward: !!spec.outward,
       /* How much of an outward layer's depth is carried at near-full
        * opacity before the taper starts. Undefined leaves draw/layers.js's
-       * default. See the note at the fillOutward call in draw/scene.js. */
+       * default. See the note at the fillOutward call in draw/scene-outward.js. */
       fadeHold: spec.fadeHold,
       luminous: !!spec.luminous,
       /* HOW MUCH A LUMINOUS LAYER DARKENS TOWARD ITS OWN LIMB.
@@ -289,7 +289,7 @@ var CC = CC || {};
        * straight down into it and dimmer where you look obliquely through
        * cooler, higher material — a fusing surface, a lava sea, an
        * incandescent shell. Declared here so any future emitting body gets
-       * it without a role name reaching draw/ (see draw/scene.js
+       * it without a role name reaching draw/ (see draw/emissive.js
        * `paintLimbDarkening`).
        *
        * 0 or undefined means "flat", which is what every existing family
@@ -311,10 +311,10 @@ var CC = CC || {};
        * existed before the moon. */
       reliefSpec: spec.reliefSpec,
       /* Traits this layer answers with its OWN marks rather than hosting
-       * the trait's. See `absorbedScale` in gen/details.js. */
+       * the trait's. See `absorbedScale` in gen/details-traits.js. */
       absorbs: spec.absorbs,
       /* Per-trait depth overrides within this layer. See `placeOne` in
-       * gen/traitroll.js. */
+       * gen/traitplace.js. */
       traitDepth: spec.traitDepth,
       /* A number, or a [lo, hi] range rolled from the layer's OWN stream
        * so rolling it never reshuffles anything else. A translucent region

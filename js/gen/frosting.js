@@ -25,7 +25,7 @@ CC.Frosting = (function () {
   var M = CC.Math;
   var clamp = M.clamp, lerp = M.lerp;
 
-  /* gen/palette.js owns the colour-relative factories and hue wrapping. They
+  /* gen/palette-util.js owns the colour-relative factories and hue wrapping. They
    * are handed in rather than reimplemented here so there is exactly one
    * definition of what "a lighter relative of this colour" means. */
   var wrapHue, makeLighter, makeDarker, makeRgba;

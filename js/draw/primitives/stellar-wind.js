@@ -9,7 +9,7 @@
  * direction it broke out along, so it is built from a centreline that leans; a
  * hole has a SECTOR and no particular moment, so this is built from a bearing
  * and a half-width and has to know how wide the hole it sits in is (`el.half`,
- * set in gen/traitroll.js when the sectors are rolled).
+ * set in gen/traitfinish.js when the sectors are rolled).
  *
  * The rule both files share: material that is leaving fades to nothing rather
  * than stopping, because a shape ending at a visible alpha ends on a line.

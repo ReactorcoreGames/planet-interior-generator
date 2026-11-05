@@ -115,7 +115,7 @@ CC.ZoneSwell = (function () {
      *
      * IT LIVES HERE RATHER THAN IN THE RENDERER so there is exactly one
      * answer. The boundary (draw/scene.js) and the detail elements
-     * (gen/details.js) both consume this, and a cap applied in one and not
+     * (gen/details-instances.js) both consume this, and a cap applied in one and not
      * the other would shear the marks off the band they belong to — a
      * defect that would be invisible on any body whose interior is thin. */
     if (swellAnchored[role]) return v;

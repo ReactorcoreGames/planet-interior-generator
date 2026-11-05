@@ -59,7 +59,7 @@ CC.TraitPicker = (function () {
    *
    * Exclusion is symmetric — declared on either side is enough — so a pair
    * only needs recording once, and the same test serves the picker and the
-   * roller in gen/traitroll.js. */
+   * roller in gen/traitselect.js. */
   function compatible(trait, chosenIds) {
     for (var i = 0; i < chosenIds.length; i++) {
       if (chosenIds[i] === trait.id) continue;
@@ -232,7 +232,7 @@ CC.TraitPicker = (function () {
     archetypeId = id;
     /* Selections that the new archetype cannot carry are dropped, so a trait
      * cannot survive an archetype change into a body that has no place for
-     * it. gen/traitroll.js re-checks anyway; this keeps the UI honest. */
+     * it. gen/traitselect.js re-checks anyway; this keeps the UI honest. */
     var pool = CC.Traits.eligible(CC.Archetypes.get(id));
     var ok = {};
     for (var i = 0; i < pool.length; i++) ok[pool[i].id] = true;
@@ -244,7 +244,7 @@ CC.TraitPicker = (function () {
     build();
   }
 
-  /* The selection, as the list gen/traitroll.js expects. Returns null when
+  /* The selection, as the list gen/traitselect.js expects. Returns null when
    * nothing is ticked, which is what tells the pipeline to ROLL traits rather
    * than honour an empty explicit selection — "I have chosen none" and "I have
    * chosen nothing yet" are different states and only the first should

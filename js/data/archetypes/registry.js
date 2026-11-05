@@ -22,7 +22,7 @@
  *              | soft-gradient
  *
  * PRESENCE — how a layer decides whether it exists at all. One mechanism,
- * three forms, evaluated by one code path in gen/structure.js:
+ * three forms, evaluated by one code path in gen/structure-resolve.js:
  *
  *   (omitted)              always present
  *   presence: 1.0          a 100% roll at max slider; scales down with Optional layers

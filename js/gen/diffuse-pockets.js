@@ -5,7 +5,7 @@
  * belong where its gas is — a belt of ice where the cloud is thick, a station
  * hidden in a void, pillars standing on a bank of dense gas with their heads
  * toward the light — so a nebula trait declares `place: "pocket"` and this
- * placer moves the elements the ordinary builder made (gen/traitroll.js
+ * placer moves the elements the ordinary builder made (gen/traitplace.js
  * `placeOne`). Positions are in BODY SPACE, for a trait drawn in the spanning
  * pass, after all the gas and through the plain view.
  *
@@ -167,7 +167,7 @@ var CC = CC || {};
     return out;
   }
 
-  /* THE COUNT, PER CLUSTER — `perPocket` (gen/traitroll.js asks before it
+  /* THE COUNT, PER CLUSTER — `perPocket` (gen/traitplace.js asks before it
    * builds). The clusters are counted here, ahead of the build, so the count
    * the builder makes is the sum of theirs. */
   function plan(trait, layer, count, r) {
@@ -383,7 +383,7 @@ var CC = CC || {};
         if (dl.absorb) e.absorb = M.curve(dl.absorb, x0);
       });
     }
-    /* Sunk beneath the other traits in the spanning pass (gen/details.js),
+    /* Sunk beneath the other traits in the spanning pass (gen/details-instances.js),
      * extras included: the trait is ground, not a thing on it. */
     if (trait.under) made.forEach(function (e) { e.under = true; });
     return made;

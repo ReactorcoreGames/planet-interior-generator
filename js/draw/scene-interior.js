@@ -55,7 +55,7 @@ var CC = CC || {};
        * thin, which is what makes the pinch geometric.
        *
        * Keyed to the layer BELOW, because sea level belongs to the surface the
-       * fluid rests on — the same lookup gen/details.js keys it by. */
+       * fluid rests on — the same lookup gen/details-terrain.js keys it by. */
       var below = layers[i + 1];
       var sea = (below && details.seaLevel) ? details.seaLevel[below.role] : null;
       var lvl = CC.Layers.levelFn(layers[i], bf, sea);

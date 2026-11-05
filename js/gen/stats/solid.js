@@ -164,7 +164,7 @@ var CC = CC || {};
     /* A SUB-PIXEL SEA IS NOT A SEA — the renderer already agrees (D21). The
      * ocean's `strength` fade finishes at Ocean depth 0.079, but the water
      * does not reach one rendered pixel of thickness until around 0.2, and in
-     * that window draw/scene.js fades its opacity out over the first ~1.5px
+     * that window draw/scene-interior.js fades its opacity out over the first ~1.5px
      * of rendered thickness. So there is a real band of settings where the
      * layer exists, the geometry crosses the terrain over most of the
      * circumference, and NOTHING IS DRAWN.
@@ -223,7 +223,7 @@ var CC = CC || {};
    * changes this line, because it changes which layer that is. */
   /* HOW MUCH OF THE SEA THE LID HAS LOST (D317): a weak shell breaks and
    * the sea shows through. Asks the renderer's own question — the breach
-   * draw/scene.js composes from the same `breachFn` — over 360 bearings. */
+   * draw/scene-interior.js composes from the same `breachFn` — over 360 bearings. */
   function openWaterOf(body, settings) {
     for (var i = 1; i < body.layers.length; i++) {
       var L = body.layers[i];

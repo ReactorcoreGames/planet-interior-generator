@@ -172,7 +172,7 @@ var CC = CC || {};
          * with a flat 0.40 roll: only 11% of ice moons actually showed the
          * thing the branch exists for — a frozen shell over a liquid sea —
          * and the rest were warm bodies wearing a lid, some at 610 C. See
-         * `presence: { colder }` in gen/structure.js. */
+         * `presence: { colder }` in gen/structure-resolve.js. */
         presence: { colder: 0.46, fade: 0.13 },
         /* THE SHELL'S UNDERSIDE, and it is a different field from any ground.
          *

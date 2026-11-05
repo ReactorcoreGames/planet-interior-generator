@@ -204,7 +204,7 @@ var CC = CC || {};
 
   /* ---- THE ORBITAL BAND NEEDS A COLOUR OF ITS OWN --------------------
    *
-   * `anchor: "orbit"` gets a SYNTHETIC layer (gen/traitroll.js) so rings and
+   * `anchor: "orbit"` gets a SYNTHETIC layer (gen/traitanchor.js) so rings and
    * debris can be placed outside the body without a separate code path. It
    * is not a real layer, so nothing here ever built a palette entry for it,
    * and `get("orbit")` fell all the way through to the neutral fallback

@@ -182,7 +182,7 @@ var CC = CC || {};
       boundary: "soft-gradient",
       outward: true,
       fadeHold: hold,
-      /* THE CORONA HEAVES. See `wobbleRel` in gen/structure.js — a proportion
+      /* THE CORONA HEAVES. See `wobbleRel` in gen/structure-wobble.js — a proportion
        * of the layer's OWN thickness, so the corona's absolute wobble comes
        * out far larger than the chromosphere's from the same figure simply
        * because a corona is far wider. That is wanted, and is the reason the

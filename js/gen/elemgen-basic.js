@@ -380,7 +380,7 @@ var CC = CC || {};
          * divisions, the body's shadow); see draw/primitives/orbital-rings.js.
          *
          * IT IS `recipe.kind`, NOT `recipe.element`. A trait's `element` has
-         * already been renamed to `kind` by the time gen/traitroll.js hands
+         * already been renamed to `kind` by the time gen/traitplace.js hands
          * the recipe over — reading `element` here found undefined, fell back
          * to the old value, and the giant drew the ring it was supposed to
          * have stopped drawing. The render looked plausible and the change

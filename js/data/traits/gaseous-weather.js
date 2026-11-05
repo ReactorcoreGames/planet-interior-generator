@@ -72,7 +72,7 @@ var CC = CC || {};
      * `reach: "spanning"` is implemented for the first time here; it lets the
      * depth range run OUTSIDE the anchor's 0..1 box, and the element draws in
      * its own unclipped pass so no layer boundary cuts it. See traitDepth and
-     * the spanning pass in draw/scene.js.
+     * the spanning pass in draw/scene-surface.js.
      *
      * -2.6 reaches roughly two troposphere-thicknesses below its floor; 1.15
      * carries it just past the cloud tops. `fadeEnds` dissolves both extremes
@@ -103,7 +103,7 @@ var CC = CC || {};
      * thick or thin, and `icy-mantle` is the ice giant's name for the same
      * place. `floorFrac` catches a body with neither.
      *
-     * See the floor block in gen/traitroll.js: this pulls the inward edge
+     * See the floor block in gen/traitfinish.js: this pulls the inward edge
      * back and leaves the outward end alone, so the bulge through the cloud
      * deck is unaffected. */
     floorAt: ["water-cloud", "icy-mantle"],
@@ -203,7 +203,7 @@ var CC = CC || {};
      * the clouds. This is a second, smaller, fainter instance at the same
      * bearing and a higher radius, drawn in the spanning pass after the
      * outward layers and therefore ON TOP of the haze. See the companion
-     * block in gen/traitroll.js for why this rather than a hole in the deck.
+     * block in gen/traitfinish.js for why this rather than a hole in the deck.
      *
      * `lift` is in body radii, MEASURED RATHER THAN GUESSED. The troposphere
      * runs out to 1.000 and the cirrus deck sits at 1.000-1.045, so a storm
@@ -310,7 +310,7 @@ var CC = CC || {};
     element: "gradient-band",
     /* BENEATH EVERYTHING ELSE IN THE LAYER. Banding is the background a storm
      * sits on; drawn in trait order it painted over them. See the draw-order
-     * pass in gen/details.js. */
+     * pass in gen/details-instances.js. */
     under: true,
     named: true,
     tiers: 1,

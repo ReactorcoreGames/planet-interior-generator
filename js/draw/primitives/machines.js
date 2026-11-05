@@ -52,7 +52,7 @@ var CC = CC || {};
     ctx.save();
     ctx.translate(c.x, c.y);
     /* `rot` is set when the plate was seated on the real surface
-     * (draw/scene.js `seatOn`), so it lies along the local slope. */
+     * (draw/scene-surface.js `seatOn`), so it lies along the local slope. */
     ctx.rotate(el.rot !== undefined ? el.rot
                                     : el.angle + (el.upright ? 0 : Math.PI / 2));
 

@@ -261,7 +261,7 @@ CC.Climate = (function () {
     /* HOW MUCH ATMOSPHERE STANDS BETWEEN THE STAR AND THE GROUND.
      *
      * Read off the BUILT STACK rather than from a parameter, so it stays true
-     * however the atmosphere came to be there — the same rule gen/details.js
+     * however the atmosphere came to be there — the same rule gen/details-terrain.js
      * follows for erosion. An airless world is fully exposed; a thick envelope
      * shields almost completely, which is what makes activity interesting
      * rather than a flat penalty on every world. */
@@ -365,7 +365,7 @@ CC.Climate = (function () {
       /* Air shields the ground. `shield` runs 0 (airless, fully exposed) to 1
        * (a thick envelope), read from the built stack rather than from a
        * parameter so it stays true however the atmosphere came to be there —
-       * the same reasoning gen/details.js's erosion figure uses. */
+       * the same reasoning gen/details-terrain.js's erosion figure uses. */
       var exposure = 1 - shield;
       var t = tempAt(angle);
 

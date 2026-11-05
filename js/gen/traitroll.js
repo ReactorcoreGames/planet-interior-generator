@@ -121,7 +121,7 @@ CC.TraitRoll = (function () {
      *
      * `thins` says: in these angular sectors, this many of the anchor
      * layer's own elements survive. The trait draws NOTHING — it returns
-     * sectors, and gen/details.js removes elements inside them.
+     * sectors, and gen/details-instances.js removes elements inside them.
      *
      * A CORONAL HOLE IS WHY THIS EXISTS, and it is a genuinely different
      * shape of trait rather than a special case. The first version was a
@@ -299,7 +299,7 @@ CC.TraitRoll = (function () {
       var layer = CC.TraitRoll.anchorLayer(trait, body);
       if (!layer) continue;
       /* The layer answers this trait with its own marks — see
-       * `absorbedScale` in gen/details.js. Nothing of the trait's is drawn. */
+       * `absorbedScale` in gen/details-traits.js. Nothing of the trait's is drawn. */
       if (layer.absorbs && layer.absorbs[trait.id]) continue;
 
       var made = CC.TraitRoll.placeOne(trait, body, layer, params, seed, zones,

@@ -296,7 +296,7 @@ var CC = CC || {};
          * their hue from the primary/secondary anchors by depth. */
         atmosphere:   { sat: [0.15, 0.45], val: [0.55, 0.85] },
         /* THE OCEAN IS THE ONLY LAYER WITH AN ABSOLUTE HUE, and the reason is
-         * recorded in gen/palette.js: without it, a sea on a rust-coloured
+         * recorded in gen/palette-hue.js: without it, a sea on a rust-coloured
          * world came out brown, which was the single thing that most stopped
          * these reading as planets. An authored hue range is a strong claim
          * that needs a stated reason — this one has it, and the frosting's did

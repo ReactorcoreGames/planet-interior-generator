@@ -1,6 +1,6 @@
 /* Even spacing for a layer detail — `spacing: "even"` on a recipe.
  *
- * Until now only a trait could space its instances evenly (gen/traitroll.js
+ * Until now only a trait could space its instances evenly (gen/traitanchor.js
  * anchorAngles, through the placement grammar). A built layer needs the same
  * for its own details: a ring of identical platforms at exactly equal
  * intervals is the single strongest signal that a thing was made

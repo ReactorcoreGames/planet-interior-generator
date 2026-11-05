@@ -37,7 +37,7 @@
  *    frosting systems instead, so a locked world is cold at one end because
  *    snow DEPOSITS there and hot at the other because the sea has BOILED OFF.
  *
- * WHERE THIS RUNS. In the GENERATION stage. gen/details.js resolves per-
+ * WHERE THIS RUNS. In the GENERATION stage. gen/details-instances.js resolves per-
  * element membership and converts sea level into body space; only the
  * frosting, which walks its own circumference, samples at draw time. Either
  * way `draw/` receives plain numbers and functions of angle and never learns
@@ -341,7 +341,7 @@ CC.Zones = (function () {
      * absence in a field, not a dark shape laid over one.
      *
      * IT HAS TO BE AN ABSENCE, because the corona is drawn with a `screen`
-     * blend (ATMOSPHERE_BLEND in draw/scene.js) and under `screen` dark paint
+     * blend (ATMOSPHERE_BLEND in draw/scene-outward.js) and under `screen` dark paint
      * is very nearly a no-op: it can only ever ADD light. That is why the
      * first implementation had to be a flat, hard-edged, unfaded `darker`
      * wedge — a soft dark region on a screen-blended layer is invisible, which
@@ -368,7 +368,7 @@ CC.Zones = (function () {
      * recipe's `temp` shifts it per face. A hot world's night side is milder
      * than a cold world's, and neither becomes the other.
      *
-     * Consumed by gen/frosting.js for colour, by gen/details.js for erosion,
+     * Consumed by gen/frosting.js for colour, by gen/details-terrain.js for erosion,
      * and by the surface-state read below for text. One source, so those three
      * can never disagree about which face is which. */
     function tempAt(angle, base) {

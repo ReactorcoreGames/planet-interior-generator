@@ -36,7 +36,7 @@ var CC = CC || {};
     if (!layer.wobble) return null;
     /* A LAYER STATED IN ITS OWN THICKNESS IS A LIMB, AND A LIMB WANTS WAVES.
      *
-     * `wobbleRel` (gen/structure.js) is how a layer says "I am wavy by a
+     * `wobbleRel` (gen/structure-wobble.js) is how a layer says "I am wavy by a
      * proportion of myself" rather than "I am lumpy by a fraction of the
      * body". Those two statements want different FREQUENCIES as well as
      * different amplitudes: a mantle at 1.7 reads as an off-centre boundary,

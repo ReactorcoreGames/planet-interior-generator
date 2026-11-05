@@ -323,7 +323,7 @@ CC.ElemGen = (function () {
     BUILDERS[kind] = fn;
   }
 
-  /* NAMED PLACEMENTS for traits (`place` — see placeOne in gen/traitroll.js).
+  /* NAMED PLACEMENTS for traits (`place` — see placeOne in gen/traitplace.js).
    * `fn(made, trait, body, layer, params, seed, rng)` returns the elements,
    * moved. Kept here beside the builders because a family registers both from
    * its own file, and this file loads before any of them. */

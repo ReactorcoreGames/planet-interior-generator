@@ -104,7 +104,7 @@ var CC = CC || {};
     /* ON THE SURFACE, A QUARTER SUNK IN. `spanning` takes it out of the
      * shell's own clipped pass, where it was buried in the crust and its top
      * cut off at the outline; `seat` sits each module on the outline as
-     * drawn and tilts it to the local slope (draw/scene.js `seatOn`). */
+     * drawn and tilts it to the local slope (draw/scene-surface.js `seatOn`). */
     reach: "spanning",
     seat: 0.25,
     depth: [0.5, 0.5],

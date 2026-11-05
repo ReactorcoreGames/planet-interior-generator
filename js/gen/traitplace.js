@@ -194,7 +194,7 @@ var CC = CC || {};
        * from the clumping alpha and takes the largest size tiers. */
       named: trait.named,
       /* Sinks this trait beneath everything else in its layer. See the draw
-       * order pass in gen/details.js. */
+       * order pass in gen/details-instances.js. */
       under: trait.under,
       /* Storm edge softness, and the radial dissolve on a spanning one. */
       feather: trait.feather,

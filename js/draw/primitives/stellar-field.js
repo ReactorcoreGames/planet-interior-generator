@@ -87,7 +87,7 @@ var CC = CC || {};
    * both what is actually happening and the thing that says "this sector is
    * hazardous" — and it is the density thesis rather than a few loud strokes.
    *
-   * `el.half` is the sector's half-width, set in gen/traitroll.js when the
+   * `el.half` is the sector's half-width, set in gen/traitfinish.js when the
    * hole is rolled: the field opens across the whole hole, so the mark has to
    * know how wide the hole is. `style` is the {glow, line, core, dim} set —
    * see `fieldFill` in draw/details-star.js, and read its note before touching the

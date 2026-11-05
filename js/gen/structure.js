@@ -395,7 +395,7 @@ CC.Structure = (function () {
       archetype: archetype.id,
       /* A BODY THAT RADIATES INTO THE SPACE AROUND IT.
        *
-       * `{ reach, strength, veins }` — see draw/scene.js `drawEmissiveGlow`.
+       * `{ reach, strength, veins }` — see draw/emissive.js `drawEmissiveGlow`.
        * A property of the WHOLE BODY rather than of any layer, because it is
        * light in the space beyond the outermost layer and belongs to no band.
        * Carried here rather than looked up from the archetype in draw/ so the

@@ -32,7 +32,7 @@
  * text reads level. The anchor is placed in body space and turned by the
  * body's rotation by hand, so it still lands on its band.
  *
- * Reads `layer.name`, resolved upstream (js/gen/structure.js); no role name
+ * Reads `layer.name`, resolved upstream (js/gen/structure-resolve.js); no role name
  * appears here. Loaded before js/draw/scene.js, which calls it. */
 
 var CC = CC || {};

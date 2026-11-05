@@ -134,7 +134,7 @@ var CC = CC || {};
        * sea is a property of the surface it sits on. */
       /* THE FLUID THAT ACTUALLY RESTS ON THIS LAYER, if any.
        *
-       * Found by the same adjacency test draw/scene.js's deferred pass and
+       * Found by the same adjacency test draw/scene-interior.js's deferred pass and
        * draw/film.js both use — the layer immediately outside this one, when
        * it is not an outward falloff. Keeping the three in agreement matters:
        * a sea level clamped against the wrong layer is a clamp that never

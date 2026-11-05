@@ -6,7 +6,7 @@
  * names shared.
  *
  * AN ARCHETYPE OVERRIDES WITH `name` ON THE LAYER SPEC when its version of a
- * role is a different thing to look at. js/gen/structure.js resolves the
+ * role is a different thing to look at. js/gen/structure-resolve.js resolves the
  * name once — spec, then this table, then the role slug itself — so the
  * overlay only ever reads `layer.name` and no role reaches js/draw/.
  *

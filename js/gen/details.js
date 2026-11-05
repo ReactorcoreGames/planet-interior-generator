@@ -175,7 +175,7 @@ CC.Details = (function () {
        * folds `rubble-pile` and `void-riddled` into that one axis).
        *
        * Passed through `opts` rather than added to `build`'s signature, so
-       * gen/traitroll.js — which calls the same dispatch — needs no change
+       * gen/traitplace.js — which calls the same dispatch — needs no change
        * and no builder that ignores it can be broken by it. */
       var made = CC.ElemGen.build(recipe, layer, plan, count, rng,
                                   { phase: phase, params: params, seed: seed,
@@ -381,7 +381,7 @@ CC.Details = (function () {
       seed: seed,
       byRole: {},
       /* Layer details whose recipe declares `seat`: drawn on the body's real
-       * surface in the unclipped pass, as a seated trait is (draw/scene.js). */
+       * surface in the unclipped pass, as a seated trait is (draw/scene-surface.js). */
       seated: [],
       terrain: {},
       film: {},

@@ -149,7 +149,7 @@ CC.Emissive = (function () {
    *
    * ---- IT IS EXCLUDED FROM THE EXTENT SWEEP, DELIBERATELY --------------
    *
-   * `extent` is documented in draw/scene.js as a MEASUREMENT used by the pan
+   * `extent` is documented in draw/scene-outward.js as a MEASUREMENT used by the pan
    * clamp, and it also decides where the frame's contents reach. A glow
    * reaching 1.9 radii folded into it would pull the frame out and SHRINK THE
    * STAR to make room for a halo — which is the wrong trade, and is exactly
@@ -173,7 +173,7 @@ CC.Emissive = (function () {
    *
    * `lighter` rather than `screen`: this is emitted light adding to an empty
    * sky, and there is nothing behind it to blow out. Screen is the right
-   * choice for a layer sitting OVER something (see scene.js ATMOSPHERE_BLEND);
+   * choice for a layer sitting OVER something (see scene-outward.js ATMOSPHERE_BLEND);
    * over black the two are nearly identical anyway, and additive keeps the
    * veins building where they cross. */
   function drawEmissiveGlow(ctx, view, body, palette, settings) {

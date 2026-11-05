@@ -321,7 +321,7 @@ var CC = CC || {};
    * Averaged as plain numbers, a shoreline blending a hue of 350 into one of
    * 10 would travel backwards through 180 and put a band of the complementary
    * colour along every coast. Summing unit vectors takes the short way round,
-   * which is the same reasoning as gen/palette.js's mixHue. */
+   * which is the same reasoning as gen/palette-util.js's mixHue. */
   function hueBlend(colours, w) {
     var x = 0, y = 0;
     for (var i = 0; i < colours.length; i++) {

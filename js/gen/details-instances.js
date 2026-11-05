@@ -101,7 +101,7 @@ var CC = CC || {};
    * genuinely has fewer plumes there — the feature IS the absence.
    *
    * IT CANNOT BE DARK PAINT, and that is not an aesthetic preference. The
-   * corona is composited with `screen` (ATMOSPHERE_BLEND in draw/scene.js),
+   * corona is composited with `screen` (ATMOSPHERE_BLEND in draw/scene-outward.js),
    * and under `screen` dark paint is very nearly a no-op — it can only ever
    * add light. That is why the first implementation had to be a flat,
    * hard-edged, unfaded `darker` wedge, which the user correctly called out

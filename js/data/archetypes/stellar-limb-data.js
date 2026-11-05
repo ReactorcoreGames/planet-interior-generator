@@ -18,8 +18,8 @@ var CC = CC || {};
    * and fall away toward the edge, because near the limb your line of sight
    * only grazes the cooler upper material.
    *
-   * `limbDarkening` is a general layer property (gen/structure.js,
-   * draw/scene.js `paintLimbDarkening`) rather than anything a photosphere
+   * `limbDarkening` is a general layer property (gen/structure-resolve.js,
+   * draw/emissive.js `paintLimbDarkening`) rather than anything a photosphere
    * owns — an incandescent shell on a machine world would want the same.
    *
    * TWO FIGURES, NOT ONE, and the second one matters more than it looks. The

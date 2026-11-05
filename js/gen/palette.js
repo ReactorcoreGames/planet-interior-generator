@@ -289,12 +289,12 @@ CC.Palette = (function () {
 
     var secondary = wrapHue(relation(primary, rng) + (params.secondaryOffset || 0));
 
-    /* Tertiary: the atmosphere. Derived by default — a hue between the two
-     * anchors, nudged, which keeps a haze looking like it belongs to the
-     * world it sits on. */
-    var tertiary = (params.tertiaryHue === undefined || params.tertiaryHue === null)
-      ? wrapHue(mixHue(primary, secondary, 0.25) + (rng() * 24 - 12))
-      : wrapHue(params.tertiaryHue);
+    /* Tertiary: the atmosphere. Derived — a hue between the two anchors,
+     * nudged, which keeps a haze looking like it belongs to the world it sits
+     * on — and the Tertiary hue offset turns it from there (D318). An offset
+     * rather than a hue so the draw always happens and 0 changes nothing. */
+    var tertiary = wrapHue(mixHue(primary, secondary, 0.25) + (rng() * 24 - 12) +
+                           (params.tertiaryOffset || 0));
 
     /* --- per-layer derivation --- */
 
@@ -983,7 +983,7 @@ CC.Palette = (function () {
     }
 
     /* The accent hue, against the settled hull colour (js/gen/accent.js). */
-    var accent = CC.Accent ? CC.Accent.build(profile, out, order, seed) : null;
+    var accent = CC.Accent ? CC.Accent.build(profile, out, order, seed, params.accentOffset) : null;
 
     /* The surface frosting is a pseudo-role, resolved after the layers so it
      * cannot disturb their RNG streams or the adjacency pass. It lives in

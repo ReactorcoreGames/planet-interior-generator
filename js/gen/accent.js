@@ -12,7 +12,8 @@
  * layer, the one the eye reads as "what this body is made of" — so a
  * complement ±30° is [150, 210]. Rolled from its own stream, so the accent
  * moving never recolours a layer and a layer moving never re-rolls the accent
- * (only the host's hue, which it is defined against).
+ * (only the host's hue, which it is defined against). The Accent hue offset
+ * turns it from there, after the draws, so 0 changes nothing (D319).
  *
  * The result rides on every layer colour as `accent`, so an element asks for
  * it with `tone: "accent"` through the same colour object it already has
@@ -71,7 +72,7 @@ CC.Accent = (function () {
 
   /* `out` maps role -> layer colour; `order` is the palette's adjacency list,
    * the non-outward layer colours outermost first. */
-  function build(profile, out, order, seed) {
+  function build(profile, out, order, seed, offset) {
     var spec = profile && profile.accent;
     if (!spec) return null;
     var host = null;
@@ -82,7 +83,7 @@ CC.Accent = (function () {
 
     var r = CC.RNG.stream(seed, "colour/accent");
     var rel = spec.rel || [150, 210];
-    var h = CC.Palette.wrapHue(host.h + lerp(rel[0], rel[1], r()));
+    var h = CC.Palette.wrapHue(host.h + lerp(rel[0], rel[1], r()) + (offset || 0));
     var s = lerp((spec.sat || [0.7, 0.9])[0], (spec.sat || [0.7, 0.9])[1], r());
     var v = lerp((spec.val || [0.9, 1.0])[0], (spec.val || [0.9, 1.0])[1], r());
     var accent = { h: h, s: s, v: v, hex: CC.Color.hsvToHex(h, s, v) };

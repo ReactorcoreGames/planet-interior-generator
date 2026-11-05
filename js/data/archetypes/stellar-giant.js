@@ -12,7 +12,7 @@ var CC = CC || {};
   "use strict";
 
   var C = CC.StellarCommon;
-  var stellarClimate = C.climate, hueFromStars = C.hueFromStars;
+  var stellarClimate = C.climate;
   var corona = C.corona, chromosphere = C.chromosphere, lit = C.lit;
   var LIMB = C.LIMB, binaryCompanion = C.binaryCompanion, SWELL = C.SWELL;
 
@@ -168,10 +168,8 @@ var CC = CC || {};
     climate: stellarClimate(0.48),
 
     colorProfile: {
-      /* COOL, AS STARS GO — 2,000-4,000 C, which is the red end of the table.
-       * The one archetype here whose hue band is genuinely narrow, because a
-       * blue red-giant is a contradiction rather than a stylistic choice. */
-      hue: hueFromStars("red-dwarf", "orange", 14),
+      /* No `hue`: free for every star type, and what tells them apart is
+       * saturation and lightness (stars.md, D320). */
       secondaryRel: "analogous",
       order: ["shed-envelope", "photosphere", "convective", "h-shell",
               "he-shell", "degenerate-core"],

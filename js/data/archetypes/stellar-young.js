@@ -13,7 +13,7 @@ var CC = CC || {};
   "use strict";
 
   var C = CC.StellarCommon;
-  var stellarClimate = C.climate, hueFromStars = C.hueFromStars;
+  var stellarClimate = C.climate;
   var corona = C.corona, chromosphere = C.chromosphere, lit = C.lit;
   var LIMB = C.LIMB, binaryCompanion = C.binaryCompanion, SWELL = C.SWELL;
 
@@ -141,12 +141,8 @@ var CC = CC || {};
     climate: stellarClimate(0.70),
 
     colorProfile: {
-      /* Hot and young: the blue-white end of the table, widened generously
-       * because the spec says hue is free and a green or violet star is fine
-       * in this generator. */
-      /* Hot and young: the blue-white end of the table. Padded modestly —
-       * see hueFromStars for why the first version's 70 was far too much. */
-      hue: hueFromStars("sunlike", "blue-giant", 26),
+      /* No `hue`: free for every star type, and what tells them apart is
+       * saturation and lightness (stars.md, D320). */
       /* A star is ONE object at one temperature — analogous keeps the whole
        * body inside one family of colour, which is what stops a cutaway
        * looking like two objects stacked. The interior's departure from the

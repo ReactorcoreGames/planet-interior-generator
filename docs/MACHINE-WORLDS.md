@@ -390,11 +390,8 @@ better story hook than a hundred. The low end of the density range should be
 genuinely sparse.
 
 **Most evocative outputs:**
-- a main star half-enclosed by a partially-built Dyson sphere — *Enclosure ~50,
-  which the old swarm/sphere split couldn't express at all*
-- a planet with a full surface-city grid and an orbital ring
+- a main star half-enclosed by an unfinished Dyson shell, whole arcs of it open (Half-Built Dyson)
+- a garden world under an orbital ring, a defence network and a minefield (Fortress World)
 - a machine world at Operational status 0 with a breached hull, the dark layers
   visible through the tear
 - a hollowed asteroid with ships docked at the entrance
-- a tidally locked world with its cities crowded into the twilight ribbon and
-  its refineries on the burning face

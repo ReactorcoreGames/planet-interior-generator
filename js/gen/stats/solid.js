@@ -6,9 +6,8 @@
  * right frame for a planet and the wrong one for a gas giant, which is why
  * the templates are split at all; see js/gen/stats/registry.js.
  *
- * `moon`, `ice-moon` and `asteroid` will share this template when they land at
- * Phase 7 — an airless moon is still a body you stand on. They may want their
- * own line sets, which is a `levels` edit rather than a new file.
+ * The moon shares this template, ice-shelled or not: an airless moon is still
+ * a body you stand on. The asteroid has its own (js/gen/stats/asteroid.js).
  *
  * The registry must load before this file. */
 

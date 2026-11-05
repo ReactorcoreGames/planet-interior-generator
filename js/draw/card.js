@@ -25,10 +25,10 @@
  * THE FIT IS GRADUATED BY DETAIL LEVEL, because the levels have genuinely
  * different amounts to say:
  *
- *   compact    six lines. Fits one column at full size; no measures.
- *   standard   eight. May take a mild shrink.
- *   full       eleven, several of them prose. Two columns, a shrink, and a
- *              wider panel if it still does not fit.
+ *   compact    five or six lines. Fits one column at full size; no measures.
+ *   standard   seven to ten. May take a mild shrink.
+ *   full       eleven to fifteen, several of them prose. Two columns, a shrink,
+ *              and a wider panel if it still does not fit.
  *
  * Nothing here knows what a planet is. It receives `stats` and paints it.
  *

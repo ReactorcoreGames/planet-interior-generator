@@ -15,7 +15,7 @@ var CC = CC || {};
   "use strict";
 
   var C = CC.StellarCommon;
-  var stellarClimate = C.climate, hueFromStars = C.hueFromStars;
+  var stellarClimate = C.climate;
   var corona = C.corona, chromosphere = C.chromosphere, lit = C.lit;
   var LIMB = C.LIMB, binaryCompanion = C.binaryCompanion, SWELL = C.SWELL;
 
@@ -123,10 +123,8 @@ var CC = CC || {};
     climate: stellarClimate(0.42),
 
     colorProfile: {
-      /* THE RED END, from the table's own red dwarf row outward. Narrow for
-       * the same reason the old giant's is: a dwarf star is cool, and cool has
-       * a colour. */
-      hue: hueFromStars("red-dwarf", "orange", 16),
+      /* No `hue`: free for every star type, and what tells them apart is
+       * saturation and lightness (stars.md, D320). */
       secondaryRel: "analogous",
       order: ["corona", "chromosphere", "photosphere", "convective",
               "fusion-core"],

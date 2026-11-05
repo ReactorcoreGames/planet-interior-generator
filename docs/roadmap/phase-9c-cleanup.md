@@ -36,13 +36,13 @@ A crop render per item; the user says keep or change. The user is generally sati
 
 ## AK — the unbuilt controls and the spec drift
 
-- [ ] **Tertiary hue** (PARAMETERS.md ⬜): build or strike
-- [ ] **Accent hue** (⬜): the machine world's accent colour exists (D252) with no control; build the slider or strike
-- [ ] **Artificial traits allowed**: strike it — natural presets ✕ their built traits instead (D310)
-- [ ] **The four Randomize settings** (scope, archetype pool, respect locks, auto-randomize on load): build, strike or record each
-- [ ] The defaults table's **Composition ⬜ P8** row struck (D286 removed it)
-- [ ] **The preset tables** against `js/data/presets*.js`: drop Coreless Giant and Superionic Ice Giant or mark them unbuilt; add Ringed, Industrial, Ice Giant, Diamond Sea, Prismatic, the four moon, three asteroid and nebula presets under their real names; the stale ⬜ P7 rows replaced
-- [ ] **Stale comments**: `js/draw/scene.js` header (scale bar is step 7, overlay 8, no "[Phase 8]"), `js/ui/infopanel.js` (Composition), `js/draw/card.js` (Standard 9 lines, Full 15), `js/gen/stats/solid.js` (the asteroid has its own template); MACHINE-WORLDS.md's "surface-city grid" example
+- [x] **Tertiary hue** (D318: built as an offset, with `hides` on the archetype): build or strike
+- [x] **Accent hue** (D319: built as an offset; Randomize now honours a profile's hue range): the machine world's accent colour exists (D252) with no control; build the slider or strike
+- [x] **Artificial traits allowed**: strike it — natural presets ✕ their built traits instead (D310)
+- [x] **The four Randomize settings** (D321: all four struck; section lock buttons, and Randomize rolls the archetype): build, strike or record each
+- [x] The defaults table's **Composition ⬜ P8** row struck (D286 removed it)
+- [x] **The preset tables** against `js/data/presets*.js`: drop Coreless Giant and Superionic Ice Giant or mark them unbuilt; add Ringed, Industrial, Ice Giant, Diamond Sea, Prismatic, the four moon, three asteroid and nebula presets under their real names; the stale ⬜ P7 rows replaced
+- [x] **Stale comments**: `js/draw/scene.js` header (overlay is step 7, scale bar 8, no "[Phase 8]"), `js/ui/infopanel.js` (Composition), `js/draw/card.js` (Standard 9 lines, Full 15), `js/gen/stats/solid.js` (the asteroid has its own template); MACHINE-WORLDS.md's "surface-city grid" example
 - [ ] `npm test` passes; commit
 
 ## AL — the eighteen straightforward splits

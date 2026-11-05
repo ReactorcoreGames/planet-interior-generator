@@ -386,6 +386,20 @@
             <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-secondary-offset"><span class="lock-icon">&#128274;</span></label>
           </div>
 
+          <div class="control-row" title="Turns the outermost glow away from the body's own colours: the sky on a planet, the top of the clouds on a giant, the corona on a star, the disc and jets on a black hole. At 0 it keeps the hue the body derives for itself.">
+            <label for="tertiary-offset">Tertiary hue offset</label>
+            <input type="range" id="tertiary-offset" min="-180" max="180" value="0">
+            <output data-readout="tertiary-offset"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-tertiary-offset"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
+          <div class="control-row" title="Turns the colour of the lights and the heart away from the hull's complement, leaving the hull as it is: window lights, status lights, the reactor and core, the cannon's charge, the drive's plume. At 0 the accent stays the complement rolled for this body. Randomize returns it to 0 unless locked.">
+            <label for="accent-offset">Accent hue offset</label>
+            <input type="range" id="accent-offset" min="-180" max="180" value="0">
+            <output data-readout="accent-offset"></output>
+            <label class="lock" title="Lock: Randomize will not change this."><input type="checkbox" id="lock-accent-offset"><span class="lock-icon">&#128274;</span></label>
+          </div>
+
           <div class="control-row" title="Scales the archetype's saturation profile. The relationships between layers are preserved, so the body stays recognisable.">
             <label for="saturation">Saturation</label>
             <input type="range" id="saturation" min="0" max="200" value="100">
@@ -678,6 +692,15 @@
             <button id="lock-all" class="mini-btn wide" title="Lock every control, so Randomize changes nothing.">Lock all</button>
             <button id="unlock-all" class="mini-btn wide" title="Unlock every control.">Unlock all</button>
             <button id="invert-locks" class="mini-btn wide" title="Flip every lock to its opposite state.">Invert</button>
+          </div>
+          <!-- One section's locks at a time. Lit when the whole section is locked. See js/ui/controls.js. -->
+          <div class="bulk-locks section-locks">
+            <button class="mini-btn wide" data-lock-section="body" title="Lock or unlock every control in Body, so Randomize keeps this archetype, seed and name.">Body</button>
+            <button class="mini-btn wide" data-lock-section="structure" title="Lock or unlock every control in Structure.">Structure</button>
+            <button class="mini-btn wide" data-lock-section="colour" title="Lock or unlock every control in Colour.">Colour</button>
+            <button class="mini-btn wide" data-lock-section="traits" title="Lock or unlock the Traits section: Randomize keeps your picks.">Traits</button>
+            <button class="mini-btn wide" data-lock-section="detail" title="Lock or unlock every control in Detail.">Detail</button>
+            <button class="mini-btn wide" data-lock-section="output" title="Lock or unlock every control in Output.">Output</button>
           </div>
           <!-- Two presses: the first arms it, the second resets. See js/ui/persist.js. -->
           <div class="bulk-locks">

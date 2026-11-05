@@ -164,7 +164,8 @@ CC.ShellWallDraw = (function () {
     ctx.moveTo(e0.x, e0.y); ctx.lineTo(e1.x, e1.y);
     ctx.moveTo(f0.x, f0.y); ctx.lineTo(f1.x, f1.y);
     var rungs = s.signals.length * 2;
-    for (i = 0; i <= rungs; i++) {
+    /* A dark shaft has no signals, so no rungs: i / 0 would be NaN. */
+    for (i = 0; rungs && i <= rungs; i++) {
       var r0 = pt(i / rungs, -0.62), r1 = pt(i / rungs, 0.62);
       ctx.moveTo(r0.x, r0.y); ctx.lineTo(r1.x, r1.y);
     }

@@ -14,7 +14,7 @@ var CC = CC || {};
   "use strict";
 
   var C = CC.StellarCommon;
-  var stellarClimate = C.climate, hueFromStars = C.hueFromStars;
+  var stellarClimate = C.climate;
   var corona = C.corona, chromosphere = C.chromosphere, lit = C.lit;
   var LIMB = C.LIMB, binaryCompanion = C.binaryCompanion, SWELL = C.SWELL;
 
@@ -123,16 +123,8 @@ var CC = CC || {};
     climate: stellarClimate(0.62),
 
     colorProfile: {
-      /* THE WHOLE TABLE'S RANGE. A main-sequence star is the one that can
-       * genuinely be any of the five rows in data/stars.js — that is what
-       * "main sequence" means — so its band spans from the red dwarf to the
-       * blue giant and out past both. */
-      /* THE WHOLE TABLE'S RANGE, red dwarf through blue giant, because a
-       * main-sequence star genuinely can be any of the five rows — that is
-       * what "main sequence" means. Barely padded: this band is already the
-       * widest in the family at over two hundred degrees, and widening it
-       * further was what made these stop reading as stars at all. */
-      hue: hueFromStars("red-dwarf", "blue-giant", 14),
+      /* No `hue`: free for every star type, and what tells them apart is
+       * saturation and lightness (stars.md, D320). */
       secondaryRel: "analogous",
       order: ["corona", "chromosphere", "photosphere", "convective",
               "tachocline", "radiative", "fusion-core"],

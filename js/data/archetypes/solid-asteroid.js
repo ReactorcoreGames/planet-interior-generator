@@ -192,6 +192,8 @@ var CC = CC || {};
      * and, at the top, glow (`mosaicRadio` on the mosaic recipe). The label
      * and tooltip move with the archetype — see syncAxisDials in
      * js/ui/controls.js. */
+    /* No outward layer that takes the tertiary anchor (D318). */
+    hides: ["tertiary-offset"],
     dials: {
       "interior-heat": {
         label: "Radioactivity",

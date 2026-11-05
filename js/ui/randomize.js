@@ -47,8 +47,11 @@ CC.Randomize = (function () {
     { id: "atmosphere-opacity", lo: 70, hi: 140 },
     { id: "interior-heat", lo: 0, hi: 100 },
     { id: "rotation", lo: 0, hi: 360 },
-    { id: "primary-hue", lo: 0, hi: 360 },
     { id: "secondary-offset", lo: -30, hi: 30 },
+    { id: "tertiary-offset", lo: -30, hi: 30 },
+    /* Back to 0, not rolled: the accent is rolled as the hull's complement
+     * ±30° already, and that complement is the look (D319). */
+    { id: "accent-offset", lo: 0, hi: 0 },
     /* Saturation, brightness and contrast stay near 100%: they scale the
      * archetype's profile, and the profile is what makes a body look like
      * its type. Rolling them wide would just produce washed-out or
@@ -136,10 +139,26 @@ CC.Randomize = (function () {
     if (!CC.Controls.isLocked("seed")) {
       CC.Controls.set("seed", randomSeed(rng));
     }
+    /* ANY BODY THE TOOL CAN MAKE, unless the Archetype lock says keep this one
+     * (D321). First, because the hue below is rolled inside this body's range,
+     * and told to the consumers at once, because set() fires no change. */
+    if (!CC.Controls.isLocked("archetype")) {
+      CC.Controls.set("archetype", CC.Math.pick(rng, CC.Archetypes.ids()));
+      CC.ExportUI.syncArchetypeConsumers();
+    }
     for (var i = 0; i < RANDOM_SPEC.length; i++) {
       var s = RANDOM_SPEC[i];
       if (CC.Controls.isLocked(s.id)) continue;
       CC.Controls.set(s.id, Math.round(s.lo + rng() * (s.hi - s.lo)));
+    }
+    /* INSIDE WHAT THIS BODY CAN BE. The slider always hands the palette a hue,
+     * so a profile's `hue` range or families are honoured here or nowhere: a
+     * machine world's steel and bronze, an ice giant's blues (D319). Dragging
+     * the slider stays free. */
+    if (!CC.Controls.isLocked("primary-hue")) {
+      var arch = CC.Archetypes.get(CC.Controls.get("archetype"));
+      var hues = (arch && arch.colorProfile && arch.colorProfile.hue) || [0, 360];
+      CC.Controls.set("primary-hue", Math.round(CC.Accent.rollHue(hues, rng)));
     }
     if (!CC.Controls.isLocked("hue-relationship")) {
       CC.Controls.set("hue-relationship", CC.Math.pick(rng, HUE_RELATIONS));

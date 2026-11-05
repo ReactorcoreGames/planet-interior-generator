@@ -93,8 +93,10 @@ CC.Color = (function () {
    * avoids a pointless round-trip through hex. */
   function hsva(h, s, v, a) {
     var c = hsvToRgb(h, s, v);
+    /* Below 1e-6 a number prints as "1e-7", not as a plain decimal. */
+    var al = clamp(a, 0, 1);
     return "rgba(" + Math.round(c[0]) + "," + Math.round(c[1]) + "," +
-           Math.round(c[2]) + "," + clamp(a, 0, 1) + ")";
+           Math.round(c[2]) + "," + (al < 1e-6 ? 0 : al) + ")";
   }
 
   /* --- HSL: still the right space for lighten/darken and hue rotation --- */

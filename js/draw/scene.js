@@ -1,19 +1,17 @@
 /* Scene assembly — the draw order from docs/ARCHITECTURE.md.
  *
  *   1. background
- *   2. outward traits (back)          [Phase 4]
+ *   2. outward traits (back)
  *   3. layers, outermost -> innermost
  *        a. base fill
- *        b. layer details             [Phase 3]
- *        c. trait instances           [Phase 4]
+ *        b. layer details
+ *        c. trait instances
  *        d. boundary line
- *   4. surface-attached               [Phase 4]
- *   5. outward traits (front)         [Phase 4]
- *   6. scale bar                      [Phase 8]
+ *   4. surface-attached
+ *   5. outward traits (front)
+ *   6. (rotation undone)
  *   7. overlay labels                 draw/overlay.js
- *
- * The later steps are absent rather than stubbed — an empty function that gets
- * called is a lie about what the pipeline does. They slot in here when built.
+ *   8. scale bar                      draw/scalebar.js
  *
  * This function is called by both the live preview and by export, at whatever
  * pixel size each needs. Nothing here consults the canvas size to decide how

@@ -75,6 +75,8 @@ var CC = CC || {};
       primaryHue: c.get("primary-hue"),
       hueRelationship: c.get("hue-relationship") || "auto",
       secondaryOffset: c.get("secondary-offset") || 0,
+      tertiaryOffset: c.get("tertiary-offset") || 0,
+      accentOffset: c.get("accent-offset") || 0,
       saturation: (c.get("saturation") === undefined ? 100 : c.get("saturation")) / 100,
       brightness: (c.get("brightness") === undefined ? 100 : c.get("brightness")) / 100,
       contrast: (c.get("contrast") === undefined ? 100 : c.get("contrast")) / 100,
@@ -436,6 +438,8 @@ var CC = CC || {};
     { id: "primary-hue", stage: "colour", format: deg },
     { id: "hue-relationship", stage: "colour" },
     { id: "secondary-offset", stage: "colour", format: function (v) { return (v > 0 ? "+" : "") + Math.round(v) + "°"; } },
+    { id: "tertiary-offset", stage: "colour", format: function (v) { return (v > 0 ? "+" : "") + Math.round(v) + "°"; } },
+    { id: "accent-offset", stage: "colour", format: function (v) { return (v > 0 ? "+" : "") + Math.round(v) + "°"; } },
     { id: "saturation", stage: "colour", format: pct },
     { id: "brightness", stage: "colour", format: pct },
     { id: "contrast", stage: "colour", format: pct },
@@ -594,6 +598,7 @@ var CC = CC || {};
     on("lock-all", "click", CC.Controls.lockAll);
     on("unlock-all", "click", CC.Controls.unlockAll);
     on("invert-locks", "click", CC.Controls.invertLocks);
+    CC.Controls.initSectionLocks();
 
     /* The export menu, its feedback and the settings-paste import live in
      * ui/exportui.js; the keyboard map, initialised after it, in ui/keys.js. It is handed the four accessors

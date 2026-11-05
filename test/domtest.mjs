@@ -295,6 +295,10 @@ check("randomize with nothing locked", () => {
   $("randomize-btn").click();
   if ($("seed").value === before) throw new Error("unlocked seed was not changed by Randomize");
 });
+// Randomize rolls the archetype unless locked (D321), and everything below
+// measures the default planet.
+$("archetype").value = "planet"; fire($("archetype"), "change");
+$("lock-archetype").click();
 
 // --- Accordion ---
 check("accordion toggles", () => {

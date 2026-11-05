@@ -256,6 +256,8 @@ var CC = CC || {};
     /* Nothing here has a latitude, is warmed by another star in the way a
      * planet is, or has a surface to frost — declared as the stellar family
      * is, so the climate system asks nothing of it (D50). */
+    /* No outward layer that takes the tertiary anchor (D318). */
+    hides: ["tertiary-offset"],
     climate: { latitude: 0, starlit: false, selfHeated: 0.5 },
 
     colorProfile: {

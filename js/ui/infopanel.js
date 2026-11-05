@@ -3,9 +3,8 @@
  * IT IS DOM, NOT CANVAS, and that is a deliberate split. On screen the card is
  * text a user selects and copies, so it should be real text: a canvas-drawn
  * card would be an image of words. Composing the card INTO an exported PNG is
- * a separate feature (PARAMETERS.md's "Composition" dropdown, Phase 8) and
- * would draw the same `stats.lines` through the canvas; this module owns the
- * on-screen half only.
+ * the export menu's job (draw/card.js), which draws the same `stats.lines`
+ * through the canvas; this module owns the on-screen half only.
  *
  * IT RENDERS WHAT `CC.Stats` HANDS IT AND DECIDES NOTHING. No thresholds, no
  * comparisons, no phrasing live here — if this file ever grows a number, the

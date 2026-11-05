@@ -42,7 +42,7 @@ what makes "keep this body type and palette but re-roll everything else" work.
 Locks are visually distinct when engaged (highlighted, not just checked).
 
 **Bulk actions:** `Lock all` / `Unlock all` / `Invert locks` at the top of the
-Randomize settings.
+Randomize settings, and below them one button per section with locks (Body, Structure, Colour, Traits, Detail, Output) that locks or unlocks that whole section and is lit while all of it is locked. "Re-roll only the colours" is Lock all, then Colour (D321).
 
 Locks persist between visits with the rest of the settings, and Reset to defaults clears them (see Persistence).
 
@@ -298,8 +298,8 @@ a Europa-like world's 74°, and a rogue world freezes over entirely.
 | **Brightness** | slider | 0–200% | ✅ | Scales the archetype's lightness profile |
 | **Contrast between layers** | slider | 0–200% | ✅ | How different adjacent layers look |
 | **Exotic oceans** | checkbox | off | ✅ | **Off by default, deliberately.** The ocean is the only layer with an authored hue range, and it exists because a sea derived freely came out brown on a rust-coloured world — the single thing that most stopped these reading as planets. Off, the sea keeps its blue-green range. On, its hue rolls anywhere on the wheel *and* its brightness ceiling lifts from 0.38 to 0.78, so pale, milky, white and near-black seas become reachable; Star activity then pushes it further toward looking chemically wrong. The sea still may never collide with its crust in hue and value at once |
-| **Tertiary hue** | slider + toggle | 0–360° | ⬜ | Atmosphere / halo. Currently always derived automatically; the manual override is not yet exposed |
-| **Accent hue** | slider | 0–360° | ⬜ | Artificial structures, lights, active systems. Arrives with Phase 9 |
+| **Tertiary hue offset** | slider | −180…+180° | ✅ | Turns the outward layers from the hue they derive: a planet's sky, a giant's upper cloud, a star's corona or shed envelope, a black hole's disc and jets, the machine world's outer shell. 0 is as derived, byte for byte. Rolled ±30° like Secondary hue offset. Hidden on the asteroid, neutron star, pulsar and nebula, which have nothing it reaches (`hides` on the archetype, D318) |
+| **Accent hue offset** | slider | −180…+180° | ✅ | Turns the lights and the heart from the hull's complement, leaving the hull as it is: window and status lights, pulses, the power and computation cores, the bore's charge, the drive's plume. 0 is the complement rolled for this body, byte for byte. Randomize returns it to 0 unless locked. Shown only on a profile that declares an `accent`, which today is the machine world (D319) |
 
 **Not every layer answers to Primary hue.** Materials with a colour of their
 own — water, ice, molten metal — keep it and only *lean* toward the primary, so
@@ -323,7 +323,6 @@ No manual per-layer colour picker — seed + these nudges is the decided approac
 | **Trait count** | slider | ✅ | 0–8 (D311), default 2. How many traits Randomize gives a body |
 | **Trait list** | filtered checkbox list | ✅ | Generated from `data/traits.js`. Only shows traits compatible with the current archetype and already-selected traits |
 | **Exclude from Randomize** | ✕ per trait | ✅ | A trait row is **tri-state**: ticked forces it on, ✕ bars Randomize from ever picking it, neither leaves it free to roll. Deliberately not a lock — "keep this value" and "never pick this" are different instructions |
-| **Artificial traits allowed** | checkbox | ⬜ P9 | Allow megastructures on natural bodies. Arrives with the machine worlds |
 | **Re-roll traits** | button | ✅ | Re-roll only the traits, keeping the seed, structure, palette and every layer detail byte-identical |
 
 **Randomize clears the trait selection**, so the roll actually happens — a
@@ -392,9 +391,7 @@ the export menu's *body + info card* item is for: it draws the same
 
 **Layer labels and the scale bar are render settings, like framing** (D282): whatever is switched on is drawn into every body export, so there is no Composition dropdown and no Show body name checkbox. Both were specced and struck.
 
-**Every figure on the card is read off the render**, never rolled beside it —
-HAZARDS.md holds the contract and `test/stats.mjs` asserts it across 576
-bodies.
+**Every figure on the card is read off the render**, never rolled beside it: HAZARDS.md holds the contract.
 
 **Layer labels are names only.** No stat nuggets, no feature callouts, no
 legend — that was v2's mistake.
@@ -472,95 +469,99 @@ Presented as a **gallery near the top of the Body section**, so a user can brows
 "what kinds of world can this make?" without knowing which traits to hunt for.
 That discoverability is the entire reason presets exist.
 
-**Solid**
+**Planets** — `js/data/presets.js`
 
 | Preset | Sets |
 |---|---|
-| **Desert World** | Ocean depth 0, warm low-saturation palette, ice caps off |
-| **Ocean World** | Ocean depth 90%+, thin crust, blue-green palette |
-| **Frozen World** | Ocean depth low, interior heat low, ice-caps at high extent, cold palette |
-| **Volcanic World** | Interior heat 100%, magma-chambers, thin crust, red-orange palette |
-| **Dead World** | Interior heat 0, no atmosphere, no ocean, grey palette, cratered |
-| **Garden World** | Ocean depth ~45%, interior heat ~50%, atmosphere, temperate palette |
-| **Locked World** | Tidally-locked at full strength, moderate ocean depth |
-| **Rogue World** | Starlight 0 — no star at all; warm only where its own core keeps it warm |
-| **Tilted World** | Axial tilt past halfway — the Uranus case, poles warm and equator frozen |
-| **Irradiated World** | Blue giant, Star activity 100, no atmosphere — cold *and* lethally irradiated |
-| ~~Ice-Shelled Moon~~ | ⬜ P7. Needs the `moon` archetype and its ice-shell layer |
-| ~~Rubble Pile~~ | ⬜ P7. Needs the `asteroid` archetype and Cohesion |
-| ~~Solid Fragment~~ | ⬜ P7. Needs the `asteroid` archetype |
+| **Desert World** | Ocean depth 0, Starlight 68, warm low-saturation palette; the ring system barred |
+| **Ocean World** | Ocean depth 94, blue-green palette |
+| **Frozen World** | Ocean depth 22, Starlight 14, Interior heat 18, cold palette |
+| **Volcanic World** | Interior heat 100, Ocean depth 0, magma-chambers, red-orange palette |
+| **Dead World** | Interior heat 0, Optional layers 0, Ocean depth 0, grey palette, cratered |
+| **Garden World** | Ocean depth 45, Interior heat 52, Starlight 44, Optional layers 100 |
+| **Locked World** | Tidal locking 100, Ocean depth 38 |
+| **Rogue World** | Starlight 0 — no star at all; warm only where its own core keeps it warm (Interior heat 88) |
+| **Tilted World** | Axial tilt 88 — the Uranus case, poles warm and equator frozen |
+| **Irradiated World** | Blue giant, Star activity 100, Optional layers 0, cratered — cold *and* lethally irradiated |
 
-**✅ The ten shipped in Session G**, in `js/data/presets.js`. Three of the
-originally-listed ten needed archetypes that do not exist yet — a preset is a
-set of *control values*, so one naming an absent archetype cannot be a stored
-configuration of anything. They are struck through above and land with Phase 7;
-**Rogue World**, **Tilted World** and **Irradiated World** take their places,
-each chosen to demonstrate an axis the climate system already has and nothing
-else in the gallery shows: Starlight at zero, tilt past the inversion point,
-and radiation as a fact independent of temperature.
+Rogue, Tilted and Irradiated each demonstrate an axis of the climate system nothing else in the gallery shows: Starlight at zero, tilt past the inversion point, and radiation as a fact independent of temperature.
 
-**No `ice-caps` preset, and there must never be one.** D27 cut the trait; caps
-emerge from a lowered snowline plus the existing deposition model. Frozen World
-gets its ice by having Starlight 14, which is the same mechanism the render
-uses.
+**No `ice-caps` preset, and there must never be one.** D27 cut the trait; caps emerge from a lowered snowline plus the existing deposition model. Frozen World gets its ice by having Starlight 14, which is the same mechanism the render uses.
 
-**Gaseous**
+**Moons** — `js/data/presets.js`
 
 | Preset | Sets |
 |---|---|
-| **Hot Jupiter** | Gas giant + tidally-locked, high storm activity |
-| **Banded Giant** | Gas giant, violent-banding, great-storm, strong belt contrast |
-| **Coreless Giant** | Gas giant, Core size bias −100 — no discrete core |
-| **Superionic Ice Giant** | Ice giant, superionic layer present, tilted-axis |
+| **Ice-Shelled Moon** | Starlight 10, Interior heat 62, Optional layers 100, Tidal locking 55, mineral-veins — a frozen shell over a hidden ocean |
+| **Battered Grey Moon** | Starlight 72, Interior heat 8, Star activity 88, cratered, impact-basin — airless and scoured |
+| **Tidally Heated Moon** | Interior heat 100, Tidal locking 95, magma-chambers, mineral-veins |
+| **Frozen Dead Moon** | Starlight 4, Interior heat 3, Optional layers 100, void-pockets — the ocean frozen into the shell |
 
-**Stellar**
-
-| Preset | Sets |
-|---|---|
-| **Quiet Sun** | Main star, Star activity 8 — clean, stable, tachocline visible |
-| **Angry Star** | The same star at Star activity 100 — prominences, spotting, flare storms |
-| **Red Giant** | Old giant, Core size bias at its floor — the extreme core-to-envelope contrast |
-| **Dying Giant** | Old giant — dredge-up, pulsation, and a planet it swallowed |
-| **Flare Star** | Dwarf star, Star activity 94 — heavy spotting, frequent flares |
-| **Patient Ember** | Dwarf star, quiet and cool — the trillion-year lifespan |
-| **Newborn Star** | Young star — the inverted interior, still surrounded by its debris |
-| **Harvested Star** | Main star + orbital-mirrors + stellar-collector — deliberately ordinary, so what orbits it is the subject |
-
-> Built in Session M. **Starlight is deliberately absent from every stellar
-> preset**: a star declares `starlit: false`, so the control is inert on one by
-> design, and setting it would make it look like a knob that does something.
-> `Binary Pair` is not built — `binary-companion` is a whole axis of work and
-> is recorded as open in
-> [session-m-stars.md](progress/session-m-stars.md#still-open).
-
-**Compact**
+**Asteroids** — `js/data/presets.js`
 
 | Preset | Sets |
 |---|---|
-| **Magnetar** | Neutron star, Field strength 100 — vast twisted magnetosphere, starquakes |
-| **Cooling Neutron Star** | Neutron star, low Surface heat, Field strength and Spin rate |
-| **Accreting Neutron Star** | Neutron star, accretion stream onto a pole |
-| **Millisecond Pulsar** | Pulsar, Spin rate 100, high beam tilt |
-| **Young Pulsar** | Pulsar, hot, fast, strong field, glitching |
-| **Beacon Pulsar** | Pulsar, navigation beacon |
-| **Feeding Black Hole** | Black hole, Accretion rate 100, jets |
-| **Dormant Black Hole** | Black hole, Accretion rate 0, Spin rate 0 — almost entirely black |
+| **Rubble Pile** | Cohesion 4, Caverns 0, shattered |
+| **Iron Fragment** | Cohesion 96, Caverns 8, ore-deposits; shattered barred |
+| **Ice Hauler** | Cohesion 30, Caverns 45, Starlight 14 — water ice in every gap |
+| **Hollowed Rock** | Cohesion 62, Caverns 96, mining-station, tunnel-borer; shattered barred. `hollowed-out` was retired in U1: it is a position on the Caverns axis since U2 |
+
+**Gaseous** — `js/data/presets.js`
+
+| Preset | Sets |
+|---|---|
+| **Banded Giant** | Gas giant, great-storm, storm-belts, Contrast 118; rings barred |
+| **Hot Jupiter** | Gas giant, Starlight 96, Star activity 78, violent-banding; rings barred |
+| **Ringed Giant** | Gas giant, ringlet-system, pale palette; great-storm and violent-banding barred (D309) |
+| **Industrial Giant** | Gas giant, gas-miner-platforms, skimmer-tracks |
+| **Ice Giant** | Ice giant, Starlight 16, helium-rain; rings barred |
+| **Diamond Sea** | Ice giant, Interior heat 88, diamond-rain; rings barred |
+| **Prismatic Giant** | Ice giant, prismatic-ice, Contrast 124; rings barred |
+
+**Stellar** — `js/data/presets.js`
+
+| Preset | Sets |
+|---|---|
+| **Quiet Sun** | Main star, Star activity 8 — clean, stable, tachocline visible; flare storms barred |
+| **Angry Star** | Main star, Star activity 100 — prominences, starspot clusters, flare storms |
+| **Harvested Star** | Main star, orbital-mirrors, stellar-collector — deliberately ordinary, so what orbits it is the subject |
+| **Red Giant** | Old giant, Core size bias −95, shed-shells, dust-formation — the extreme core-to-envelope contrast |
+| **Dying Giant** | Old giant, Core size bias −70, engulfed-planet, dredge-up, pulsating, shed-shells |
+| **Flare Star** | Dwarf star, Star activity 94, heavy-spotting, flare-storms, prominences |
+| **Patient Ember** | Dwarf star, Star activity 10, Interior heat 12 — quiet and cool, the trillion-year lifespan; flare storms barred |
+| **Newborn Star** | Young star, accretion-disc, prominences, flare-storms — the inverted interior, still surrounded by its debris |
+
+> **Starlight is deliberately absent from every stellar preset**: a star declares `starlit: false`, so the control is inert on one by design, and setting it would make it look like a knob that does something. `Binary Pair` is not built — `binary-companion` is a whole axis of work and is recorded as open in [session-m-stars.md](progress/session-m-stars.md#still-open).
+
+**Compact** — `js/data/presets-compact.js`
+
+| Preset | Sets |
+|---|---|
+| **Magnetar** | Neutron star, Field strength 100, starquake-scars — vast twisted magnetosphere |
+| **Cooling Neutron Star** | Neutron star, Surface heat 8, Field strength 15, Spin rate 10; starquakes and glitching barred |
+| **Accreting Neutron Star** | Neutron star, accretion-stream onto a pole |
+| **Millisecond Pulsar** | Pulsar, Spin rate 100, Beam tilt 82 |
+| **Young Pulsar** | Pulsar, Surface heat 95, Field strength 80, Spin rate 72, glitching, pulsar-wind |
+| **Beacon Pulsar** | Pulsar, navigation-beacon |
+| **Feeding Black Hole** | Black hole, Accretion rate 100, Spin rate 70 — jets both ways |
+| **Dormant Black Hole** | Black hole, Accretion rate 0, Spin rate 0 — almost entirely black; tidal disruption barred |
 | **Spinning Black Hole** | Black hole, Spin rate 96 — the full Kerr interior |
-| **Supermassive** | Black hole, Mass class supermassive, moderate accretion |
+| **Supermassive** | Black hole, Mass class at its top, Accretion rate 50 |
 
-Built in Session V — `js/data/presets-compact.js`.
-
-**Diffuse**
+**Diffuse** — `js/data/presets-nebula.js`, Ringworld Nebula in `js/data/presets-built.js`
 
 | Preset | Sets |
 |---|---|
-| **Emission Nebula** | Luminosity source 100, protostars, pillars, vivid multi-hue |
-| **Dark Nebula** | Luminosity source 0, dark lanes, a cavity to hide in |
-| **Reflection Nebula** | Luminosity source ~35, cool blue-biased palette |
-| **Planetary Nebula** | Shell stack, white dwarf at centre |
-| **Supernova Remnant** | Shell stack, filament web, pulsar at the heart |
+| **Pillars of Creation** | Cloud, Luminosity source 88, pillars, protostar-cluster |
+| **Supernova Remnant** | Remnant, Luminosity source 75, Spin rate 70, filament-web, a pulsar at the heart |
+| **Dark Nebula Hideout** | Cloud, Luminosity source 4, cavity, hidden-station |
+| **Planetary Nebula** | Planetary, Luminosity source 80 — the shell and its white dwarf, with every structural trait barred |
+| **Reflection Nebula** | Cloud, Luminosity source 35 — every structural trait barred |
+| **Emission Nebula** | Cloud, Luminosity source 100 — every structural trait barred |
+| **Mining Frontier** | Cloud, Luminosity source 60, metal-belts, ice-belts, mining-flotilla |
+| **Ringworld Nebula** | Cloud, Luminosity source 8 (dark), with the ringworld — the one light in the cloud is the ring's own sun (D306) |
 
-**Artificial**
+**Artificial** — `js/data/presets-machine.js`, the other two in `js/data/presets-built.js`
 
 | Preset | Sets |
 |---|---|
@@ -569,13 +570,10 @@ Built in Session V — `js/data/presets-compact.js`.
 | **Automated Factory** | Operational status 35, Hull integrity 85, Optional layers 0 (no habitation layer) — running, nobody home |
 | **Unfinished World** | Operational status 50, Hull integrity 40 with the Under construction trait — scaffolding, clean edges, crews at work |
 | **Worldship** | Operational status 65, Hull integrity 80, with the Worldship trait — engine cluster on one side, firing |
-| ~~**Planet-Cracker**~~ | **Removed** by the user in Session Z, with the planet-cracker trait |
-| **Half-Built Dyson** | Main star, Star activity 18, with the Unfinished Dyson Shell (1–9 open arcs, each ending at a rib) over stellar collectors — built in Session AG (D305–D306) |
-| **Fortress World** | Replaces ~~Coruscant World~~, which needed cities (ruled out by D290). A garden world (Ocean depth 48, Interior heat 52, Starlight 46) wearing all three of the planet's orbital traits: orbital ring + elevators, defence network, minefield. Whether they keep something out or in is left open (D306) |
-| **Ringworld Nebula** | Nebula, cloud form, Luminosity source 8 (dark), with the ringworld — the one light in the cloud is the ring's own sun (D306) |
-| **Hollowed Asteroid** | Built as **Hollowed Rock**: Asteroid, Caverns 96, Cohesion 62, mining-station + tunnel-borer (`hollowed-out` retired in U1; it is a position on the Caverns axis since U2) |
+| **Half-Built Dyson** | Main star, Star activity 18, with the Unfinished Dyson Shell (1–9 open arcs, each ending at a rib) over stellar collectors (D305–D306) |
+| **Fortress World** | A planet: a garden world (Ocean depth 48, Interior heat 52, Starlight 46) wearing all three of the planet's orbital traits: orbital ring + elevators, defence network, minefield. Whether they keep something out or in is left open (D306) |
 
-The five machine-world presets were built in Session Z — `js/data/presets-machine.js`. Derelict, Hive and Factory ban Under construction and Worldship (`traitsOff`): one would contradict the blurb, the other is the Worldship preset; any other machine trait may roll. Half-Built Dyson, Fortress World and Ringworld Nebula were built in Session AG — `js/data/presets-built.js` — each naming its traits outright so nothing else rolls; Hollowed Asteroid is built (Session U).
+Derelict, Hive and Factory ban Under construction and Worldship (`traitsOff`): one would contradict the blurb, the other is the Worldship preset; any other machine trait may roll. The built presets name their traits outright so nothing else rolls. A natural preset that names no traits ✕s every built trait it offers (`CC.Presets.offList`, D310).
 
 **Presets are not a body type.** A desert world is a planet whose ocean depth is
 zero — which is why "frozen desert with a dying core" or "tidally locked ocean
@@ -590,16 +588,18 @@ lives.
 
 ## Randomize settings
 
-Lives inside a section; the **button stays pinned**. The section holds the bulk lock buttons and **Reset to defaults** (see Persistence).
+Lives inside a section; the **button stays pinned**. The section holds the bulk lock buttons, the section lock buttons and **Reset to defaults** (see Persistence).
 
-**Built so far:** the bulk lock buttons and Reset. The four controls below are specified and not built.
+**Randomize rolls the archetype too**, evenly across all of them, unless the Archetype lock is on (D321). That lock is what "keep this body type but re-roll everything else" means. A rolled body's Primary hue stays inside the archetype's `hue` range or families where it declares one (D319).
 
-| Control | Type | Notes |
-|---|---|---|
-| **Randomize scope** | checkbox group | Which categories Randomize touches: Archetype / Seed / Colour / Traits / Structure / Detail. **Structure** covers the parameter axes (Ocean depth, Interior heat, Cohesion, and the archetype-specific ones) |
-| **Archetype pool** | checkbox list | Which archetypes can be rolled. Lets you get "only stars" |
-| **Respect locks** | checkbox | Default on. Off = randomize everything regardless |
-| **Auto-randomize on load** | checkbox | Fresh body each time the page opens |
+Specified and struck (D321), so nobody rebuilds them:
+
+| Control | Why not |
+|---|---|
+| Randomize scope | The section lock buttons do it with the one lock system, and show what is held on the rows themselves |
+| Archetype pool | The Archetype lock covers "only this body"; a family-sized pool was not worth a 14-row list |
+| Respect locks | Unlock all does it in one press, and a switch that overrides locks makes them less trustworthy |
+| Auto-randomize on load | The app reopens on the body it was closed on (D287), and this would throw that away |
 
 ---
 
@@ -662,9 +662,11 @@ first thing anyone sees.
 | Boundary irregularity | 100% | ✅ |
 | Keep upright | off | ✅ |
 | Rotation | 0° | ✅ |
-| Primary hue | 210° | ✅ |
+| Primary hue | 210° | ✅ — rolled inside the archetype's `hue` range or families (D319) |
 | Hue relationship | Auto | ✅ |
 | Secondary hue offset | 0° | ✅ |
+| Tertiary hue offset | 0° | ✅ |
+| Accent hue offset | 0° | ✅ — machine world only |
 | Saturation / Brightness / Contrast | 100% each | ✅ |
 | Background | Starfield | ✅ — no lock; Randomize never rolls the type |
 | Background colour | #05070e | ✅ — rolled dark, and lockable |
@@ -683,8 +685,6 @@ first thing anyone sees.
 | Lock facing / Companion bearing | 90° | ✅ |
 | Show info panel | on | ✅ |
 | Info detail level | Standard | ✅ |
-| Artificial traits | allowed | ⬜ P9 |
-| Composition | Body + info panel | ⬜ P8 |
 
 **Randomize** rolls the structure axes and the colour anchors. Saturation,
 brightness and contrast are rolled only in a narrow band around 100%, because

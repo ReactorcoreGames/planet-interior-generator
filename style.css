@@ -377,6 +377,8 @@ html, body {
 
 /* --- control rows --- */
 
+.control-row[hidden] { display: none; }
+
 .control-row {
   display: grid;
   grid-template-columns: 1fr auto auto;
@@ -532,6 +534,8 @@ html, body {
 
 .bulk-locks { display: flex; gap: 6px; padding: 4px 0 10px; }
 .mini-btn.armed { color: var(--ink); border-color: #c0605a; background: #4a2a36; }
+.section-locks { flex-wrap: wrap; }
+.mini-btn.on { color: var(--lock); border-color: var(--lock); }
 
 .phase-note {
   margin: 8px 0 2px;

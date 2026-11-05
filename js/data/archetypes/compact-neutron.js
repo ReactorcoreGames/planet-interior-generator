@@ -239,6 +239,8 @@ var CC = CC || {};
       strength: 0.70,
       veins: { count: 60, length: [0.10, 0.36], alpha: 0.22, lean: 0.10 }
     },
+    /* No outward layer that takes the tertiary anchor (D318). */
+    hides: ["tertiary-offset"],
     dials: DIALS,
     /* No latitude, not lit by another star, its own furnace — the stellar
      * declaration, because it is the same situation (D50). */
@@ -281,6 +283,8 @@ var CC = CC || {};
       strength: 0.62,
       veins: { count: 50, length: [0.10, 0.34], alpha: 0.20, lean: 0.10 }
     },
+    /* No outward layer that takes the tertiary anchor (D318). */
+    hides: ["tertiary-offset"],
     dials: {
       "star-activity": DIALS["star-activity"],
       "interior-heat": DIALS["interior-heat"],

@@ -49,6 +49,7 @@
 | [session-ai-fixes.md](session-ai-fixes.md) | D309–D312 — Phase 9c block AI. Part one: Ringed Giant forces the giants' `ringlet-system` and the ring flavour checks both kinds; natural presets ✕ every built trait from their roll (`CC.Presets.offList`); the orbital ring beside the ring system accepted as is; Trait count 0–8. Part two: the machine world's defense shell kept, Under construction with Overgrown allowed, open question 1b closed, Atmosphere opacity (Session AI) |
 
 | [session-aj-eye-lists.md](session-aj-eye-lists.md) | D313–D317 — Phase 9c block AJ, the eye lists and the card notes: the asteroid's voids to ~90% at Cohesion 0, glassy ice and a depth shade; its impact basin as a bite out of the form (`biteRoll`, `CC.Form.fn(form, bites)`) and pink-white radioactivity; saturated black-hole discs; a cream neutron-star white point and the pulsar wind reading Detail density (`detail` on trait elements); the nebula's Navigation fallback, a sealed ocean as a resource, and a weak ice shell breaking into leads and floes (`breach: { by: "above" }`) with the card measuring the open water (Session AJ) |
+| [session-ak-controls-drift.md](session-ak-controls-drift.md) | D318–D321 — Phase 9c block AK: the unbuilt controls and the spec drift: the Tertiary and Accent hue offsets, `hides` on an archetype, Randomize inside a body's hue range and across the archetypes, section locks, the preset tables and stale comments |
 
 Sessions are listed oldest first. `session-f.md` is a stub left where Session F used to be; it points at the three F files above.
 

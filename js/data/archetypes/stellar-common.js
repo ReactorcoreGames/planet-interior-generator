@@ -51,17 +51,6 @@
  * it. Granulation is convective churn and is a layer detail, not a film.
  *
  *
- * ---- CONSISTENCY WITH THE STAR TABLE ------------------------------------
- *
- * `js/data/stars.js` already describes stars — from the other side, as the
- * thing a planet orbits. A `main-star` body and the `Star colour` a planet
- * orbits are the same physical object seen from two sides, so the archetypes
- * here take their hue bands from `CC.Stars.STARS` rather than authoring a
- * second opinion about what colour a star is. See `hueFromStars` below: if a
- * blue giant renders one way as a body and tints planets another way, that is
- * a contradiction the tool would eventually be caught in.
- *
- *
  * ---- STAR ACTIVITY IS ONE CONTROL WITH TWO CONSUMERS ---------------------
  *
  * PARAMETERS.md struck through the old per-star `Stellar activity` row for
@@ -170,51 +159,6 @@ var CC = CC || {};
    * `maxThickness` raises the layer's floor rather than lowering its ceiling,
    * so the layer keeps its position and the space goes inward to the interior
    * layer that should have had it. */
-
-  /* THE HUE BAND, TAKEN FROM THE STAR TABLE RATHER THAN INVENTED.
-   *
-   * `CC.Stars.STARS` is the existing description of what colour a star is, and
-   * it spans 18 deg (red dwarf) through 224 deg (blue giant). Rather than
-   * author a second range per archetype, each body names the two table entries
-   * that bracket what it can be and the band is read off them at load time.
-   *
-   * The spec says hue is FREE for every star type and that what distinguishes
-   * one from another is saturation and lightness. That is honoured — these
-   * bands are wide — but a red giant should not roll blue, and the table
-   * already knows where red and blue are. Widening the shared table is what
-   * the roadmap asked for in preference to authoring a second one.
-   *
-   * ---- TWO THINGS THE FIRST VERSION GOT WRONG, both found on a contact sheet
-   * rather than on any single render, which is what a contact sheet is for:
-   *
-   * 1. IT PADDED BELOW ZERO. `pad` was subtracted from the low end, so a band
-   *    starting at 18 became -42 — and `wrapHue` maps that to 318, which is
-   *    MAGENTA. Half the sheet came out pink and violet: not "hue is free",
-   *    but hue wrapping off the bottom of the scale into the one part of the
-   *    wheel no star occupies. The low end is clamped at 0 now (pure red),
-   *    which is where the stellar sequence genuinely ends.
-   *
-   * 2. THE PAD WAS FAR TOO GENEROUS. At 60-70 degrees the main star's band
-   *    came out 326 degrees wide — very nearly the entire wheel — and a range
-   *    that admits every colour is not a range. What made those stars stop
-   *    reading as stars was not that green was reachable but that NOTHING was
-   *    unreachable, so the family lost the red-through-blue character that is
-   *    the one thing a viewer already knows about star colour.
-   *
-   * The pads below are modest. The spec's freedom is real — a green or violet
-   * star is still reachable at the ends of the widest band — it simply is not
-   * the default outcome. */
-  function hueFromStars(loId, hiId, pad) {
-    var T = (CC.Stars && CC.Stars.STARS) || {};
-    var lo = T[loId], hi = T[hiId];
-    /* If the table ever loses a row this must not silently produce a nonsense
-     * band; falling back to the full wheel is the honest failure. */
-    if (!lo || !hi) return [0, 360];
-    var p = pad === undefined ? 0 : pad;
-    /* NEVER BELOW ZERO — see note 1 above. Padding off the bottom wraps into
-     * magenta, which is the one region of the wheel no star belongs in. */
-    return [Math.max(0, lo.hue - p), Math.min(359, hi.hue + p)];
-  }
 
   /* A CORONA, WHICH THREE OF THE FOUR BODIES HAVE.
    *
@@ -587,7 +531,6 @@ var CC = CC || {};
    * lands once. */
   CC.StellarCommon = {
     climate: stellarClimate,
-    hueFromStars: hueFromStars,
     corona: corona,
     chromosphere: chromosphere,
     lit: lit,

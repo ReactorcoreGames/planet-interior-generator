@@ -58,6 +58,7 @@ CC.Controls = (function () {
       desc.lock.addEventListener("change", function () {
         var row = desc.lock.closest(".control-row");
         if (row) row.classList.toggle("locked", desc.lock.checked);
+        syncSectionLocks();
       });
     }
 
@@ -147,6 +148,7 @@ CC.Controls = (function () {
     d.lock.checked = !!locked;
     var row = d.lock.closest(".control-row");
     if (row) row.classList.toggle("locked", !!locked);
+    syncSectionLocks();
   }
 
   function eachLock(fn) {
@@ -158,6 +160,44 @@ CC.Controls = (function () {
   function lockAll() { eachLock(function (id) { setLocked(id, true); }); }
   function unlockAll() { eachLock(function (id) { setLocked(id, false); }); }
   function invertLocks() { eachLock(function (id) { setLocked(id, !isLocked(id)); }); }
+
+  /* ONE SECTION'S LOCKS AT ONCE (D321): "re-roll only the colours" is Lock all,
+   * then Colour. These are the same locks, so Randomize has no second system
+   * to consult. A button reads as on when its whole section is locked, however
+   * the locks got that way, and pressing it then unlocks the section. */
+  function sectionLocks(name) {
+    var ids = [];
+    eachLock(function (id) {
+      var sec = bound[id].el.closest("[data-section]");
+      if (sec && sec.getAttribute("data-section") === name) ids.push(id);
+    });
+    return ids;
+  }
+
+  function sectionLocked(ids) {
+    return ids.length > 0 && ids.every(isLocked);
+  }
+
+  function syncSectionLocks() {
+    var btns = document.querySelectorAll("[data-lock-section]");
+    for (var i = 0; i < btns.length; i++) {
+      var on = sectionLocked(sectionLocks(btns[i].getAttribute("data-lock-section")));
+      btns[i].classList.toggle("on", on);
+      btns[i].setAttribute("aria-pressed", on ? "true" : "false");
+    }
+  }
+
+  function initSectionLocks() {
+    var btns = document.querySelectorAll("[data-lock-section]");
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].addEventListener("click", function () {
+        var ids = sectionLocks(this.getAttribute("data-lock-section"));
+        var to = !sectionLocked(ids);
+        ids.forEach(function (id) { setLocked(id, to); });
+      });
+    }
+    syncSectionLocks();
+  }
 
   /* --- misc ------------------------------------------------------------ */
 
@@ -281,6 +321,18 @@ CC.Controls = (function () {
       setLabel(did, (spec && spec.label) || dialDefaults[did].label,
                (spec && spec.title) || dialDefaults[did].title);
     }
+
+    /* ANY ROW AN ARCHETYPE HAS NOTHING TO ANSWER WITH: `hides: [<control id>]`
+     * on the archetype, declared rather than detected (D318). Every id ANY
+     * archetype hides is walked, so switching away shows it again. */
+    for (var hi = 0; hi < ids.length; hi++) {
+      var hl = CC.Archetypes.get(ids[hi]).hides || [];
+      for (var hj = 0; hj < hl.length; hj++) {
+        setVisible(hl[hj], !(arch && arch.hides && arch.hides.indexOf(hl[hj]) >= 0));
+      }
+    }
+    /* The accent exists only on a profile that declares one (js/gen/accent.js). */
+    setVisible("accent-offset", !!(arch && arch.colorProfile && arch.colorProfile.accent));
   }
   var dialDefaults = {};
 
@@ -302,6 +354,7 @@ CC.Controls = (function () {
     setVisible: setVisible,
     setLabel: setLabel,
     syncAxisDials: syncAxisDials,
+    initSectionLocks: initSectionLocks,
     setChangeHandler: setChangeHandler
   };
 })();

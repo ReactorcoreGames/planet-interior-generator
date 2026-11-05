@@ -41,3 +41,66 @@ The user looked at Help in the real app: layout and reading are fine, with the s
 **One tag changed in the suggested list:** `tool` becomes `ttrpg`, since the page's type already says it is a tool. The user approved it. The label D325 rules out appears nowhere in the three files.
 
 **D330: `promo.md` is internal, under the user's updated brief.** It does not ship in the zips. The earnings-share notice and the Reddit posts are gone, replaced by five unchecked marketing targets, and no price is stated or advised, though the business section still says what the paid copy offers. Step 5's list is changed to match.
+
+## Step 4 — `promo/`
+
+**The set is 34 images, 12 MB, all new and all kept by the user.** The filenames are numbered in reading order: the store page runs from `03` onward, with `01` the cover and `02` the thumbnail, which go in their own fields on itch. Every body comes from the app's own presets and seeds, and only the stamps are added on top. Every file came out smaller as JPG than as PNG.
+
+- **`01`–`02`:** the cover and thumbnail, the title in big type over fourteen slices, with the subtitle "Planetary interior procedural art generator". The user asked for the subtitle because "planetary" is a more familiar word than "celestial" and says at once what the app is, even though it covers more than planets.
+- **Ads, 11:** what it is, what it's for, the controls, one click, megastructures, machine worlds, nebulae, the fact card, labels, export, body types.
+- **Collages, 4:** `collage-columns` (a strip through each of the fourteen), `collage-fourteen-slices` (fourteen wedges round one core), `collage-fourteen-bodies` (a named grid), `collage-info-cards`.
+- **The real interface, 5:** `screenshot-app-*`. **Plain renders, 12:** the other `screenshot-*`.
+
+**D331: anything with text in it comes from real Edge.** The step said the harness cannot show the interface, but headless Edge can, over its debugging port with a throwaway profile and nothing installed, and it runs the real app from `file://`. So the GUI shots did not need to be asked of the user. It mattered for the cards too: `@napi-rs/canvas` has different font metrics, and in its render a long name runs into the danger badge, which does not happen in Edge. So the cards, the composed export and the labelled export are the browser's own files. Bodies without text use `@napi-rs/canvas`.
+
+**D332: the highlight colour is pink, `#ff5fa8`**, because the user already has many projects that use the same yellow. It applies to the trailer's titles too.
+
+**D333: ads say plainly what the tool is.** The first round's slogans ("Built, not born", "Find a ringworld in the fog") were pretty but cryptic, and the user rejected them. The copy now names procedural art and planet interiors, says what the images are useful for (game assets, TTRPG material, lore and worldbuilding, framed art, wallpapers, backgrounds for any media), says they can be used commercially, and lists concrete controls. Compared with round one the headlines are about a quarter smaller, the copy is larger, and each ad has about twice the text. The full title "Celestial Cutaway: Planetary Interior Art Generator" sits in the upper left of every ad. The user asked for the concrete controls as a list, so `ad-controls` was added as a new ad.
+
+**Three things the renders taught, for anyone reusing them:**
+
+- A body's generated name comes from the seed alone, so one seed on several bodies gives one name. The fact cards use eight different seeds.
+- The seed prints on the card and in the preview's caption, so anything showing them uses a natural-looking seed (`long-watch`, `red-meridian`) rather than `promo-b`.
+- A ringworld is small against its nebula, so it sells only in close-up. `ad-nebulae` is 6.5x; at normal framing it is a speck.
+
+**The copy was checked against the app.** The counts (36 sliders, 58 presets, 70 traits, 14 types) are step 3's, counted from the data. "Up to 4K" is 2160 px at 16:9, which `sizeFor` makes 3840x2160; 20x is `MAX_ZOOM`. Listed controls and traits use their real names, and the commercial line is the licence's own. A machine world's card has no climate line, so the fact card ad does not promise one.
+
+**Scripts:** `test/_tmp/_ao*`, gitignored. `_aoedge.mjs` and `_aoedgeshots.mjs` drive Edge (set `AO_PROFILE` to a temp folder first), `_aobuild.mjs` makes the screenshots and ads, `_aocollage.mjs` the rest, all into `shots/ao/final/`, and `_aonumber.mjs` copies them into `promo/` in order. Step 6 should keep them and `shots/ao/` until the trailer is done. An early `keep()` wrote each image as both JPG and PNG and permanently deleted the larger, against the C:\trash rule; it now compares them in memory and writes only one. Only those just-written twins were lost.
+
+### The bodies, for the trailer
+
+Open the app, apply the preset, set the seed, and set the view. In the last column, `bodySize` is the Body size slider over 100, and `panX`, `panY` and `zoom` are the framing, with a negative `panY` moving the body down. Hyphenated names are the app's controls, in their own units.
+
+| File | Preset | Seed | Name | View or controls |
+|---|---|---|---|---|
+| 03-ad-what-it-is.jpg | fortress-world | `promo-c` | Esbara | bodySize 0.74, panX -1.14 |
+| 04-ad-what-its-for.jpg | newborn-star | `promo-b` | Kavexor KX-4112 | bodySize 0.72, panX -1.25 |
+| 07-ad-controls.jpg | angry-star | `promo-a` | Belnitha Prime | bodySize 0.74, panX -1.2 |
+| 08-screenshot-app-main.jpg | fortress-world | `red-meridian` | Sonithor |  |
+| 10-ad-megastructures.jpg | half-built-dyson | `promo-a` | Belnitha Prime | bodySize 0.6, panX -1.5 |
+| 11-ad-machine-worlds.jpg | worldship | `promo-b` | Kavexor KX-4112 | bodySize 0.72, panX -1.25 |
+| 12-ad-nebulae.jpg | emission-nebula + ringworld trait, luminosity 100 | `ring-5` | Drolornun III | bodySize 0.78, zoom 6.5, panX -0.053, panY 0.505 |
+| 13-ad-fact-card.jpg | derelict-machine-world | `long-watch` | Phaeketae Reach | body-size 54, pan-y -0.42, pan-x -0.9, info-detail compact |
+| 15-ad-labels.jpg | volcanic-world | `old-iron` | Ithcyneth | show-labels True, show-scale-bar True, label-side right, label-size 150, body-size 70, pan-x -0.82, pan-y -0.12 |
+| 16-ad-export.jpg | derelict-machine-world | `promo-b` | Kavexor KX-4112 | bodySize 0.9, zoom 4.2, panX -0.1, panY -0.42 |
+| 17-ad-body-types.jpg | feeding-black-hole | `promo-c` | Esbara | bodySize 0.62, panY 0.72 |
+| 19-screenshot-app-presets.jpg | worldship | `long-watch` | Phaeketae Reach |  |
+| 20-screenshot-app-traits.jpg | half-built-dyson | `ashfall` | Drosetheth |  |
+| 21-screenshot-app-colour.jpg | newborn-star | `quiet-harbor` | Thomiror |  |
+| 22-screenshot-app-labels.jpg | volcanic-world | `old-iron` | Ithcyneth | show-labels True, show-scale-bar True, label-size 130 |
+| 23-screenshot-fortress-world.jpg | fortress-world | `promo-c` | Esbara | bodySize 0.8 |
+| 24-screenshot-half-built-dyson.jpg | half-built-dyson | `promo-a` | Belnitha Prime | bodySize 0.8 |
+| 25-screenshot-derelict-machine-world.jpg | derelict-machine-world | `promo-b` | Kavexor KX-4112 | bodySize 0.92 |
+| 26-screenshot-worldship.jpg | worldship | `promo-b` | Kavexor KX-4112 | bodySize 0.8, panY 0.1 |
+| 27-screenshot-black-hole.jpg | feeding-black-hole | `promo-c` | Esbara | bodySize 0.8 |
+| 28-screenshot-pulsar.jpg | young-pulsar | `promo-b` | Kavexor KX-4112 | bodySize 0.8 |
+| 29-screenshot-ringed-giant.jpg | ringed-giant | `promo-a` | Belnitha Prime | bodySize 0.8 |
+| 30-screenshot-newborn-star.jpg | newborn-star | `promo-b` | Kavexor KX-4112 | bodySize 0.8 |
+| 31-screenshot-ice-moon.jpg | ice-shelled-moon | `promo-b` | Kavexor KX-4112 | bodySize 0.92 |
+| 32-screenshot-volcanic-world.jpg | volcanic-world | `promo-b` | Kavexor KX-4112 | bodySize 0.92 |
+| 33-screenshot-nebula.jpg | emission-nebula + ringworld trait, luminosity 100 | `ring-5` | Drolornun III | bodySize 0.95, zoom 1.35 |
+| 34-screenshot-asteroid.jpg | ice-hauler | `promo-b` | Kavexor KX-4112 | bodySize 0.9 |
+
+The fact cards in `14-collage-info-cards`: `fortress-world` / `red-meridian` (Sonithor); `derelict-machine-world` / `long-watch` (Phaeketae Reach); `feeding-black-hole` / `first-light` (Kyrossa); `diamond-sea` / `deep-thunder` (Delta Zanmiris); `angry-star` / `ashfall` (Drosetheth); `young-pulsar` / `salt-road` (Eslorna IV); `ice-shelled-moon` / `pale-anvil` (Lambda Essethus); `pillars-of-creation` / `hollow-crown` (Marketyn).
+
+The fourteen in the collages, on a solid `#05070e` background: Planet `fortress-world` / `promo-c`; Moon `ice-shelled-moon` / `promo-b`; Asteroid `ice-hauler` / `promo-b`; Gas giant `ringed-giant` / `promo-a`; Ice giant `diamond-sea` / `promo-b`; Young star `newborn-star` / `promo-b`; Main star `half-built-dyson` / `promo-a`; Old giant `dying-giant` / `promo-c`; Dwarf star `flare-star` / `promo-b`; Neutron star `cooling-neutron-star` / `promo-c`; Pulsar `young-pulsar` / `promo-b`; Black hole `feeding-black-hole` / `promo-c`; Nebula `emission-nebula` / `ring-5` at luminosity 100; Machine world `derelict-machine-world` / `promo-b`. `09-ad-one-button` is 40 presses of Randomize under a seeded `Math.random`, seed 12345.

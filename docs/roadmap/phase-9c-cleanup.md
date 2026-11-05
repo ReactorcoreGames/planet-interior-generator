@@ -88,8 +88,10 @@ The same byte-for-byte check, against AL's reference renders. Each function's nu
 | js/gen/structure.js (787) | presence and thickness resolution → `structure-resolve.js`; the wobble pass → `structure-wobble.js` |
 | js/gen/traitroll.js (1216) | selection → `traitselect.js`; anchors → `traitanchor.js`; `placeOne` by placement kind → `traitplace.js` |
 
-## AN — close 9c
+## AN — close 9c ✅
 
-- [ ] ARCHITECTURE.md § File layout rewritten from the real tree
-- [ ] PROGRESS.md, ROADMAP.md, phase-9-10.md and the checklist mark 9c complete
-- [ ] Write the prompt for Phase 10, the release (the user's release prompt is [RC prompt to make releases easier.md](../RC%20prompt%20to%20make%20releases%20easier.md))
+*Done ([session-an-close-9c.md](../progress/session-an-close-9c.md)). Phase 9c is complete.*
+
+- [x] ARCHITECTURE.md § File layout rewritten from the real tree
+- [x] PROGRESS.md, ROADMAP.md, phase-9-10.md and the checklist mark 9c complete
+- [x] Write the prompt for Phase 10, the release (the user's release prompt is [RC prompt to make releases easier.md](../RC%20prompt%20to%20make%20releases%20easier.md))

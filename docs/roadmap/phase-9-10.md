@@ -24,9 +24,9 @@
 
 **Closed in Session AG (D304–D306)**: the black hole's starfield lensed star by star (about 10 ms a render, against 74–252 ms for a pixel remap), an unfinished Dyson shell with open arcs, and three presets — Fortress World (replacing Coruscant World, which needed cities), Half-Built Dyson and Ringworld Nebula. See [session-ag-close-9b.md](../progress/session-ag-close-9b.md).
 
-### 9c — final clean-up pass (under way, Sessions AH–AN)
+### 9c — final clean-up pass ✅ (Sessions AH–AN)
 
-**Audited in Session AH (D307–D308)** and split into one block per session; the checklist is [phase-9c-cleanup.md](phase-9c-cleanup.md).
+**Audited in Session AH (D307–D308)** and split into one block per session; the checklist is [phase-9c-cleanup.md](phase-9c-cleanup.md). **Closed in Session AN**: no file in `js/` is over 500 lines, and the file layout in ARCHITECTURE.md is written from the real tree.
 
 A last pass over the whole generator once the megastructures are in: does everything land together, on every family, with every trait, in the composed export? The user's eye leads; the open "for the user's eye" lists in the session write-ups are its agenda.
 
@@ -66,6 +66,8 @@ sun-shield to be drawn than "it looks technical".
 ---
 
 ## Phase 10 — Release
+
+*Next, Session AO. The brief is the user's [RC prompt to make releases easier.md](../RC%20prompt%20to%20make%20releases%20easier.md); the session prompt built on it is at the end of [session-an-close-9c.md](../progress/session-an-close-9c.md).*
 
 - `build_release.bat` producing a clean `dist/`
 - itch.io packaging (works in an iframe)

@@ -186,6 +186,18 @@ assumed.
 - [x] **the `nebula` card** — crossed, not reached; every figure computed and checked (D238); a navigational **hazard rating** calibrated against the frequency contract (D239)
 - [x] **flavour pool and seven presets**, each checked against its blurb (D240)
 
+### Phase 9c — final clean-up pass ✅ (Sessions AH–AN)
+
+The ticked items, block by block, are in [phase-9c-cleanup.md](../roadmap/phase-9c-cleanup.md).
+
+- [x] **AH** the audit, and 9c split into sessions (D307–D308)
+- [x] **AI** the bugs and the picture decisions (D309–D312)
+- [x] **AJ** the eye lists and the card notes (D313–D317)
+- [x] **AK** the unbuilt controls and the spec drift (D318–D321)
+- [x] **AL** the eighteen straightforward file splits, no pixel changed (D322)
+- [x] **AM** the five stage refactors, no pixel changed (D323)
+- [x] **AN** the file layout from the real tree, 9c marked complete, the Phase 10 prompt
+
 ### Phase 9b — megastructure traits on natural bodies ✅ (Sessions AB–AG)
 
 [session-ab-megastructures.md](session-ab-megastructures.md) — D289–. The audit, then the user's own list (D289) and the rule behind it: a trait must be visible at the body's scale and leave the story open (D290). One family per session; each ends with the prompt for the next.

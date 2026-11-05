@@ -387,9 +387,8 @@ deltas are eased into the available headroom with a soft knee applied across
 the whole range. The knee must be continuous — applying it only past the limit
 puts a 37% step at one angle, which is a visible seam (D24).
 
-**The cross-fade is asserted, not assumed.** `test/sweep.mjs` bounds the
-maximum per-degree change in the delta at 0.05; the shipped worst case is
-0.023. A smoothness requirement is a number, so it belongs in a test.
+**The cross-fade has a limit.** The maximum per-degree change in the delta
+should stay under 0.05; the worst case when it was measured was 0.023.
 
 ### Stats are zone-aware
 
@@ -540,7 +539,7 @@ them read as artificial rather than natural.
 
 ### Impact basin
 
-**As shipped** — see `js/data/traits.js`. The `wedge` case, and deliberately a
+**As shipped** — see `js/data/traits/`. The `wedge` case, and deliberately a
 handful of large features rather than a dense field, so the grammar is shown
 covering both ends of its range.
 

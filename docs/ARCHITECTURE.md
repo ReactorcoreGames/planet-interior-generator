@@ -367,9 +367,7 @@ the heat dial. Every interior layer of a planet grades one way or the other;
 that is what gives the cutaway depth and separates the bands.
 
 **Rule 4 is judged at the edges that touch.** A graded layer does not meet its
-neighbour with its base colour, so both the separation pass and the sweep's
-muddiness check read `hotEdge` where it exists. Comparing base colours asks
-about a boundary that is not on screen.
+neighbour with its base colour, so the separation pass reads `hotEdge` where it exists. Comparing base colours asks about a boundary that is not on screen.
 
 **A layer at full brightness grades in hue, not value.** With no headroom left,
 "hotter" would otherwise be expressed as *lower saturation* by rule 3 and wash
@@ -522,7 +520,7 @@ its one job is naming the layers.
 - Each label has an **underline**; a 1px leader runs from the underline's inner end to a dot inside that layer's band
 - The dots sit on **one ray per side**, 55° from straight up, so walking the ray outward meets the bands in depth order and the leaders cannot cross. Labels start level with their dots and are pushed apart only as far as they must be. "Both" deals the bands out alternately
 - **Sized from the frame, not the body**: a 20x close-up does not print 20x names. Drawn after the scene's rotation is undone, so the text reads level
-- The name is `layer.name`, resolved in `js/gen/structure.js` from the layer spec's `name` or `js/data/layernames.js` by role (D283). No role reaches `js/draw/`
+- The name is `layer.name`, resolved in `js/gen/structure-resolve.js` from the layer spec's `name` or `js/data/layernames.js` by role (D283). No role reaches `js/draw/`
 - Everything else lives in the sidebar — **never** over the illustration
 
 ---
@@ -634,76 +632,145 @@ Also:
 
 ## File layout
 
-`✅` exists · `⬜` planned, with the phase that adds it.
+*Written from the real tree in Session AN. Everything listed exists, and each folder's scripts are in the order they load. **`index.html` is the single source of truth for the file list:** `test/domtest.mjs` reads its `<script src>` tags and `build_release.bat` copies `js/` and `lib/` wholesale, so adding a file means adding its tag and nothing else.*
 
 ```
+index.html  style.css  favicon.ico
+build_release.bat  launch_app_win.bat  package.json
+
+lib/        simplex-noise.js  delaunay.js
+            (vendored, with a README.md giving versions and licences)
+
 js/
-  core/     ✅ math.js  ✅ rng.js  ✅ color.js
-  data/     ✅ archetypes.js  ✅ elements.js  ✅ traits.js
-            ⬜ presets.js (MVP)  hazards.js  names.js (MVP)
-  gen/      ✅ structure.js  ✅ frosting.js  ✅ palette.js  ✅ terrain.js
-            ✅ zones.js  ✅ elemgen.js  ✅ traitroll.js  ✅ details.js
-            ⬜ stats.js  text.js (MVP)
-  draw/     ✅ canvas.js  ✅ layers.js  ✅ scene.js
-            ✅ primitives.js  ✅ details.js  ✅ film.js
-            ✅ overlay.js  ✅ scalebar.js
-  ui/       ✅ accordion.js  ✅ controls.js  ✅ traitpicker.js
-            ⬜ export.js (MVP)
-  ✅ main.js
-lib/        ✅ simplex-noise.js  ✅ delaunay.js
-test/       ✅ stubcanvas.mjs  domtest.mjs  sweep.mjs  shots.mjs  sheet.mjs
-            ✅ libcheck.mjs  doccheck.mjs  film.mjs  zones.mjs
-               (dev only, never shipped)
-archive/v2/ superseded v2 app, reference only
+  main.js   the app's wiring; loads last
+
+  core/     math.js  rng.js  color.js
+
+  data/     stars.js  layernames.js  scaleladder.js
+            presets.js  presets-solid.js  presets-gaseous.js  presets-stellar.js
+            presets-moon.js  presets-asteroid.js  presets-compact.js
+            presets-nebula.js  presets-built.js  presets-machine.js
+            phrasebook.js
+    archetypes/  registry.js
+            solid-film.js  solid.js  solid-moon-film.js  solid-moon.js  solid-asteroid.js
+            gaseous-common.js  gaseous-gas-giant.js  gaseous-ice-giant.js
+            stellar-common.js  stellar-limb-data.js  stellar-young.js  stellar-main.js
+            stellar-giant.js  stellar-dwarf.js
+            compact-neutron.js  compact-blackhole.js  diffuse-nebula.js  machine-world.js
+    elements/  registry.js
+            solid.js  solid-moon.js  solid-asteroid.js  gaseous.js
+            stellar-common.js  stellar-envelope.js  stellar-interior.js
+            compact.js  diffuse.js  machine.js
+    traits/  registry.js
+            orbital.js  orbital-built.js  giant-built.js
+            solid.js  solid-asteroid.js
+            gaseous-weather.js  gaseous-precip.js  gaseous-built.js
+            stellar-magnetic.js  stellar-corona.js  stellar-spots.js  stellar-evolved.js
+            stellar-built.js  dyson.js
+            compact.js  diffuse.js  ringworld.js  machine.js
+    flavour/  registry.js
+            solid.js  solid-asteroid.js  gaseous.js  stellar.js
+            compact.js  blackhole.js  nebula.js  machine.js
+
+  gen/      form.js  caves.js  activity.js  shells.js  shellwalls.js
+            rupture.js  woundedge.js  woundclean.js  wounddebris.js
+            structure.js  structure-wobble.js  structure-resolve.js
+            frosting.js  frosting-thermal.js
+            accent.js
+            palette.js  palette-util.js  palette-hue.js  palette-value.js
+            palette-layer.js  palette-bands.js
+            terrain.js  zonegeom.js  zoneswell.js  zones.js
+            climate.js  climate-baseline.js  climatesummary.js
+            evenspacing.js
+            elemgen.js  elemgen-basic.js  elemgen-mosaic.js  elemgen-family.js
+            compact.js  diffuse.js  diffuse-pockets.js  ringworld.js
+            claims.js  materials.js  cellgrid.js  glyph.js
+            orbitalbuilt.js  giantbuilt.js  dyson.js
+            fixtures.js  pulses.js  containment.js  conduits.js  capacitors.js
+            shaftdoors.js  overgrowth.js  bore.js  engines.js
+            traitroll.js  traitselect.js  traitanchor.js  traitplace.js  traitfinish.js
+            traitsets.js
+            details.js  details-traits.js  details-terrain.js  details-instances.js
+            climatetext.js  hazard.js
+    stats/  registry.js
+            solid.js  asteroid.js  gaseous.js  stellar-derive.js  stellar.js
+            compact.js  blackhole.js  nebula.js  machine.js
+
+  draw/     canvas.js  background.js  lens.js
+            layers.js  boundary.js  shells.js  shellwalls.js  rupture.js
+            formfill.js  sheen.js  feather.js
+            primitives.js  rocktexture.js
+            conduits.js  capacitors.js  shaftdoors.js  overgrowth.js  bore.js  engines.js
+            wounddebris.js  woundscaffold.js  woundedge.js  caves.js  hole.js
+            details.js  details-tone.js  details-gas.js  details-star.js
+            details-mosaic.js  relief.js
+            grain.js  film.js  film-zones.js  frostpaint.js  frost.js
+            zonepaint.js  emissive.js  overlay.js  scalebar.js
+            scene.js  scene-outward.js  scene-interior.js  scene-surface.js
+            card.js
+    primitives/  vein.js  flow.js
+            orbital-rings.js  orbital-storm.js  orbital-rocks.js
+            mosaic.js  machines.js  built.js
+            orbital-built.js  orbital-mines.js  giant-built.js  dyson.js
+            materials.js  cellgrid.js  glyph.js  fixtures.js  machinery.js
+            pulses.js  containment.js
+            stellar.js  stellar-spots.js  stellar-foreign.js  stellar-limb.js
+            stellar-flare.js  stellar-wind.js  stellar-field.js
+            compact.js  compact-stream.js  diffuse.js  diffuse-marks.js  ringworld.js
+    zonepaint/  outward.js  sea.js
+
+  ui/       accordion.js  help.js  controls.js  traitpicker.js  randomize.js
+            presets.js  infopanel.js  export.js  share.js  framing.js  exportui.js
+            keys.js  persist.js  gather.js  sync.js
+
+test/       the suite:  doccheck.mjs  domtest.mjs  stubcanvas.mjs
+            on request: libcheck.mjs
+            renders:    sheet.mjs  shots.mjs  climate.mjs  film.mjs  framing.mjs  zones.mjs
+            (dev only, never shipped; test/_tmp/ holds throwaway probes, gitignored)
+docs/       the spec set
+dist/  shots/  archive/   generated or old; gitignored
 ```
 
-- **`gen/elemgen.js`** — the size-tier system and one builder per element
-  shape. Split out of `gen/details.js` when zones pushed it past 500 lines:
-  `elemgen` is *how* an element is built, `details` is *which* elements a body
-  gets. The trait stage calls the same builders, so a trait's `element` selects
-  from exactly the same list a layer detail does.
-- **`draw/traitdraw.js` was not needed.** Trait instances are ordinary elements
-  carrying a `trait` id, drawn through `draw/details.js` like everything else —
-  which is the point of keeping the primitive list small. Only their *draw
-  order* differs, and that lives in `draw/scene.js` where the rest of the order
-  already is.
+Load order follows dependency order: `core` → `data` → `gen` → `draw` → `ui` → `main`.
 
-Notes on what exists:
+### The load-order idiom
 
-- **`draw/scene.js`** — the draw-order spine. Later stages slot into it rather
-  than being called from `main.js`.
-- **`core/noise.js` was not needed.** Value noise and periodic angular noise
-  (for seam-free wobbled boundaries) live in `core/rng.js`, since they are
-  seeded generators like everything else in it.
-- **`ui/locks.js` was not needed.** The lock system is part of
-  `ui/controls.js`, which is where the controls it locks are bound.
-- **`test/sheet.mjs`** — renders 24 randomized bodies to one contact sheet.
-  Added because harmony and density are properties of the *spread* of outputs,
-  and single renders mislead badly. See the testing note below.
+**A file either creates one namespace or adds to one.** There are two ways a namespace gets spread over several files, and both rely on a script tag's order:
 
-Load order in `index.html` follows dependency order: `core` → `data` → `gen` →
-`draw` → `ui` → `main`. Each file exposes one namespace object.
+- **A family registry.** `registry.js` creates the namespace (`CC.Archetypes`, `CC.Elements`, `CC.Traits`, `CC.Flavour`, `CC.Stats`) and each family file after it registers into it. `data/presets.js` and its `presets-*.js` work the same way, and so do `draw/primitives.js` and `draw/primitives/`, whose files add kinds through `CC.Primitives.register`. Adding a family is a new file and a new tag.
+- **A split file.** A file that outgrew 500 lines keeps its name and creates the namespace; the code moved out of it loads straight after it and attaches to the same namespace (`CC.Structure.relativeWobble = …`, or `CC.ElemGen.registerBuilder(…)`), each in its own function wrapper. No caller had to be renamed (Sessions AL and AM, D322–D323). So `palette.js` is followed directly by `palette-util.js`, `palette-hue.js`, `palette-value.js`, `palette-layer.js` and `palette-bands.js`, all of them `CC.Palette`.
 
-**`index.html` is the single source of truth for the file list.**
-`test/domtest.mjs` reads its `<script src>` tags and `build_release.bat` copies
-`js/` and `lib/` wholesale, so adding a file means editing `index.html` and
-nothing else.
+**Where a split function kept its order.** `CC.Scene.render`, `CC.Palette.build`, `CC.Details.build`, `CC.Structure.build` and `CC.TraitRoll.placeOne` were cut into stages (D323). Each builds one state object and calls its stages in order, and that is all it does, so the order of the passes can be read straight off it. A stage takes the fields it needs as local names and writes back what a later stage reads. The state is `st`, except in the scene, where it is `sc`.
 
-- **`gen/terrain.js`** — the generic angular field generator (D15). Not a crust
-  feature: any layer may attach one via `relief`, which is what lets the same
-  code produce continents, a moon's cratered plains, a star's granulation and
-  a gas giant's buried rocky floor. Wired for the planet only in Phase 3.
-- **`draw/primitives.js`** — one function per element primitive, all with the
-  signature `(ctx, view, el, style)`. Contains **no role or archetype names**;
-  dispatch goes through its `KINDS` table.
+**Three exceptions, each because something is read while a file loads rather than when it is called:**
 
-- **`gen/zones.js`** — the angular-zone primitive. Owns **all** zone logic;
-  `draw/` may call it but contains none. Terrain was already a pure function of
-  angle, so zones multiply into the field without restructuring, exactly as D15
-  predicted. See [PROGRESS.md](PROGRESS.md) D23.
+- `data/archetypes/solid-film.js` and `solid-moon-film.js` load *before* `solid.js` and `solid-moon.js`, under their own namespaces (`CC.PlanetFilm`, `CC.MoonFilm`), because an archetype reads their tables as it registers.
+- `gen/stats/stellar-derive.js` loads before `stellar.js`, whose template reads it.
+- `ui/gather.js` and `ui/sync.js` came out of `main.js` but load before it, under their own namespaces (`CC.Gather`, `CC.Sync`), because `main.js` is the file that starts the app.
 
-Notes on what is still to come:
-- **`data/presets.js`** — named control-value sets; pure data, no logic
+### Where each pipeline stage starts
+
+| Stage | Entry | Namespace |
+|---|---|---|
+| Structure | `gen/structure.js` | `CC.Structure` |
+| Traits | `gen/traitroll.js` | `CC.TraitRoll` |
+| Colour | `gen/palette.js` | `CC.Palette` |
+| Detail | `gen/details.js` | `CC.Details` |
+| Stats and text | `gen/stats/registry.js` | `CC.Stats` |
+| Render | `draw/scene.js` | `CC.Scene` |
+| Controls to pipeline | `ui/gather.js` | `CC.Gather` |
+
+### Notes on what exists
+
+- **`draw/scene.js`** is the draw-order spine. Later stages slot into it rather than being called from `main.js`.
+- **`gen/elemgen.js`** holds the size-tier system and the builder registry, with the shapes themselves in `elemgen-basic.js`, `elemgen-mosaic.js` and `elemgen-family.js`, and in feature files such as `gen/cellgrid.js`. `elemgen` is *how* an element is built, `details` is *which* elements a body gets. The trait stage calls the same builders, so a trait's `element` selects from exactly the same list a layer detail does.
+- **Trait instances have no drawing file of their own.** They are ordinary elements carrying a `trait` id, drawn through `draw/details.js` like everything else, which is the point of keeping the primitive list small. Only their *draw order* differs, and that lives in the `draw/scene*.js` files.
+- **`draw/primitives.js`** is the element primitive library: one function per primitive, all with the signature `(ctx, view, el, style)`. It contains **no role or archetype names**; dispatch goes through its `KINDS` table, and `draw/primitives/` adds to that table.
+- **`gen/terrain.js`** is the generic angular field generator (D15). It is not a crust feature: any layer may attach one via `relief`, which is what lets the same code produce continents, a moon's cratered plains, a star's granulation and a gas giant's buried rocky floor.
+- **`gen/zones.js`** is the angular-zone primitive, with `zonegeom.js` and `zoneswell.js` beneath it. They own **all** zone logic; `draw/` may call them but contains none. Terrain was already a pure function of angle, so zones multiply into the field without restructuring, exactly as D15 predicted. See D23.
+- **A built feature is usually two files of one name**, `gen/x.js` deciding what is there and `draw/x.js` or `draw/primitives/x.js` drawing it: `bore`, `engines`, `conduits`, `capacitors`, `shaftdoors`, `overgrowth`, `caves`, `dyson`, `ringworld` and others.
+- **Value noise and periodic angular noise** live in `core/rng.js`, since they are seeded generators like everything else in it, and **the lock system** is part of `ui/controls.js`, which is where the controls it locks are bound.
+- **`test/sheet.mjs`** renders 24 randomized bodies to one contact sheet, because harmony and density are properties of the *spread* of outputs and single renders mislead badly. See below.
 
 ---
 
@@ -723,7 +790,7 @@ contact sheet to see it.
 | `npm run shots` | Parameter sweeps, one PNG per setting. For checking a specific control |
 | `npm run film` | The frosting: whole discs, rim crops, and its colour against the rock |
 | `npm run zones` | Angular zones: the Lock strength sweep as whole discs, a gallery of locked worlds, one disc per trait, plus the numbers behind each |
-| `npm test` | Invariants: determinism, resolution independence, layer independence, colour guardrails, zone and trait contracts |
+| `npm test` | Facts, not looks: the specs still describe the code, every control drives a render, no NaN geometry, determinism, resolution independence. See [PROGRESS.md](PROGRESS.md) § Test suite |
 
 **Judge zones on whole bodies, large.** A terminator is a property of a
 hemisphere, so it cannot be assessed on a contact sheet — and a trait's
@@ -731,9 +798,7 @@ visibility is answered by *how many pixels it changes against an otherwise
 identical body*, which is one number rather than an argument. Both of those
 found defects that an hour of looking at renders had not.
 
-Where a visual rule can be stated numerically, it belongs in `test/sweep.mjs`
-as an assertion rather than as advice — the colour guardrails above are all
-enforced there, because none of them is obvious from reading the code.
+A numeric threshold on how something looks is still an opinion, so it does not become a test: the checks that held them were deleted in Session J, and the colour rules above now live in the palette code. A check earns its place only if it is mechanically true-or-false and generic over the archetypes.
 
 ---
 

@@ -31,8 +31,8 @@ The architecture is designed so later phases slot in without rework: archetypes 
 | 9a — The `machine-world` archetype | ✅ (Session Z) | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
 | 8 — Overlay, scale, polish | ✅ (Session AA; framing built early, Session I) | [roadmap/phase-8-polish.md](roadmap/phase-8-polish.md) |
 | 9b — Megastructure traits | ✅ (Sessions AB–AG) | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
-| **9c — Final clean-up pass** | 🔶 **under way** (AH–AN) | [roadmap/phase-9c-cleanup.md](roadmap/phase-9c-cleanup.md) |
-| 10 — Release | ⬜ | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
+| 9c — Final clean-up pass | ✅ (Sessions AH–AN) | [roadmap/phase-9c-cleanup.md](roadmap/phase-9c-cleanup.md) |
+| **10 — Release** | ⬜ **next** (Session AO) | [roadmap/phase-9-10.md](roadmap/phase-9-10.md) |
 
 **The rows are in build order, not number order** (D246). The phase numbers are kept so existing references stay valid.
 | Out of scope, risk notes, session boundaries | | [roadmap/scope-and-risk.md](roadmap/scope-and-risk.md) |
@@ -41,7 +41,7 @@ The architecture is designed so later phases slot in without rework: archetypes 
 
 ## Current status
 
-**Phases 0–8, 9a and 9b are complete**, along with the climate system (Session F) and framing (Session I, pulled forward from Phase 8). **Next: 9c, the final clean-up pass**, under way from a checklist (Session AH, D307).
+**Phases 0–8, 9a, 9b and 9c are complete**, along with the climate system (Session F) and framing (Session I, pulled forward from Phase 8). **Next: 10, the release.**
 
 **Phase 7 is complete:**
 
@@ -55,7 +55,7 @@ The architecture is designed so later phases slot in without rework: archetypes 
 1. ✅ **9a — the `machine-world` archetype first**, so the polish pass covers every body type that will ship. Done in Session Z (D248–D281, [session-z-machine-world.md](progress/session-z-machine-world.md)).
 2. ✅ **8 — overlay, scale bar, polish**, including the per-type stat templates, over the full set of archetypes. Done in Session AA (D282–D288, [session-aa-polish.md](progress/session-aa-polish.md)): the layer-name overlay, the scale bar, the stat-template pass, persistence and Reset to defaults, the full keyboard map.
 3. ✅ **9b — megastructure traits.** Audited and the list set by the user in Session AB (D289–D290); built one family per session, AC–AF; closed in Session AG with the black hole's lensing, three presets and the unfinished Dyson shell (D304–D306). See [progress/session-ab-megastructures.md](progress/session-ab-megastructures.md) and [progress/session-ag-close-9b.md](progress/session-ag-close-9b.md).
-4. **9c — a final clean-up pass**, so everything lands together.
-5. **10 — release.** The user's release-prep prompt is [RC prompt to make releases easier.md](RC%20prompt%20to%20make%20releases%20easier.md). Releasing later is fine: machine worlds and megastructures are intended parts of the generator, not extras.
+4. ✅ **9c — a final clean-up pass**, so everything lands together. Audited in Session AH (D307–D308) and worked through a checklist, AI–AN: the bugs and picture decisions, the eye lists, the unbuilt controls and spec drift, every file over 500 lines split with no pixel changed, and the docs. See [roadmap/phase-9c-cleanup.md](roadmap/phase-9c-cleanup.md).
+5. **10 — release.** The user's release-prep prompt is [RC prompt to make releases easier.md](RC%20prompt%20to%20make%20releases%20easier.md), and the session prompt built on it is at the end of [session-an-close-9c.md](progress/session-an-close-9c.md). Releasing later is fine: machine worlds and megastructures are intended parts of the generator, not extras.
 
 Finished planning docs (the Phase 6 polish docs, the Phase 7 prompt, the asteroid overhaul, the climate plan) are in [archive/](archive/). They are records of design reasoning, not open work.

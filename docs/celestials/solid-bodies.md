@@ -347,9 +347,9 @@ that declares neither behaves exactly as before.
 
 > **Adjacency is judged at the edges that touch.** Once a layer carries a
 > gradient, its base colour is no longer what meets its neighbour — the outer
-> core meets the inner core with its *hot* edge. Both the palette's separation
-> pass and the sweep's muddiness check compare `hotEdge` where present, or they
-> would be asking about a boundary that is not on screen.
+> core meets the inner core with its *hot* edge. The palette's separation
+> pass compares `hotEdge` where present, or it would be asking about a boundary
+> that is not on screen.
 
 `secondaryRel: "complement"` — a warm core against a cool crust reads well.
 
@@ -375,7 +375,7 @@ dead in both its shape and its colour without needing a trait to say so.
 
 ### Layer details (always drawn)
 
-Counts below are the **shipped** figures from `js/data/elements.js`, given as
+Counts below are the **shipped** figures from `js/data/elements/solid.js`, given as
 the range from Detail density 0 to 1. They run well above the original spec,
 which was written against much thinner layers — see the note after the table.
 

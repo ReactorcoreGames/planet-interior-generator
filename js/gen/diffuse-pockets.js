@@ -38,7 +38,7 @@
  *               stamped as `hueShift` (an off-hue pocket of gas)
  *   paint       [[h, s, v], ...] liveries, one per pocket, no two pockets
  *               alike while the list lasts; stamped as `paint: {h, s, v}`
- *               (draw/details.js hullFill)
+ *               (draw/details-gas.js hullFill)
  *   round       chance a pocket ignores `stretch` and is a rounder field
  *               (stretch 1 to 1.5) — a belt that is sometimes a patch
  *   oval        chance a pocket is a FIELD rather than a belt: round to oval
@@ -318,7 +318,7 @@ var CC = CC || {};
       if (pk.hue !== undefined) el.hueShift = pk.hue;
       if (pk.paint) el.paint = pk.paint;
       if (trait.elongate !== undefined) el.elongate = trait.elongate;
-      /* A built thing dimmed — a derelict's dead hull (draw/details.js
+      /* A built thing dimmed — a derelict's dead hull (draw/details-gas.js
        * hullFill). */
       if (trait.dim !== undefined) el.dim = trait.dim;
       /* A lane's width against its length (draw/primitives/diffuse.js). */

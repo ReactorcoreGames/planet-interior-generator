@@ -91,7 +91,7 @@ var CC = CC || {};
          *
          * Its thickness is also what every `sizeRel` storm is measured
          * against, so this range and the storm sizes in
-         * js/data/traits/gaseous.js move together. */
+         * js/data/traits/gaseous-weather.js move together. */
         /* A NARROW RANGE ON PURPOSE. Its thickness is what every `sizeRel`
          * storm is measured against, so a range that can roll 0.07 or 0.27
          * means the same authored storm size draws four times larger on one

@@ -7,7 +7,7 @@
  * counter-rotating jets are `arrow` and `flow-line` with `zonal`; everything
  * else is the existing speckle/arc/cell/blob vocabulary at gaseous
  * proportions. That was the point of Phase 5 — see
- * js/data/archetypes/gaseous.js.
+ * js/data/archetypes/gaseous-common.js.
  *
  * The registry must load before this file. */
 

@@ -9,7 +9,7 @@
  *              rim and a lit crescent on its upper left
  *   vent       the scoring pressed into the lid: a cross, a Y or a K
  *
- * The conduits' machined metal (draw/details.js hullFill), so the board's
+ * The conduits' machined metal (draw/details-gas.js hullFill), so the board's
  * hardware reads as one fit-out. Below a few pixels across, only the sleeve
  * and lid. Pixels enter only through `view`.
  *

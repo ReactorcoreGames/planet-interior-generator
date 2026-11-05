@@ -32,7 +32,7 @@ var CC = CC || {};
   /* Shortest signed hue rotation from `from` to `to`, in degrees. Lets a
    * colour be pulled a FRACTION of the way toward another without travelling
    * the long way round the wheel — the same reasoning as gen/palette.js's
-   * mixHue and draw/film.js's hueBlend. */
+   * mixHue and draw/film-zones.js's hueBlend. */
   function shortestTo(from, to) {
     var d = (to - from) % 360;
     if (d > 180) d -= 360;

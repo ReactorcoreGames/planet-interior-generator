@@ -134,7 +134,7 @@ function report(seed, over = {}) {
   const r = terrain.range();
   const span = Math.max(1e-6, r.hi - r.lo);
 
-  /* Mirror draw/film.js's zoneWeights so the split reported is the split
+  /* Mirror draw/film-zones.js's zoneWeights so the split reported is the split
    * drawn. Kept in step by hand; the constants are read from CC.Film where
    * they are exported. */
   const SNOWLINE = 0.42, SHELF = -0.16, BLEND = 0.13;

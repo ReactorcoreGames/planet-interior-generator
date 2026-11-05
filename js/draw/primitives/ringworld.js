@@ -15,7 +15,7 @@
  *
  * Every count is body-space (segments round the ring, not pixels), so the
  * call count is the same at every zoom and resolution; only line widths and
- * light radii floor. Metal is hullFill's (draw/details.js).
+ * light radii floor. Metal is hullFill's (draw/details-gas.js).
  *
  * draw/primitives.js must load first. */
 

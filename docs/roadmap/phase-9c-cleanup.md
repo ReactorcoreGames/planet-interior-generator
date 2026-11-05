@@ -34,7 +34,7 @@ A crop render per item; the user says keep or change. The user is generally sati
 - [x] **Y** (D316: a cream white point, the wind reads Detail density; hot patches kept): the blackbody white point at Surface heat ~0.5; hot-patch size and count; pulsar-wind wisps not reading Detail density
 - [x] **D286's card notes** (D317: the nebula fallback reworded, `hiddenOcean`, the shell breaks up): the nebula's Navigation and Biggest danger repeating each other; the ice moon's "Nothing of obvious value" over its hidden ocean; the ice shell drawn at full weight whatever its presence strength
 
-## AK — the unbuilt controls and the spec drift
+## AK — the unbuilt controls and the spec drift ✅
 
 - [x] **Tertiary hue** (D318: built as an offset, with `hides` on the archetype): build or strike
 - [x] **Accent hue** (D319: built as an offset; Randomize now honours a profile's hue range): the machine world's accent colour exists (D252) with no control; build the slider or strike
@@ -43,9 +43,11 @@ A crop render per item; the user says keep or change. The user is generally sati
 - [x] The defaults table's **Composition ⬜ P8** row struck (D286 removed it)
 - [x] **The preset tables** against `js/data/presets*.js`: drop Coreless Giant and Superionic Ice Giant or mark them unbuilt; add Ringed, Industrial, Ice Giant, Diamond Sea, Prismatic, the four moon, three asteroid and nebula presets under their real names; the stale ⬜ P7 rows replaced
 - [x] **Stale comments**: `js/draw/scene.js` header (overlay is step 7, scale bar 8, no "[Phase 8]"), `js/ui/infopanel.js` (Composition), `js/draw/card.js` (Standard 9 lines, Full 15), `js/gen/stats/solid.js` (the asteroid has its own template); MACHINE-WORLDS.md's "surface-city grid" example
-- [ ] `npm test` passes; commit
+- [x] `npm test` passes; commit
 
-## AL — the eighteen straightforward splits
+## AL — the eighteen straightforward splits ✅
+
+*Done ([session-al-splits.md](../progress/session-al-splits.md), D322): every row split, byte-identical across 310 renders. Where a row did not fit the code, that log says what was done instead; the table below is the plan as written.*
 
 Move code, change no pixel. Before the first split, render a fixed set (every archetype × 3 seeds × with/without traits, plus the presets) and keep the PNGs; after each split, render again and compare byte for byte. Keep `index.html`'s script order honest (a file's dependencies load before it), and `npm test` after each.
 

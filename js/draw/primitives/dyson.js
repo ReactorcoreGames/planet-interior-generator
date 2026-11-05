@@ -9,7 +9,7 @@
  *                 An unfinished shell skips the cells in its gaps, breaks
  *                 its rails there, and runs bare rail stubs into them
  *
- * Metal is hullFill's (draw/details.js). Every part is drawn at every size
+ * Metal is hullFill's (draw/details-gas.js). Every part is drawn at every size
  * and every count is body-space, so the call count is the same at every
  * zoom and resolution; only line widths and light radii floor.
  *

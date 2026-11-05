@@ -12,7 +12,7 @@
  *   ends      a junction box at each end with a status light, the accent
  *             mostly, sometimes cold white (draw/shellwalls.js lightHsv)
  *
- * Machined metal (draw/details.js hullFill) rather than the band's own
+ * Machined metal (draw/details-gas.js hullFill) rather than the band's own
  * colour: a run passes through several layers and must read as one thing
  * in all of them. Pixels enter only through `view`.
  *

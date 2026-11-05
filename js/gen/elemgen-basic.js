@@ -377,7 +377,7 @@ var CC = CC || {};
          * `element` field a lie for any ring that wanted a different one. A
          * giant's `ringlet-system` asks for `ringlet-band`, which is a
          * genuinely different object (resolved ringlets, knife-edge
-         * divisions, the body's shadow); see draw/primitives/orbital.js.
+         * divisions, the body's shadow); see draw/primitives/orbital-rings.js.
          *
          * IT IS `recipe.kind`, NOT `recipe.element`. A trait's `element` has
          * already been renamed to `kind` by the time gen/traitroll.js hands

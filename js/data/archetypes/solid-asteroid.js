@@ -223,7 +223,7 @@ var CC = CC || {};
          * band has an inside and an outside rather than reading as an outline. */
         "outer-shell": { sat: [0.05, 0.25], val: [0.20, 0.45],
                          depthGradient: 0.72 },
-        /* THE MOSAIC'S GROUND. `mosaicFill` in draw/details.js fans 2-4
+        /* THE MOSAIC'S GROUND. `mosaicFill` in draw/details-mosaic.js fans 2-4
          * material tones out of this one colour, so this is the CENTRE of the
          * fan — which is what keeps the Primary hue control moving the body.
          * Wide value range: carbonaceous lump at one end, bright stony body at

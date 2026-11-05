@@ -6,7 +6,7 @@
  * edit to a data file and nothing else.
  *
  * ONE FILE PER FAMILY. This file holds the API and the shared documentation of
- * the data format; `solid.js`, `gaseous.js` and their successors hold the
+ * the data format; `solid.js`, `gaseous-common.js` and their successors hold the
  * bodies themselves and call `register()`. The split happened at Phase 5 when
  * the single file passed 600 lines — the ≤500-line rule in CLAUDE.md — and it
  * is also the shape that makes "a new family is a data edit" literally true:

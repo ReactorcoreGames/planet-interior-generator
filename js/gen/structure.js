@@ -335,12 +335,12 @@ CC.Structure = (function () {
         /* HOW ANGULAR THE WOBBLE IS, as opposed to how large. A boundary that
          * got its shape by fracturing has flat faces meeting at corners rather
          * than a smooth undulation, and no amount of amplitude produces that
-         * from fBm — see `boundaryFn` in draw/layers.js. 0 on every layer that
+         * from fBm — see `boundaryFn` in draw/boundary.js. 0 on every layer that
          * does not ask, which is all of them but the asteroid's. */
         boundaryFacet: spec.boundaryFacet || 0,
         /* WHOSE SHAPE THIS BOUNDARY WEARS. Names another role, so two
          * boundaries on the same broken fragment rise and fall together and
-         * cannot cross. See `boundaryFn` in draw/layers.js. */
+         * cannot cross. See `boundaryFn` in draw/boundary.js. */
         boundaryShare: spec.boundaryShare || null,
         /* How many lobes the wobble puts round the body. See `boundaryFn`. */
         boundaryFreq: spec.boundaryFreq || 0,

@@ -357,7 +357,8 @@ var CC = CC || {};
   }
 
   CC.Primitives.register({
-    /* All three exist because no existing primitive could say what the thing
+    /* It exists, as the two in stellar-spots.js do, because no existing
+     * primitive could say what the thing
      * IS — a loop anchored at both ends, a magnetically-structured dark patch,
      * and a closed cell with a rising and a sinking flank. See each function's
      * note (D76, D80). */

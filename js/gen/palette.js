@@ -195,7 +195,7 @@ CC.Palette = (function () {
     var contrast = params.contrast === undefined ? 1 : params.contrast;
     var heat = params.interiorHeat === undefined ? 0.5 : params.interiorHeat;
 
-    /* THE STAR'S LIGHT, read from the same table gen/climate.js builds the
+    /* THE STAR'S LIGHT, read from the same table gen/climate-baseline.js builds the
      * temperature baseline from. One definition of what a blue giant is,
      * rather than two that can drift apart.
      *

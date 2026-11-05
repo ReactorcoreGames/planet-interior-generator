@@ -146,7 +146,7 @@ CC.ZoneGeom = (function () {
   /* Weight of every zone at one angle, summing to 1.
    *
    * ONE FUNCTION, N OVERLAPPING RAMPS — deliberately the same shape as
-   * draw/film.js's `zoneWeights`, because both answer "how much of each kind
+   * draw/film-zones.js's `zoneWeights`, because both answer "how much of each kind
    * is here" and both must produce gradients rather than steps. Each zone's
    * weight falls off from 1 at its centre to 0 at `blend` past its own edge;
    * normalizing at the end makes the sum exactly 1 without the ramps having to

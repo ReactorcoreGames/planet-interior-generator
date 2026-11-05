@@ -121,7 +121,7 @@ This is what stops megastructures being a bolted-on layer. The spec's table here
 ### For gas giants and ice giants
 
 **Built (Phase 9b, Session AD, D296).** Three traits, gated on `gaseous`. The
-two older ones are in `js/data/traits/gaseous.js`; the new one is declared in
+two older ones are in `js/data/traits/gaseous-built.js`; the new one is declared in
 `js/data/traits/giant-built.js`, built by `js/gen/giantbuilt.js` and drawn by
 `js/draw/primitives/giant-built.js`, ONE element rolled by its builder (Detail
 density does not change it). Lowest first:

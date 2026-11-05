@@ -48,7 +48,7 @@
  *
  *   bandWidth  how thick each band is. For an ALTERNATING comb this is a
  *              fraction of the band's own SPACING, not of the layer: see
- *              gen/elemgen.js's buildBands for why, and for the failure that
+ *              gen/elemgen-basic.js's buildBands for why, and for the failure that
  *              taught it. For a plain set it is a fraction of the layer
  *   alternate  ["lighter", "darker"] — consecutive bands cycle through these
  *              tones. This is the whole of gas-giant banding

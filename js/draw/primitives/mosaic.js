@@ -9,7 +9,7 @@
  *
  * The phase doc's bar is that the interior "reads as broken rock, not as a
  * mosaic pattern laid over a circle", and `CC.Primitives.voronoi` — declared
- * in orbital.js and never called — fails it by construction: it fills each
+ * in orbital-rocks.js and never called — fails it by construction: it fills each
  * cell FLAT. A field of flat polygons in slightly different colours is a
  * stained-glass window. That is a pattern, not a material.
  *
@@ -148,7 +148,7 @@ var CC = CC || {};
 
   /* ---- the primitive ----------------------------------------------------- */
 
-  /* `style` is the rich object built by draw/details.js `mosaicFill`:
+  /* `style` is the rich object built by draw/details-mosaic.js `mosaicFill`:
    *
    *   materials    [{ body }]  one flat colour per material index
    *   seam         the colour of the joint between fragments

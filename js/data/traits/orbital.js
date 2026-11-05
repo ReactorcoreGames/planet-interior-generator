@@ -93,7 +93,7 @@ var CC = CC || {};
      * The two ring families are separated by what they are MADE OF rather
      * than by how they are lit — there is no light source in a cross-section,
      * which is why the shadow that used to do this job was removed (see
-     * draw/primitives/orbital.js).
+     * draw/primitives/orbital-rings.js).
      *
      * A rocky world's ring is pulverised rock and dust: dark, and warm-toned
      * the way regolith is. `darker` is the tone that says that — it steps

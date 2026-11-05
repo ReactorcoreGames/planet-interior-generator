@@ -66,7 +66,7 @@ var CC = CC || {};
    * Ammonia, ammonium hydrosulphide and water condense at different
    * temperatures, so which deck you are looking at is a fact about how much
    * light arrives. The palette already colours the envelope from `chillAt` and
-   * `scorchAt` (see `climateLean` in js/data/archetypes/gaseous.js); this
+   * `scorchAt` (see `climateLean` in js/data/archetypes/gaseous-common.js); this
    * reads the SAME two figures, so the sentence and the colour cannot
    * disagree. That is D42 applied to text: one physical fact, one threshold.
    *
@@ -221,7 +221,7 @@ var CC = CC || {};
   /* ---- day length ------------------------------------------------------ */
 
   /* GIANTS SPIN FAST — that is what drives the banding, and it is why the
-   * climate declaration in js/data/archetypes/gaseous.js keeps `latitude`
+   * climate declaration in js/data/archetypes/gaseous-*.js keeps `latitude`
    * low. A rotation figure that contradicted the bands would be exactly the
    * card-versus-render disagreement this whole stage exists to prevent.
    *

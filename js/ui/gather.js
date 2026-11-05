@@ -29,7 +29,7 @@ CC.Gather = (function () {
       coreBias: (c.get("core-bias") || 0) / 100,
       /* HOW SOLIDLY THE BODY HOLDS TOGETHER. Drives the Voronoi cell count,
        * the cell size, the void fraction and the seam width together — see
-       * buildMosaic in gen/elemgen.js, and the note beside the control in
+       * buildMosaic in gen/elemgen-mosaic.js, and the note beside the control in
        * index.html for why those four are one slider rather than four.
        *
        * It sits in the Structure section and belongs to the DETAIL stage, the
@@ -126,7 +126,7 @@ CC.Gather = (function () {
 
       /* THE BACKGROUND IS A STACK: a base colour, an optional field, and an
        * optional star overlay. `background` names only the FIELD now — stars
-       * ride on top of any of them. See draw/canvas.js drawBackground. */
+       * ride on top of any of them. See draw/background.js drawBackground. */
       background: c.get("background") || "solid",
       backgroundColor: c.get("background-color") || "#05070e",
       backgroundColor2: c.get("background-color2") || "#141a33",

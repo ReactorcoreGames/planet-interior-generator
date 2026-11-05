@@ -117,7 +117,7 @@ var CC = CC || {};
         frac: [0.740, 0.820],
         boundary: "perfect",
         /* A GLOWING SPHERE, NOT A FLAT DISC — the star family's limb
-         * darkening (stellar-common.js LIMB), on the wide fluid band that is
+         * darkening (stellar-limb-data.js LIMB), on the wide fluid band that is
          * most of the face. Not on the crust: multiplied down, the bright
          * rim went a dull grey, which is the opposite of hot. */
         limbDarkening: 0.45

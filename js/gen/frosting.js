@@ -73,7 +73,7 @@ CC.Frosting = (function () {
    *           difference between a poured glaze and a crumbly one
    *
    * ANY COUNT, NOT FOUR. A planet declares four (peak, land, shallow, deep);
-   * a giant's crushed floor declares two. `zoneWeights` in draw/film.js is
+   * a giant's crushed floor declares two. `zoneWeights` in draw/film-zones.js is
    * written against the table's length and the `snow` / `aquatic` flags
    * rather than against four fixed positions, so neither number appears
    * anywhere in the renderer.

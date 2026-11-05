@@ -142,7 +142,7 @@ var CC = CC || {};
    * is the STAR, reflected. A mirror reflecting some independent hue would be
    * a mirror pointed at something else. The exception is the whole idea of the
    * trait, so it is named here rather than left to be rediscovered as a bug:
-   * see `mirrorFill` in draw/details.js, which takes the emitted colour the
+   * see `mirrorFill` in draw/details-star.js, which takes the emitted colour the
    * palette publishes.
    *
    * `style` is a {hull, lit, shade, trim, glass, glow} set — see mirrorFill. */

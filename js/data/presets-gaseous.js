@@ -39,7 +39,7 @@ var CC = CC || {};
      *
      * NOTE ON HUE. A giant's primary hue drives the envelope, and the cloud
      * deck's `climateLean` perturbs it rather than replacing it (see
-     * js/data/archetypes/gaseous.js). So these hues are chosen to be a good
+     * js/data/archetypes/gaseous-common.js). So these hues are chosen to be a good
      * BASE for that perturbation, not to be the colour you end up seeing. */
 
     {

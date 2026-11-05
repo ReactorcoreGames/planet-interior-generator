@@ -14,7 +14,7 @@
  *                spire   a spine through a stack of saucer decks seen
  *                        edge-on, low blocks on each, a mast on top
  *
- * Metal is hullFill's (draw/details.js), lights warm white, as on the
+ * Metal is hullFill's (draw/details-gas.js), lights warm white, as on the
  * planet's ring. Every part is drawn at every size, so the call count is the
  * same at every zoom and resolution; only line widths and light radii floor.
  *

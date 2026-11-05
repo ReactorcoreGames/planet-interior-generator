@@ -1,6 +1,6 @@
 /* Machines — hard-edged built objects that are not pressure hulls.
  *
- * `capsule` (orbital.js) is a pressure hull: rounded, lit across its curve,
+ * `capsule` (orbital-rocks.js) is a pressure hull: rounded, lit across its curve,
  * the shape of something holding air against vacuum or riding a wind. These
  * are the other kind of artificial thing — frames, boxes and tools, built on a
  * body with almost no gravity and no weather, where nothing pushes on a

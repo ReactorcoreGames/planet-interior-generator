@@ -50,7 +50,8 @@
 
 | [session-aj-eye-lists.md](session-aj-eye-lists.md) | D313–D317 — Phase 9c block AJ, the eye lists and the card notes: the asteroid's voids to ~90% at Cohesion 0, glassy ice and a depth shade; its impact basin as a bite out of the form (`biteRoll`, `CC.Form.fn(form, bites)`) and pink-white radioactivity; saturated black-hole discs; a cream neutron-star white point and the pulsar wind reading Detail density (`detail` on trait elements); the nebula's Navigation fallback, a sealed ocean as a resource, and a weak ice shell breaking into leads and floes (`breach: { by: "above" }`) with the card measuring the open water (Session AJ) |
 | [session-ak-controls-drift.md](session-ak-controls-drift.md) | D318–D321 — Phase 9c block AK: the unbuilt controls and the spec drift: the Tertiary and Accent hue offsets, `hides` on an archetype, Randomize inside a body's hue range and across the archetypes, section locks, the preset tables and stale comments |
+| [session-al-splits.md](session-al-splits.md) | D322 — Phase 9c block AL: the eighteen straightforward file splits, byte-identical across 310 renders; the split files attach to the source's namespace; where the table did not fit the code, including `gaseous-built.js` to keep the trait roll's order (Session AL) |
 
 Sessions are listed oldest first. `session-f.md` is a stub left where Session F used to be; it points at the three F files above.
 
-Decision numbers (`D#`) are referenced from code comments and other docs. To find a specific one, `grep -rn "D42" docs/progress/` is faster than opening each file. The next free number is **D318**.
+Decision numbers (`D#`) are referenced from code comments and other docs. To find a specific one, `grep -rn "D42" docs/progress/` is faster than opening each file. The next free number is **D323**.

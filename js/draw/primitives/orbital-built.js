@@ -14,7 +14,7 @@
  *                  light at each muzzle; each satellite a box between two
  *                  cyan panels
  *
- * Metal is hullFill's (draw/details.js): a manufactured object keeps its own
+ * Metal is hullFill's (draw/details-gas.js): a manufactured object keeps its own
  * grey whatever the world below is. Lights are warm white. Every part is
  * drawn at every size — no collapse below a pixel threshold — so the call
  * count is the same at every zoom and resolution; only line widths floor.

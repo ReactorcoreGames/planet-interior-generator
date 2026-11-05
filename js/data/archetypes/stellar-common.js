@@ -229,7 +229,7 @@ var CC = CC || {};
       /* THE ENTIRE JOB HERE IS AMPLITUDE, NOT MACHINERY.
        *
        * A chromosphere already wobbled — it is an ordinary banded layer
-       * declaring `boundary: "slight"`, so `layers.js` `boundaryFn` has been
+       * declaring `boundary: "slight"`, so `boundary.js` `boundaryFn` has been
        * shaping it all along. What it lacked was any relation between the
        * amplitude and the layer's own size: `slight` is 0.010 of the BODY
        * radius, against a fringe roughly 0.04 thick, so the ripple was a

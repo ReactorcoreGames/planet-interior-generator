@@ -234,7 +234,7 @@ CC.Form = (function () {
 
   /* ---- mosaic sites on a warped body -----------------------------------
    *
-   * The mosaic's polar lattice (gen/elemgen.js `buildMosaic`) is uniform per
+   * The mosaic's polar lattice (gen/elemgen-mosaic.js `buildMosaic`) is uniform per
    * unit area BEFORE the warp. After it, every cell on a bearing is scaled by
    * the form there, so a narrow side came out with cells half the size of the
    * long ends' — measured on the sheet as a crowd of tiny fragments on one

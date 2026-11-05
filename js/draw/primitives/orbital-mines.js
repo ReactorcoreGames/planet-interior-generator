@@ -6,7 +6,7 @@
  *               a small red light
  *
  * Every mine is turned the same way to its own radial, so the field reads
- * as laid rather than drifting. Metal is hullFill's (draw/details.js). The
+ * as laid rather than drifting. Metal is hullFill's (draw/details-gas.js). The
  * same calls at every size, so zoom cannot change the count. Pixels enter
  * only through `view`.
  *

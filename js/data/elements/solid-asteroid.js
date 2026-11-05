@@ -85,7 +85,7 @@ var CC = CC || {};
          * `count` is the CELL COUNT rather than an instance count — the mosaic
          * is one element carrying every site, because a Voronoi cell has no
          * shape of its own and is defined entirely by its neighbours. See
-         * buildMosaic in gen/elemgen.js.
+         * buildMosaic in gen/elemgen-mosaic.js.
          *
          * THE RANGE IS THE SPEC'S 40-200, AT COHESION 0. The spec's figure is
          * a cell count for the body, and Cohesion then scales it down toward a

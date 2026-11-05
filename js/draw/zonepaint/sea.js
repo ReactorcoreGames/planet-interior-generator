@@ -56,7 +56,7 @@ var CC = CC || {};
   /* How far below freezing a bearing must be before the sea is ice ALL THE WAY
    * DOWN rather than a shelf over water.
    *
-   * KEYED TO THE TEMPERATURE FLOOR, NOT TO ZERO. `gen/climate.js` holds a
+   * KEYED TO THE TEMPERATURE FLOOR, NOT TO ZERO. `gen/climate-baseline.js` holds a
    * `VOID_FLOOR` of 0.04 — a body in the deep void keeps a trace of residual
    * warmth, and a temperature pinned at exactly 0 would make every ratio
    * downstream degenerate. The consequence here is that `amt` can never reach
@@ -70,7 +70,7 @@ var CC = CC || {};
    * threshold that never fires. */
   /* DERIVED FROM THE TEMPERATURE FLOOR, never hardcoded against 1.0.
    *
-   * `gen/climate.js` holds a `VOID_FLOOR` — a body in the deep void keeps a
+   * `gen/climate-baseline.js` holds a `VOID_FLOOR` — a body in the deep void keeps a
    * trace of residual warmth, because a temperature pinned at exactly 0 makes
    * every ratio downstream degenerate. The consequence here is that `amt` can
    * NEVER reach 1.0: at the coldest temperature the field can produce it tops

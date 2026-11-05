@@ -19,7 +19,7 @@
  * data/archetypes/ and gen/stats/ already use — a registry plus one file per
  * group. The single file reached 1373 lines, well past the 500-line rule, and
  * the seam it wanted was obvious: the primitives below are what a body is made
- * of INSIDE its silhouette, and everything in primitives/orbital.js is either
+ * of INSIDE its silhouette, and everything in primitives/orbital-*.js is either
  * beyond the body or belongs to a specific family.
  *
  * THE DISPATCH TABLE IS OWNED HERE AND EXTENDED BY THE OTHERS. `register()`

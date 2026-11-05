@@ -47,8 +47,8 @@ Each specifies: standard layer stack, colour profile, layer details, eligible tr
 | Folder | Contents |
 |---|---|
 | [progress/](progress/) | The decisions log (D1 onward), one file per session. [progress/README.md](progress/README.md) is the index; [progress/checklist.md](progress/checklist.md) is the ticked build checklist |
-| [roadmap/](roadmap/) | The per-phase plan files that [ROADMAP.md](ROADMAP.md) indexes |
-| [archive/](archive/) | Finished planning docs and superseded material — the Phase 6 polish docs, the Phase 7 prompt, the asteroid overhaul plan, the climate plan, v2 design notes, and the user's WIP notes. Kept for the reasoning they carry, not as open work |
+| [roadmap/](roadmap/) | What is still live from the plan: the climate foundation, scope and risk notes, and the release checklist until the trailer is done |
+| `old wip/` (repo root, gitignored) | Finished planning docs, finished phase files and old versions. Kept for the reasoning they carry, not as open work; in git history up to commit 302550a |
 
 ---
 

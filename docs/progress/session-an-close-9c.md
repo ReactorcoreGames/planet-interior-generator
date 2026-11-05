@@ -1,6 +1,6 @@
 # Session AN — closing Phase 9c
 
-*Phase 9c, block AN, and the user's release decisions, D324–D328. Checklist: [phase-9c-cleanup.md](../roadmap/phase-9c-cleanup.md). Docs only: no file in `js/`, `index.html`, `style.css` or `lib/` changed.*
+*Phase 9c, block AN, and the user's release decisions, D324–D328. Checklist: [phase-9c-cleanup.md](../../old%20wip/docs-roadmap/phase-9c-cleanup.md). Docs only: no file in `js/`, `index.html`, `style.css` or `lib/` changed.*
 
 ## The result
 

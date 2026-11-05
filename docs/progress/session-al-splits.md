@@ -1,6 +1,6 @@
 # Session AL — the eighteen straightforward splits
 
-*Phase 9c, block AL. D322. Checklist: [phase-9c-cleanup.md](../roadmap/phase-9c-cleanup.md). Move code, change no pixel.*
+*Phase 9c, block AL. D322. Checklist: [phase-9c-cleanup.md](../../old%20wip/docs-roadmap/phase-9c-cleanup.md). Move code, change no pixel.*
 
 ## The result
 

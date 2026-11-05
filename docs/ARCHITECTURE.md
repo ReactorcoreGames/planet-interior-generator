@@ -728,7 +728,7 @@ test/       the suite:  doccheck.mjs  domtest.mjs  stubcanvas.mjs
             renders:    sheet.mjs  shots.mjs  climate.mjs  film.mjs  framing.mjs  zones.mjs
             (dev only, never shipped; test/_tmp/ holds throwaway probes, gitignored)
 docs/       the spec set
-dist/  shots/  archive/   generated or old; gitignored
+dist/  shots/  old wip/  generated or old; gitignored
 ```
 
 Load order follows dependency order: `core` → `data` → `gen` → `draw` → `ui` → `main`.

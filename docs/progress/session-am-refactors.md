@@ -1,6 +1,6 @@
 # Session AM — the five stage refactors
 
-*Phase 9c, block AM. D323. Checklist: [phase-9c-cleanup.md](../roadmap/phase-9c-cleanup.md). Move code, change no pixel.*
+*Phase 9c, block AM. D323. Checklist: [phase-9c-cleanup.md](../../old%20wip/docs-roadmap/phase-9c-cleanup.md). Move code, change no pixel.*
 
 ## The result
 

@@ -188,7 +188,7 @@ assumed.
 
 ### Phase 9c — final clean-up pass ✅ (Sessions AH–AN)
 
-The ticked items, block by block, are in [phase-9c-cleanup.md](../roadmap/phase-9c-cleanup.md).
+The ticked items, block by block, are in [phase-9c-cleanup.md](../../old%20wip/docs-roadmap/phase-9c-cleanup.md).
 
 - [x] **AH** the audit, and 9c split into sessions (D307–D308)
 - [x] **AI** the bugs and the picture decisions (D309–D312)
@@ -197,6 +197,12 @@ The ticked items, block by block, are in [phase-9c-cleanup.md](../roadmap/phase-
 - [x] **AL** the eighteen straightforward file splits, no pixel changed (D322)
 - [x] **AM** the five stage refactors, no pixel changed (D323)
 - [x] **AN** the file layout from the real tree, 9c marked complete, the Phase 10 prompt
+
+### Phase 10 — the release ✅ (Session AO)
+
+The ticked steps are in [phase-10-release.md](../roadmap/phase-10-release.md).
+
+- [x] **AO** Help and v4.0, `LICENSE`, the text, `promo/`, the zips, the clean-up (D329–D337)
 
 ### Phase 9b — megastructure traits on natural bodies ✅ (Sessions AB–AG)
 
@@ -298,7 +304,7 @@ The ticked items, block by block, are in [phase-9c-cleanup.md](../roadmap/phase-
 
 ### Asteroid overhaul, on and in the rock ✅ (Session U2)
 
-[session-u2-asteroid-interior.md](session-u2-asteroid-interior.md) — D193–D204. The second half of [ASTEROID-OVERHAUL.md](../archive/ASTEROID-OVERHAUL.md). **The body U1 built was not touched, and no other body changed**: non-asteroid renders hash identically to HEAD.
+[session-u2-asteroid-interior.md](session-u2-asteroid-interior.md) — D193–D204. The second half of [ASTEROID-OVERHAUL.md](../../old%20wip/docs-archive/ASTEROID-OVERHAUL.md). **The body U1 built was not touched, and no other body changed**: non-asteroid renders hash identically to HEAD.
 
 - [x] **a layer may answer a trait with its own marks** (D193) — `absorbs` on a layer: "Heavily Cratered" on the asteroid's shell raises the shell's own craters and pits instead of laying a second crater mechanism over them. `cratered` and `impact-basin` anchor to `outer-shell` too; `void-pockets` and `magma-chambers` stay ineligible on purpose
 - [x] **a basin on an unfrosted surface is shaped by its band** (D194) — damage clips to the real band where there is no frosting to reach for, and `traitDepth` lets a layer restate where a trait sits in it
@@ -315,7 +321,7 @@ The ticked items, block by block, are in [phase-9c-cleanup.md](../roadmap/phase-
 
 ### Asteroid overhaul, the body ✅ (Session U1)
 
-[session-u1-asteroid-body.md](session-u1-asteroid-body.md) — D184–D192. The first half of [ASTEROID-OVERHAUL.md](../archive/ASTEROID-OVERHAUL.md). **No other body changed**, checked by hashing renders against the previous commit.
+[session-u1-asteroid-body.md](session-u1-asteroid-body.md) — D184–D192. The first half of [ASTEROID-OVERHAUL.md](../../old%20wip/docs-archive/ASTEROID-OVERHAUL.md). **No other body changed**, checked by hashing renders against the previous commit.
 
 - [x] **a body FORM, applied inside `view.at`** (D184) — elongation, taper, a lobe harmonic and an eccentric centre: the low-order statements noise round a circle cannot make. One warp every boundary, cell and element passes through, so nothing can slide off anything else. Recentred on the shape's own bounding box. Relief halved
 - [x] **a warp must not decide the cell size** (D185) — mosaic sites laid out in warped space on a fine hex lattice thinned by noise, because the polar lattice crowded the narrow side and a plain hex lattice was a honeycomb

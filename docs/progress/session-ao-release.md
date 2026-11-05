@@ -122,3 +122,17 @@ The fourteen in the collages, on a solid `#05070e` background: Planet `fortress-
 **The user tested both** and reported that they work: the browser zip with its root folder on a throwaway draft itch page, and a double-click of `index.html` from an unzipped copy. So both zips keep the root folder and stay identical.
 
 **D336: the itch description uses the ads' wording.** At the user's request, `promo.md`'s long description is rewritten from the copy stamped on the `promo/` images (`test/_tmp/_aobuild.mjs`, `_aocollage.mjs`), following D333: plain headlines and concrete lists instead of the earlier prose and its slogan. The name, subtitle and tags are unchanged.
+
+## Step 6 — the clean-up
+
+**Shown to the user first and approved as listed.** `archive/` is now `old wip/`, and `.gitignore` follows. Moved into it: `docs/archive/` as `docs-archive/`, the old itch description, and the finished phase files as `docs-roadmap/`. Still in `docs/roadmap/`: `climate-foundation.md`, `scope-and-risk.md` and this step's checklist, until the trailer is done. `docs/progress/`, the specs and the RC prompt stay.
+
+**D337: citations of moved plans stay in the code.** Comments in `js/` cite `ASTEROID-OVERHAUL` and `CLIMATE-PLAN` about 45 times, and a few name moved roadmap files. The comments stand on their own, so no shipped file changed; CLAUDE.md says where the citations lead and that the files are in git history up to commit 302550a. Links in the session logs point into `old wip/`, so they work locally and are dead on GitHub.
+
+**Removed to `C:	rash61105-214946-planet-interior-generator-step6\`:** every render except `shots/ao/`, including the 564 MB `shots/al/` reference set, and 158 probes from `test/_tmp/`. Kept there: the `_ao*` scripts for the trailer, the regression kit (`_alstep.sh`, `_albase.mjs`, `_alpage.mjs`, `_allint.*`, `_alcells.json`, `_vboot.mjs`, `_lint/`), and the probes the code names. `shots/ao/` and `_ao*` can go once the trailer is done.
+
+**CLAUDE.md is rewritten for maintenance, and PROGRESS.md's Status block is cut to current state,** since the phase table links the narrative. Phase 10 is marked complete.
+
+### The trailer's prompt
+
+Read CLAUDE.md, docs/PROGRESS.md and docs/progress/session-ao-release.md, then make the YouTube trailer for Celestial Cutaway v4.0. Propose a shot list first, with your recommendation, and reuse the bodies in that log's tables so they match `promo/`. Use the pink highlight `#ff5fa8` for titles (D332) and say plainly what the tool is, what it is for and that images can be used commercially (D333). Anything showing text or the interface comes from real Edge (D331, `test/_tmp/_aoedge.mjs`). Check any new runtime tooling with the user first, since none of it may ship. Add the YouTube copy to `promo.md`: title, description with the user's links, and comma-separated tags. Publishing is the user's. When done, move `docs/roadmap/phase-10-release.md` into `old wip/docs-roadmap/`, fix its links, and move `shots/ao/` and `test/_tmp/_ao*` to `C:	rash`.

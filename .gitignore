@@ -6,7 +6,7 @@ package-lock.json
 # Generated preview renders
 shots/
 
-archive/
+old wip/
 
 # Release output (build_release.bat copies into here; nothing is compiled)
 dist/

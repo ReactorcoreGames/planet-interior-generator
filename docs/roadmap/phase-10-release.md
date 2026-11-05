@@ -74,7 +74,7 @@ The part the user cares most about, judged by looking. This step may well run to
 
 ## Step 6 — the clean-up: the brief's Phase 3
 
-- [ ] Finished
+- [x] Finished
 
 Last, so nothing the earlier steps need has moved (D327). Show the user the list before moving anything.
 

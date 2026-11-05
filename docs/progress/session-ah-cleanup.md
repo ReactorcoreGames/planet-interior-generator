@@ -1,6 +1,6 @@
 # Session AH — Phase 9c: the audit and the plan
 
-*D307–D308. Phase 9c's first session. The audit was brought to the user as a list before anything was touched; the user agreed the order and asked for the pass to be split across several smaller sessions with a checklist, so this session built nothing. The checklist is [roadmap/phase-9c-cleanup.md](../roadmap/phase-9c-cleanup.md).*
+*D307–D308. Phase 9c's first session. The audit was brought to the user as a list before anything was touched; the user agreed the order and asked for the pass to be split across several smaller sessions with a checklist, so this session built nothing. The checklist is [roadmap/phase-9c-cleanup.md](../../old%20wip/docs-roadmap/phase-9c-cleanup.md).*
 
 Scratch tools (in `test/_tmp/`, gitignored): `_ahaudit.mjs` (`presets` renders every preset on seeds p1–p3; `traits` every family with each eligible trait alone plus three six-trait crowds; `composed` one body + Standard card per family; each writes its card text beside the renders, all to `shots/ah/`), `_ahpreids.mjs` (every preset `traits` / `traitsOff` id its archetype does not offer).
 
@@ -44,7 +44,7 @@ U1, U2, V and Y are open (X was closed in Session Y). **The user: generally sati
 
 ## D307 — 9c runs over several sessions, from a checklist
 
-The user asked for the pass to be split so no one chat carries all of it. [roadmap/phase-9c-cleanup.md](../roadmap/phase-9c-cleanup.md) holds the items in the agreed order, one session per block, each ending with the prompt for the next: **AI** the bugs and picture decisions, **AJ** the eye lists and card notes, **AK** the unbuilt controls and spec drift, **AL** the eighteen straightforward splits, **AM** the five stage refactors, **AN** ARCHITECTURE.md's layout and the Phase 10 prompt. The splits come after every change that moves a pixel, so their before/after diffs are taken against a settled picture.
+The user asked for the pass to be split so no one chat carries all of it. [roadmap/phase-9c-cleanup.md](../../old%20wip/docs-roadmap/phase-9c-cleanup.md) holds the items in the agreed order, one session per block, each ending with the prompt for the next: **AI** the bugs and picture decisions, **AJ** the eye lists and card notes, **AK** the unbuilt controls and spec drift, **AL** the eighteen straightforward splits, **AM** the five stage refactors, **AN** ARCHITECTURE.md's layout and the Phase 10 prompt. The splits come after every change that moves a pixel, so their before/after diffs are taken against a settled picture.
 
 ## D308 — Atmosphere *height* stays rolled; its *opacity* is the open lever
 

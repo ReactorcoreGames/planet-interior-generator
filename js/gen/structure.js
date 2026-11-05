@@ -28,7 +28,7 @@ CC.Structure = (function () {
   "use strict";
 
   var M = CC.Math;
-  var clamp = M.clamp, lerp = M.lerp, smoothstep = M.smoothstep;
+  var clamp = M.clamp, lerp = M.lerp;
 
   /* A layer thinner than this in body-space is not worth drawing; it would be
    * a sub-pixel sliver at preview size and a visual artefact at export size. */

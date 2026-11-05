@@ -74,50 +74,94 @@ Generate cross-section cutaways of planets, stars, black holes and more, each wi
 ### Long description
 
 ```markdown
-# Slice open a world. See what's inside.
+# Procedural art of planet interiors
 
-Celestial Cutaway draws detailed cross-sections of planets, stars, black holes, nebulae and whole artificial worlds, from the outer atmosphere down to the core. Press one button for a brand new body, with a card of facts and lore to match. Change anything and the picture redraws straight away.
+Celestial Cutaway is a planetary interior art generator. It generates detailed cross-section illustrations of planets, stars, black holes, nebulae and machine worlds, from the outer sky down to the core. Every result comes with its own fact card.
 
-It's made for worldbuilding, sci-fi stories, tabletop sessions, game maps and anyone who needs a place worth visiting. Most space tools show you the surface. This one asks what's underneath, and how deep you can go.
+Press Randomize for a new body. Change any control and the picture redraws straight away. The browser version is free: press Run above and start rolling.
 
-**Every image you make is yours to use, commercially included, with no credit needed.**
+## Use the images, even commercially
 
-## 14 kinds of body
+- Game assets and backdrops
+- TTRPG handouts and session props
+- Worldbuilding and lore visuals
+- Framed art and wallpapers
+- Backgrounds for posters, video, any media
 
-- **Planet**, **Moon** and **Asteroid**: from garden worlds and frozen dead moons to hollowed-out rocks
-- **Gas giant** and **Ice giant**: storm belts, diamond seas and rings
-- **Young star**, **Main sequence star**, **Old giant star** and **Dwarf star**: flare storms, starspots and shed shells
-- **Neutron star**, **Pulsar** and **Black hole**: accretion discs, and starlight bent around the hole
-- **Nebula**: pillars, dark rifts, hidden stations and mining flotillas
-- **Machine world**: a built planet with reactors, shafts and hull wounds, running or long dead
+**The images are yours. No credit needed.**
 
-## Megastructures and strange worlds
+## Fourteen body types
 
-70 traits change a body in ways you can see at a glance. Wrap a star in a Dyson shell, or leave one half-built. Hang a ringworld in a nebula. Put an orbital ring and space elevators on a planet, or skyhooks and orbital cities above a gas giant. Make it rain diamonds. Force on any trait you like, or ban the ones you don't want.
+Planets, moons, asteroids, gas giants, ice giants, young stars, main sequence stars, old giants, dwarf stars, neutron stars, pulsars, black holes, nebulae and machine worlds. Each one has its own layers, details, traits and presets.
 
-## Every body comes with a story
+## 36 sliders, 58 presets, 70 traits
 
-The info card describes the body you're actually looking at: its size, what's worth mining, how to approach it and its biggest danger. A black hole tells you its point of no return, and a machine world tells you who still lives there. It's written for people rather than astronomers, so you can pick it up and use it straight away.
+- Interior heat, core size, ocean depth
+- Starlight, axial tilt, tidal locking
+- Layer thickness, caverns, cohesion
+- Hue, saturation, brightness, contrast
+- Detail density, texture strength
 
-## Make it yours
+Lock any setting and re-roll the rest. Force a trait on, or ban it so Randomize never picks it.
 
-- **58 presets** to start from, such as Hot Jupiter, Pillars of Creation, Fortress World and Derelict Machine World
-- **36 sliders and 10 dropdowns** for structure, colour and detail
-- **Lock what you like** and re-roll everything else
-- **Zoom and drag** for close-ups of any part of the body
-- **Layer labels and a scale bar**, with size comparisons from a person to the Oort cloud
+## Add megastructures
 
-## Export it
+- Dyson shells, half-built or finished
+- Dyson swarms and orbital mirrors
+- Orbital rings and defence networks
+- Skyhook cities on gas giants
+- Ringworlds inside nebulae
 
-Save PNGs up to 2160 px tall, in 16:9, 1:1, 4:3 or 3:2, with a transparent background if you need one. Export the body with its card, the card alone, a square image of the body, or a text factsheet. The same seed and settings always draw the same body, so copy them as text to keep it or share it.
+Tick them on, or let Randomize pick.
+
+## Machine worlds and worldships
+
+- Derelict, hive, factory or unfinished
+- Hull breaches and bore cannons
+- Engines that turn a world into a ship
+- Power, population and status on its card
+
+## Nebulae and ringworlds
+
+- Cloud, planetary or supernova remnant
+- Emission, reflection or dark
+- Pillars, protostars and filaments
+- Ringworlds with land, seas and a sun
+- Hidden stations and mining flotillas
+
+## A fact card for every body
+
+Written for that exact body. Use it for game stats, story hooks and session notes.
+
+- Name, hazard rating and size
+- Biggest danger
+- Facts that fit its type
+- Export as an image or markdown
+
+## Labelled cutaway diagrams
+
+- Name every layer, left, right or both
+- A scale bar, metres to light-years
+- Size comparison with a familiar object
+
+## Zoom in 20x. Export up to 4K.
+
+- PNG at 720, 1080, 1440 or 2160 px tall
+- 16:9, 1:1, 4:3 or 3:2
+- Solid, gradient, nebula or transparent background
+- Redrawn sharp at every size, never stretched
+
+The same seed and settings always draw the same body, so you can copy them as text to keep it or share it.
 
 Every image is drawn by the tool's own code on your computer, not by an image model. No account, and nothing is uploaded.
 
 ## Free in your browser, or take it offline
 
-**The browser version is free, and it's the whole tool.** Press Run above and start rolling.
+**The browser version is free and is the whole tool.**
 
-**The offline copy is the same tool in a zip**, ready to keep: unzip it, double-click index.html and it runs with no internet and no install. It's yours whatever happens to this page, and buying it is the best way to support my work. The source is also public on GitHub if you'd like to read how it works: https://github.com/ReactorcoreGames/planet-interior-generator
+**The offline copy is the same tool in a zip.** Unzip it, double-click index.html and it runs with no internet and no install. It stays yours whatever happens to this page, and buying it is the best way to support my work.
+
+The source is public on GitHub: https://github.com/ReactorcoreGames/planet-interior-generator
 
 Tested on Firefox. If another browser misbehaves, tell me in the comments and I'll try to fix it.
 

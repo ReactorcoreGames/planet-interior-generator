@@ -64,7 +64,7 @@ The part the user cares most about, judged by looking. This step may well run to
 
 ## Step 5 — the zips: the brief's Phase 2
 
-- [ ] Finished
+- [x] Finished
 
 `build_release.bat` exists and copies a flat `dist/`. It needs the `dist/celestial-cutaway/` root, `LICENSE`, `guide.md` and `promo/`, **but not `promo.md`, which is internal**, then two identical zips, `celestial-cutaway-v4.0.zip` and `celestial-cutaway-v4.0-offline.zip` (D324). It stays a copy with no compile step; PowerShell's `Compress-Archive` adds no dependency. It ends in `pause`, so feed it input when you run it yourself.
 

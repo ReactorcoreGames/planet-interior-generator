@@ -119,4 +119,6 @@ The fourteen in the collages, on a solid `#05070e` background: Planet `fortress-
 
 **The previous `dist/`,** a stale build from 8 October, went to `C:\trash\20261105-192039-planet-interior-generator\`. The bat itself still clears `dist/` with `rmdir` on every run, as it always has, since that folder holds only its own output.
 
-**Waiting on the user:** the browser zip on a throwaway draft itch page, and a double-click of `index.html` from an unzipped copy. The step stays unticked until then.
+**The user tested both** and reported that they work: the browser zip with its root folder on a throwaway draft itch page, and a double-click of `index.html` from an unzipped copy. So both zips keep the root folder and stay identical.
+
+**D336: the itch description uses the ads' wording.** At the user's request, `promo.md`'s long description is rewritten from the copy stamped on the `promo/` images (`test/_tmp/_aobuild.mjs`, `_aocollage.mjs`), following D333: plain headlines and concrete lists instead of the earlier prose and its slogan. The name, subtitle and tags are unchanged.

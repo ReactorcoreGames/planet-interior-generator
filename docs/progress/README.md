@@ -56,7 +56,7 @@
 
 | [session-an-close-9c.md](session-an-close-9c.md) | D324–D328 — Phase 9c closed: ARCHITECTURE.md's file layout from the real tree, checked against `index.html`; the load-order idiom with its three exceptions; stale references to deleted and split files; the user's release decisions (free in the browser and paid offline, a custom licence, v4.0, `old wip/`, branding in Help); and the plan for Phase 10 (Session AN) |
 
-| [session-ao-release.md](session-ao-release.md) | D329– — Phase 10, the release, one section per step. Step 1: Help's real walkthrough, v4.0, the links and the licence wording, stale comments. Step 2: the `LICENSE` (Session AO) |
+| [session-ao-release.md](session-ao-release.md) | D329– — Phase 10, the release, one section per step. Step 1: Help's real walkthrough, v4.0, the links and the licence wording, stale comments. Step 2: the `LICENSE`. Step 3: the text. Step 4: `promo/`. Step 5: the zips (Session AO) |
 
 Sessions are listed oldest first. `session-f.md` is a stub left where Session F used to be; it points at the three F files above.
 

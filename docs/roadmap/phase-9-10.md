@@ -69,7 +69,11 @@ sun-shield to be drawn than "it looks technical".
 
 *Next, Session AO. The brief is the user's [RC prompt to make releases easier.md](../RC%20prompt%20to%20make%20releases%20easier.md); the session prompt built on it is at the end of [session-an-close-9c.md](../progress/session-an-close-9c.md).*
 
-- `build_release.bat` producing a clean `dist/`
-- itch.io packaging (works in an iframe)
-- README with screenshots
-- Example gallery
+**Settled in Session AN (D324–D328):** v4.0, replacing v3.x on the [existing itch.io page](https://reactorcore.itch.io/celestial-cutaway-planet-interior-generator), free in the browser with an identical paid offline zip; a short custom licence; `archive/` renamed `old wip/`; branding in the Help modal only.
+
+- Help finalized, v4.0 throughout, `LICENSE`
+- `README.md`, `guide.md`, `promo.md`
+- A wholly new `promo/`: screenshots, montages and collages, stamped feature screenshots, thumbnail and cover
+- `build_release.bat` producing `dist/celestial-cutaway/` and the two zips
+- The clean-up
+- Afterwards, in its own session: a YouTube trailer
